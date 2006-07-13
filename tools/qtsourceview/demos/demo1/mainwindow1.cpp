@@ -7,27 +7,29 @@
 #include <QMenuBar>
 #include <QStatusBar>
 #include <QToolBar>
-
-#include "mainwindow1.h"
+#include <QMessageBox>
 
 #include "kateitemdatamanager.h"
 #include "qegtklangdef.h"
-#include "qegtklangdef.h"
 #include "qegtkhighlighter.h"
+
+#include "mainwindow1.h"
 
 MainWindow1::MainWindow1(QWidget *parent, Qt::WFlags flags)
     : QMainWindow(parent, flags)
 {
-	QTextEdit              *edit      = new QTextEdit;
-	kateItemDataManager    *defColors = new kateItemDataManager;
-	defColors->load( QApplication::applicationDirPath() + "/../../data/colors/kate.xml" );
-	QeGtkSourceViewLangDef *langCpp   = new QeGtkSourceViewLangDef( QApplication::applicationDirPath() + "/../../data/langs/cpp.lang" );
-	QeGTK_Highlighter      *highlight = new QeGTK_Highlighter( edit, defColors );
-	highlight->setHighlight( langCpp );
+	QString                 dataPath  = QApplication::applicationDirPath() + "/../../";
+	kateItemDataManager    *defColors = new kateItemDataManager( dataPath + "/data/colors/kate.xml" );
+	QeGtkSourceViewLangDef *langCpp   = new QeGtkSourceViewLangDef( dataPath + "/data/langs/cpp.lang" );
 
-	
-	setCentralWidget( edit );
+	// create a new text editor
+	textEditor = new QTextEdit;
+	textEditor->setAcceptRichText(false);
 
+	// assign to it the new syntax highlighter, with the default colors and language
+ 	highlight = new QeGTK_Highlighter( textEditor, defColors, langCpp );
+
+	setCentralWidget( textEditor );
 	setupActions();
 	createMenus();
 	createToolbars();
@@ -70,6 +72,9 @@ void MainWindow1::setupActions()
 
 void MainWindow1::createMenus()
 {	
+	QAction *aboutQtAct = new QAction(tr("About &Qt"), this);
+	connect(aboutQtAct, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
+	
 	QMenu *file = menuBar()->addMenu( "&File" );
 	file->addAction( actionNew );
 	file->addAction( actionOpen );
@@ -77,19 +82,10 @@ void MainWindow1::createMenus()
 	file->addAction( actionSaveAs );
 	file->addSeparator();
 	file->addAction( actionQuit );
-
-	QMenu *edit = menuBar()->addMenu( "&Edit" );
-// 	edit->addAction( textDisplay->actionUndo );
-// 	edit->addAction( textDisplay->actionRedo );
-// 	edit->addSeparator();
-// 	edit->addAction( textDisplay->actionCut );
-// // 	edit->addAction( textDisplay->actionCopy );
-// 	edit->addAction( textDisplay->actionPaste );
-// 	edit->addSeparator();
-// 	edit->addAction( actionConfigure );
-
+	
 	QMenu *help = menuBar()->addMenu( "&Help" );
-// 	help->addAction( new QAction( tr("About QT"), qApp, SLOT(aboutQt) ));
+	help->addAction( aboutQtAct );
+
 }
 
 void MainWindow1::createToolbars()
@@ -112,6 +108,22 @@ void MainWindow1::fileOpen()
 {
 	QString fileName = QFileDialog::getOpenFileName( this, "Open file", "", "*" );
 	
-// 	if (!fileName.isEmpty() )
-// 		textDisplay->loadFile( fileName );
+	if (fileName.isEmpty() )
+		return;
+	
+	QFile file(fileName);
+	if (!file.open(QFile::ReadOnly | QFile::Text)) {
+		QMessageBox::warning(this, tr("Application"),
+		       tr("Cannot read file %1:\n%2.")
+		       .arg(fileName)
+		       .arg(file.errorString()));
+		return;
+	}
+
+	QTextStream in(&file);
+	QApplication::setOverrideCursor(Qt::WaitCursor);
+	textEditor->setPlainText(in.readAll());
+	QApplication::restoreOverrideCursor();
+
+	statusBar()->showMessage(tr("File loaded"), 2000);
 }

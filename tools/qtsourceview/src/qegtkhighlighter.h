@@ -11,8 +11,8 @@ class kateItemDataManager;
 class QeGTK_Highlighter: public QSyntaxHighlighter
 {
 public:
-	QeGTK_Highlighter( QTextDocument *parent = 0, kateItemDataManager *manager=0 );
-	QeGTK_Highlighter( QTextEdit *parent = 0, kateItemDataManager *manager=0 );
+	QeGTK_Highlighter( QTextDocument *parent = 0, kateItemDataManager *manager=0, QeGtkSourceViewLangDef *lang=0 );
+	QeGTK_Highlighter( QTextEdit *parent = 0, kateItemDataManager *manager=0, QeGtkSourceViewLangDef *lang=0 );
 	void setHighlight( QeGtkSourceViewLangDef *lang );
 
 protected:

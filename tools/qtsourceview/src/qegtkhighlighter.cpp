@@ -4,18 +4,22 @@
 
 #include "debug_info.h"
 
-QeGTK_Highlighter::QeGTK_Highlighter( QTextDocument *parent, kateItemDataManager *manager  )
+QeGTK_Highlighter::QeGTK_Highlighter( QTextDocument *parent, kateItemDataManager *manager, QeGtkSourceViewLangDef *lang )
 	:QSyntaxHighlighter(parent)
 {
 	language = NULL;
 	this->manager = manager;
+
+	setHighlight( lang );
 }
 
-QeGTK_Highlighter::QeGTK_Highlighter( QTextEdit *parent, kateItemDataManager *manager )
+QeGTK_Highlighter::QeGTK_Highlighter( QTextEdit *parent, kateItemDataManager *manager, QeGtkSourceViewLangDef *lang )
 	:QSyntaxHighlighter(parent)
 {
 	language = NULL;
 	this->manager = manager;
+
+	setHighlight( lang );
 }
 
 

@@ -4,6 +4,7 @@
 #include <QtGui/QMainWindow>
 // #include <QMainWindow>
 
+class QSyntaxHighlighter;
 class QTextEdit;
 
 class MainWindow1: public QMainWindow
@@ -23,6 +24,7 @@ public slots:
 	void fileOpen();
 	
 private:
+	QSyntaxHighlighter *highlight;
 	QTextEdit   *textEditor;
 	QToolBar    *toolbar;
 
