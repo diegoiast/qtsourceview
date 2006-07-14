@@ -1,6 +1,14 @@
 #ifndef __KATE_ITEM_DATA_MANAGER__
 #define __KATE_ITEM_DATA_MANAGER__
 
+/**
+ * \file qsvcolordeffactory.h
+ * \brief Definition of the color defintion factory
+ * \author Diego Iastrubni (elcuco@kde.org)
+ * License LGPL
+ * \see qmdiActionGroup
+ */
+
 #include <QDomDocument>
 #include <QString>
 #include <QList>
@@ -21,7 +29,5 @@ public:
 private:
 	QList<QsvColorDef> colorDefs;
 };
-
-//typedef QsvColorDefFactory kateItemDataManager;
 
 #endif // __KATE_ITEM_DATA_MANAGER__

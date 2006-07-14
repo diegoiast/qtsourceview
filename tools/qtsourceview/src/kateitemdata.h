@@ -1,9 +1,14 @@
 #ifndef __QSV_COLOR_DEF_H__
 #define __QSV_COLOR_DEF_H__
 
-//#include <QDomNode>
-//#include <QColor>
-//#include <QTextCharFormat>
+/**
+ * \file qsvcolordef.h
+ * \brief Definition of the color defintion
+ * \author Diego Iastrubni (elcuco@kde.org)
+ * License LGPL
+ * \see qmdiActionGroup
+ */
+
 #include <QMap>
 
 class QDomNode;
@@ -30,4 +35,5 @@ public:
 private:
 	QMap<QString,QString> attributes;
 };
+
 #endif // __QSV_COLOR_DEF_H__

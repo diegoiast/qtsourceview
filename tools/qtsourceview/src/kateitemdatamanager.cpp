@@ -1,10 +1,17 @@
+/**
+ * \file qsvcolordeffactory.cpp
+ * \brief Implementation of the color defintion factory
+ * \author Diego Iastrubni (elcuco@kde.org)
+ * License LGPL
+ * \see qmdiActionGroup
+ */
+
 #include <QtDebug>
 #include <QFile>
 
 #include "kateitemdatamanager.h"
 #include "debug_info.h"
 
-//QsvColorDefFactory
 QsvColorDefFactory::QsvColorDefFactory()
 {
 }

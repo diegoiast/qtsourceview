@@ -1,3 +1,11 @@
+/**
+ * \file qsvsyntaxhighlighter.cpp
+ * \brief Implementation of the syntax highlighter
+ * \author Diego Iastrubni (elcuco@kde.org)
+ * License LGPL
+ * \see qmdiActionGroup
+ */
+
 #include "qegtkhighlighter.h"
 #include "qegtklangdef.h"
 #include "kateitemdatamanager.h"
@@ -20,6 +28,10 @@ QsvSyntaxHighlighter::QsvSyntaxHighlighter( QTextEdit *parent, QsvColorDefFactor
 	this->colors = colors;
 
 	setHighlight( lang );
+}
+
+QsvSyntaxHighlighter::~QsvSyntaxHighlighter()
+{
 }
 
 void QsvSyntaxHighlighter::setHighlight( QsvLangDef *lang )

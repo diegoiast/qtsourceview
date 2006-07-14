@@ -1,6 +1,14 @@
 #ifndef __QSV_SYNTAXHIGHLIGHTER__
 #define __QSV_SYNTAXHIGHLIGHTER__
 
+/**
+ * \file qsvsyntaxhighlighter.h
+ * \brief Definition of the syntax highlighter
+ * \author Diego Iastrubni (elcuco@kde.org)
+ * License LGPL
+ * \see qmdiActionGroup
+ */
+
 #include <QSyntaxHighlighter>
 #include "qorderedmap.h"
 
@@ -13,6 +21,7 @@ class QsvSyntaxHighlighter: public QSyntaxHighlighter
 public:
 	QsvSyntaxHighlighter( QTextDocument *parent = 0, QsvColorDefFactory *colors=0, QsvLangDef *lang=0 );
 	QsvSyntaxHighlighter( QTextEdit *parent = 0, QsvColorDefFactory *colors=0, QsvLangDef *lang=0 );
+	~QsvSyntaxHighlighter();
 	void setHighlight( QsvLangDef *lang );
 
 protected:
@@ -27,8 +36,7 @@ private:
 	void drawKeywords( QString text, QString s, QTextCharFormat &format );
 
 	QsvColorDefFactory	*colors;
-	QsvLangDef	*language;
-
+	QsvLangDef		*language;
 	QOrderedMap<QString,QTextCharFormat> mappings;
 };
 

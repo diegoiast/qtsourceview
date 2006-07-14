@@ -1,3 +1,11 @@
+/**
+ * \file qsvlangdeffactory.cpp
+ * \brief Implementation of the language definition factory
+ * \author Diego Iastrubni (elcuco@kde.org)
+ * License LGPL
+ * \see qmdiActionGroup
+ */
+ 
 #include <QMessageBox>
 #include <QRegExp>
 #include <QFile>
@@ -65,6 +73,8 @@ QsvLangDef *QsvLangDefFactory::getHighlight( QString fileName )
 	}
 
 	qDebug( "%s %d : Not found any highlighter for [%s]", __FILE__, __LINE__, qPrintable(fileName) );
+	QMessageBox::information(0, "Application name", "Not found any highlighter for " + fileName );
+		
 	return NULL;
 }
 
@@ -74,13 +84,15 @@ void QsvLangDefFactory::loadDirectory( QString directory )
 		directory = QDir::currentPath();
 	QDir dir(directory, "*.lang");
 
-//	QMap<QString,QStringList> files = dir.entryList(QDir::Files | QDir::NoSymLinks);
 	QStringList files = dir.entryList(QDir::Files | QDir::NoSymLinks);
 	int fileCount =	files.count();
 
 	if (fileCount == 0)
 	{
 		qDebug( "%s %d - Error: no highlight definitions found at directory: %s", __FILE__, __LINE__, qPrintable(directory) );
+		QMessageBox::information(0, "Application name", 
+			"no highlight definitions found at directory " + directory
+		);
 		return;
 	}
 
@@ -114,9 +126,13 @@ QsvLangDefFactory::QsvLangDefFactory(void)
 
 
 	// load mime types
-	QFile file( ":/src/mime.types" );
+	QFile file( ":/mime.types" );
 
-	file.open(QIODevice::ReadOnly | QIODevice::Text);
+	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+	{
+		QMessageBox::information(0, "Application name",
+		    "The factory default will be used instead.");
+	}
 	
 	// parse built in mime types definitions
 	QTextStream in(&file);

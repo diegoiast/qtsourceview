@@ -1,6 +1,14 @@
 #ifndef __QE_LANGDEF_FACTORY_H__
 #define __QE_LANGDEF_FACTORY_H__
 
+/**
+ * \file qsvlangdeffactory.h
+ * \brief Definition of the language definition factory
+ * \author Diego Iastrubni (elcuco@kde.org)
+ * License LGPL
+ * \see qmdiActionGroup
+ */
+
 #include <QMap>
 
 class QsvLangDef;

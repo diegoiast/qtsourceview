@@ -1,3 +1,11 @@
+/**
+ * \file qsvlangdef.cpp
+ * \brief Implementation of the language definition, and support structs
+ * \author Diego Iastrubni (elcuco@kde.org)
+ * License LGPL
+ * \see qmdiActionGroup
+ */
+
 #include <QString>
 #include <QStringList>
 #include <QDomDocument>
@@ -307,4 +315,3 @@ bool	QsvLangDef::loadKeywordList( QDomNodeList nodes )
 
 	return true;
 }
-					

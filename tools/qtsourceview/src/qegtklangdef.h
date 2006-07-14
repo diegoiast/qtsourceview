@@ -1,6 +1,14 @@
 #ifndef __QSV_LANG_DEF__
 #define __QSV_LANG_DEF__
 
+/**
+ * \file qsvlangdef.h
+ * \brief Definition of the language definition, and support structs
+ * \author Diego Iastrubni (elcuco@kde.org)
+ * License LGPL
+ * \see qmdiActionGroup
+ */
+
 class QDomDocument;
 class QString;
 class QStringList;
@@ -96,4 +104,3 @@ private:
 };
 
 #endif // __QSV_LANG_DEF__
-
