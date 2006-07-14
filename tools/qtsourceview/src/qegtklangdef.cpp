@@ -36,7 +36,7 @@
  * \brief Constructor for the QeGtkSourceViewLangDef class
  * 
  */
-QeGtkSourceViewLangDef::QeGtkSourceViewLangDef( QDomDocument doc )
+QsvLangDef::QsvLangDef( QDomDocument doc )
 {
 	load( doc );
 };
@@ -46,7 +46,7 @@ QeGtkSourceViewLangDef::QeGtkSourceViewLangDef( QDomDocument doc )
  * \brief Constructor for the QeGtkSourceViewLangDef class
  * 
  */
-QeGtkSourceViewLangDef::QeGtkSourceViewLangDef( QString fileName )
+QsvLangDef::QsvLangDef( QString fileName )
 {
 	load( fileName );
 };
@@ -56,7 +56,7 @@ QeGtkSourceViewLangDef::QeGtkSourceViewLangDef( QString fileName )
  * \brief Destructor for the QeGtkSourceViewLangDef class
  * 
  */
-QeGtkSourceViewLangDef::~QeGtkSourceViewLangDef()
+QsvLangDef::~QsvLangDef()
 {
 };
 
@@ -68,7 +68,7 @@ QeGtkSourceViewLangDef::~QeGtkSourceViewLangDef()
  * 
  * 
  */
-bool QeGtkSourceViewLangDef::load( QString fileName )
+bool QsvLangDef::load( QString fileName )
 {
 	QDomDocument doc("language");
 	QFile file(fileName);
@@ -76,7 +76,7 @@ bool QeGtkSourceViewLangDef::load( QString fileName )
 
 	if (!file.open(QIODevice::ReadOnly))
 	{
-#ifdef	__DEBUG_LANG_DEG_LOAD__
+#ifdef	__DEBUG_LANG_DEF_LOAD__
 		qDebug( "%s %d : Could not open %s", __FILE__, __LINE__, qPrintable(fileName) );
 #endif		
 		return false;
@@ -95,7 +95,7 @@ bool QeGtkSourceViewLangDef::load( QString fileName )
 	return load( doc );
 }
 
-bool QeGtkSourceViewLangDef::load( QDomDocument doc )
+bool QsvLangDef::load( QDomDocument doc )
 {
 	QDomNodeList list, l;
 	QDomNode n,m;
@@ -114,7 +114,7 @@ bool QeGtkSourceViewLangDef::load( QDomDocument doc )
 	mimeTypes	= n.attributes().namedItem("mimetypes").nodeValue().split(QRegExp("[;,]"));
 	extensions	= n.attributes().namedItem("extensions").nodeValue().split(";");
 
-	// read the entities which define this syntax
+	// read the entities which define this language/syntax
 	list = doc.elementsByTagName("escape-char");
 	escapeChar = list.item(0).nodeValue();
 
@@ -139,7 +139,7 @@ bool QeGtkSourceViewLangDef::load( QDomDocument doc )
 	return true;
 };
 
-bool	QeGtkSourceViewLangDef::isTrue( QString s )
+bool	QsvLangDef::isTrue( QString s )
 {
 	bool b = false;
 
@@ -151,7 +151,7 @@ bool	QeGtkSourceViewLangDef::isTrue( QString s )
 	return b;
 }
 
-bool	QeGtkSourceViewLangDef::loadEntity(QDomNode node, QeEntityDef &entity )
+bool	QsvLangDef::loadEntity(QDomNode node, QsvEntityDef &entity )
 {
 	try
 	{
@@ -167,14 +167,14 @@ bool	QeGtkSourceViewLangDef::loadEntity(QDomNode node, QeEntityDef &entity )
 	return true;
 }
 
-bool	QeGtkSourceViewLangDef::loadLineComments( QDomNodeList nodes )
+bool	QsvLangDef::loadLineComments( QDomNodeList nodes )
 {
 	QDomNode node;
 	int i, size = nodes.size();
 
 	for( i=0; i<size; i++ )
 	{
-		QeEntityLineComment e;
+		QsvEntityLineComment e;
 		node = nodes.at( i );
 
 		if (!loadEntity( node, e )) return false;
@@ -189,8 +189,7 @@ bool	QeGtkSourceViewLangDef::loadLineComments( QDomNodeList nodes )
 	return true;
 }
 
-
-bool	QeGtkSourceViewLangDef::loadStrings( QDomNodeList nodes )
+bool	QsvLangDef::loadStrings( QDomNodeList nodes )
 {
 	QDomNode node;
 	QString s;
@@ -198,7 +197,7 @@ bool	QeGtkSourceViewLangDef::loadStrings( QDomNodeList nodes )
 
 	for( i=0; i<size; i++ )
 	{
-		QeEntityString e;
+		QsvEntityString e;
 		node = nodes.at( i );
 
 		if (!loadEntity( node, e )) return false;
@@ -217,7 +216,7 @@ bool	QeGtkSourceViewLangDef::loadStrings( QDomNodeList nodes )
 	return true;
 }
 
-bool	QeGtkSourceViewLangDef::loadPatternItems( QDomNodeList nodes )
+bool	QsvLangDef::loadPatternItems( QDomNodeList nodes )
 {
 	QDomNode node;
 	int i, size = nodes.size();
@@ -228,7 +227,7 @@ bool	QeGtkSourceViewLangDef::loadPatternItems( QDomNodeList nodes )
 	{
 		node = nodes.at( i );
 
-		QeEntityPatternItem e;
+		QsvEntityPatternItem e;
 		if (!loadEntity( node, e )) return false;
 		e.regex = node.toElement().elementsByTagName("regex").item(0).toElement().text();
 
@@ -242,7 +241,7 @@ bool	QeGtkSourceViewLangDef::loadPatternItems( QDomNodeList nodes )
 	return true;
 }
 
-bool	QeGtkSourceViewLangDef::loadBlockComments( QDomNodeList nodes, QList<QeEntityBlockComment> &list )
+bool	QsvLangDef::loadBlockComments( QDomNodeList nodes, QList<QsvEntityBlockComment> &list )
 {
 	QDomNode node;
 	int i, size = nodes.size();
@@ -253,7 +252,7 @@ bool	QeGtkSourceViewLangDef::loadBlockComments( QDomNodeList nodes, QList<QeEnti
 	{
 		node = nodes.at( i );
 
-		QeEntityBlockComment e;
+		QsvEntityBlockComment e;
 		if (!loadEntity( node, e )) return false;
 		e.startRegex = node.toElement().elementsByTagName("start-regex").item(0).toElement().text();
 		e.endRegex   = node.toElement().elementsByTagName("end-regex").item(0).toElement().text();
@@ -268,8 +267,7 @@ bool	QeGtkSourceViewLangDef::loadBlockComments( QDomNodeList nodes, QList<QeEnti
 	return true;
 }
 
-
-bool	QeGtkSourceViewLangDef::loadKeywordList( QDomNodeList nodes )
+bool	QsvLangDef::loadKeywordList( QDomNodeList nodes )
 {
 	QDomNodeList strs;
 	QDomNode str;
@@ -280,7 +278,7 @@ bool	QeGtkSourceViewLangDef::loadKeywordList( QDomNodeList nodes )
 	
 	for( i=0; i<size; i++ )
 	{
-		QeEntityKeywordList e;
+		QsvEntityKeywordList e;
 		QDomNode node = nodes.at( i );
 		
 		if (!loadEntity( node, e )) return false;
@@ -309,3 +307,4 @@ bool	QeGtkSourceViewLangDef::loadKeywordList( QDomNodeList nodes )
 
 	return true;
 }
+					

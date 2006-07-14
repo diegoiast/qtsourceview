@@ -4,31 +4,32 @@
 #include "kateitemdatamanager.h"
 #include "debug_info.h"
 
-kateItemDataManager::kateItemDataManager()
+//QsvColorDefFactory
+QsvColorDefFactory::QsvColorDefFactory()
 {
 }
 
-kateItemDataManager::kateItemDataManager( QDomDocument doc )
+QsvColorDefFactory::QsvColorDefFactory( QDomDocument doc )
 {
 	load( doc );
 }
 
-kateItemDataManager::kateItemDataManager( QString fileName )
+QsvColorDefFactory::QsvColorDefFactory( QString fileName )
 {
 	load( fileName );
 }
 
-kateItemDataManager::~kateItemDataManager()
+QsvColorDefFactory::~QsvColorDefFactory()
 {
 }
 
-kateItemData kateItemDataManager::getItemData( QString name )
+QsvColorDef QsvColorDefFactory::getColorDef( QString name )
 {
 #ifdef __DEBUG_NO_ITEM_FOUND__
 	qDebug( "%s %d", __FILE__, __LINE__ );
 #endif
 
-	foreach(kateItemData item, itemDatas)
+	foreach(QsvColorDef item, colorDefs)
 	{	
 		if (item.getStyleNum() == name )
 			return item;
@@ -36,35 +37,38 @@ kateItemData kateItemDataManager::getItemData( QString name )
 
 #ifdef __DEBUG_NO_ITEM_FOUND__
 	// new empthy one	
-	qDebug( "%s $d - could not find an item data (%s)", __FILE__, __LINE__, qPrintable(fileName) );
+	qDebug( "%s $d - could not find a color definition named (%s)", __FILE__, __LINE__, qPrintable(fileName) );
 #endif	
-	return kateItemData();
+	return QsvColorDef();
 }
 
-bool kateItemDataManager::load( QDomDocument doc )
+bool QsvColorDefFactory::load( QDomDocument doc )
 {
 	/* load the attributes of this language */
 	QDomNodeList list = doc.elementsByTagName("itemData");
 
-	for( uint n=0 ;n<list.length(); n++ )
+	for( uint n=0; n<list.length(); n++ )
 	{
-		kateItemData item;
+		QsvColorDef item;
 		if (item.load(list.item(n)))
-			itemDatas.append( item );
+			colorDefs.append( item );
 	}
 
 	return true;
 }
 
-bool kateItemDataManager::load( QString fileName )
+bool QsvColorDefFactory::load( QString fileName )
 {
-	QDomDocument doc("language");
 	QFile file(fileName);
-	QString s;
 
 	if (!file.open(QIODevice::ReadOnly))
+	{
+		// TODO: display debug message, saying that
+		// this is an invalid XML
 		return false;
+	}
 
+	QDomDocument doc("language");
 	if (!doc.setContent(&file))
 	{
 		file.close();

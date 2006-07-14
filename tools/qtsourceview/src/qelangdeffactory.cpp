@@ -9,23 +9,23 @@
 
 #include "debug_info.h"
 
-QeLangDefFactory *QeLangDefFactory::LangFactory = NULL;
+QsvLangDefFactory *QsvLangDefFactory::LangFactory = NULL;
 
 
 // public....
-QeLangDefFactory *QeLangDefFactory::getInstanse()
+QsvLangDefFactory *QsvLangDefFactory::getInstanse()
 {
 	if (LangFactory == NULL)
 	{
-		LangFactory = new QeLangDefFactory();
+		LangFactory = new QsvLangDefFactory();
 	}
 
 	return LangFactory;
 }
 
-QeGtkSourceViewLangDef *QeLangDefFactory::getHighlight( QString fileName )
+QsvLangDef *QsvLangDefFactory::getHighlight( QString fileName )
 {
-	QeGtkSourceViewLangDef *langDef;
+	QsvLangDef *langDef;
 	QString langMimeType;
 
 	foreach( langDef, langList )
@@ -68,12 +68,13 @@ QeGtkSourceViewLangDef *QeLangDefFactory::getHighlight( QString fileName )
 	return NULL;
 }
 
-void QeLangDefFactory::loadDirectory( QString directory )
+void QsvLangDefFactory::loadDirectory( QString directory )
 {
 	if (directory.isEmpty())
 		directory = QDir::currentPath();
 	QDir dir(directory, "*.lang");
 
+//	QMap<QString,QStringList> files = dir.entryList(QDir::Files | QDir::NoSymLinks);
 	QStringList files = dir.entryList(QDir::Files | QDir::NoSymLinks);
 	int fileCount =	files.count();
 
@@ -85,7 +86,7 @@ void QeLangDefFactory::loadDirectory( QString directory )
 
 	for (int i = 0; i < fileCount; ++i)
 	{
-		QeGtkSourceViewLangDef *langDef = new QeGtkSourceViewLangDef ( directory + "/" + files[i] );
+		QsvLangDef *langDef = new QsvLangDef ( directory + "/" + files[i] );
 		langList << langDef;
 		QString langMimeType;
 
@@ -105,7 +106,7 @@ void QeLangDefFactory::loadDirectory( QString directory )
 }
 
 // private...
-QeLangDefFactory::QeLangDefFactory(void)
+QsvLangDefFactory::QsvLangDefFactory(void)
 {
 	// TODO: fix the code to use
 	// /usr/share/mime/globs
@@ -141,6 +142,6 @@ QeLangDefFactory::QeLangDefFactory(void)
 	file.close();
 }
 
-QeLangDefFactory::~QeLangDefFactory(void)
+QsvLangDefFactory::~QsvLangDefFactory(void)
 {
 }

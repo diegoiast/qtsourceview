@@ -4,21 +4,24 @@
 #include <QDomDocument>
 #include <QString>
 #include <QList>
+
 #include "kateitemdata.h"
 
-class kateItemDataManager
+class QsvColorDefFactory
 {
 public:
-	kateItemDataManager();
-	kateItemDataManager( QDomDocument doc );
-	kateItemDataManager( QString fileName );
-	virtual ~kateItemDataManager();
+	QsvColorDefFactory();
+	QsvColorDefFactory( QDomDocument doc );
+	QsvColorDefFactory( QString fileName );
+	virtual ~QsvColorDefFactory();
 
-	kateItemData getItemData( QString name );
+	QsvColorDef getColorDef( QString name );
 	bool load( QDomDocument doc );
 	bool load( QString fileName );
 private:
-	QList<kateItemData> itemDatas;
+	QList<QsvColorDef> colorDefs;
 };
+
+//typedef QsvColorDefFactory kateItemDataManager;
 
 #endif // __KATE_ITEM_DATA_MANAGER__

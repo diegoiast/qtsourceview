@@ -3,22 +3,22 @@
 
 #include <QMap>
 
-class QeGtkSourceViewLangDef;
+class QsvLangDef;
 class QString;
 
-class QeLangDefFactory
+class QsvLangDefFactory
 {
 public:
-	static QeLangDefFactory *getInstanse();
-	QeGtkSourceViewLangDef *getHighlight( QString fileName );
+	static QsvLangDefFactory *getInstanse();
+	QsvLangDef *getHighlight( QString fileName );
 	void loadDirectory( QString directory );
 
 private:	
-	QeLangDefFactory(void);
-	~QeLangDefFactory(void);
+	QsvLangDefFactory(void);
+	~QsvLangDefFactory(void);
 	
-	static QeLangDefFactory *LangFactory;
-	QList<QeGtkSourceViewLangDef*> langList;
+	static QsvLangDefFactory *LangFactory;
+	QList<QsvLangDef*> langList;
 	QMap<QString,QStringList> mimeTypes;
 };
 

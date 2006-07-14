@@ -1,21 +1,26 @@
+#include <QString>
+#include <QDomNode>
+#include <QColor>
+#include <QTextCharFormat>
+
 #include "kateitemdata.h"
 
 /**
  * \class kateItemData
  * \brief and item data contains the color definition for a context
  */
-kateItemData::kateItemData()
+QsvColorDef::QsvColorDef()
 {
 // 	attributes["color"] = "black";
 // 	attributes["background"] = "white";
 }
 
-kateItemData::kateItemData( QDomNode node )
+QsvColorDef::QsvColorDef( QDomNode node )
 {
 	load( node );
 }
 
-bool kateItemData::load( QDomNode node )
+bool QsvColorDef::load( QDomNode node )
 {
 	uint attrCount = node.attributes().count();
 	for( uint i=0; i< attrCount; i++ )
@@ -27,14 +32,14 @@ bool kateItemData::load( QDomNode node )
 	return true;
 }
 
-bool kateItemData::save( QDomNode node )
+bool QsvColorDef::save( QDomNode node )
 {
 //QStringMap attributes;
 	return true;
 }
 
 
-bool kateItemData::isBold()
+bool QsvColorDef::isBold()
 {
 	if (!attributes.contains("bold"))
 		return false;
@@ -46,7 +51,7 @@ bool kateItemData::isBold()
 		return false;
 }
 
-bool kateItemData::isUnderline()
+bool QsvColorDef::isUnderline()
 {
 	if (!attributes.contains("underline"))
 		return false;
@@ -58,7 +63,7 @@ bool kateItemData::isUnderline()
 		return false;
 }
 
-bool kateItemData::isItalic()
+bool QsvColorDef::isItalic()
 {
 	if (!attributes.contains("italic"))
 		return false;
@@ -71,7 +76,7 @@ bool kateItemData::isItalic()
 
 }
 
-QColor kateItemData::getColor()
+QColor QsvColorDef::getColor()
 {
 	if (!attributes.contains("color"))
 		return QColor();
@@ -79,7 +84,7 @@ QColor kateItemData::getColor()
 		return QColor( attributes["color"] );
 }
 
-QColor kateItemData::getSelColor()
+QColor QsvColorDef::getSelColor()
 {
 	if (!attributes.contains("selColor"))
 		return QColor();
@@ -87,7 +92,7 @@ QColor kateItemData::getSelColor()
 		return QColor( attributes["selColor"] );
 }
 
-QColor kateItemData::getBackground()
+QColor QsvColorDef::getBackground()
 {
 	if (!attributes.contains("background"))
 		return QColor();
@@ -95,7 +100,7 @@ QColor kateItemData::getBackground()
 		return QColor( attributes["background"] );
 }
 
-QString kateItemData::getStyleNum()
+QString QsvColorDef::getStyleNum()
 {
 // 	if (!attributes.contains("defStyleNum"))
 // 		return QString();
@@ -103,7 +108,7 @@ QString kateItemData::getStyleNum()
 	return attributes["defStyleNum"];
 }
 
-QTextCharFormat kateItemData::toCharFormat()
+QTextCharFormat QsvColorDef::toCharFormat()
 {
 	QTextCharFormat f;
 

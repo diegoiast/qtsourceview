@@ -1,19 +1,19 @@
-#ifndef __QE_GTK_HIGHLIGHTER_H__
-#define __QE_GTK_HIGHLIGHTER_H__
+#ifndef __QSV_SYNTAXHIGHLIGHTER__
+#define __QSV_SYNTAXHIGHLIGHTER__
 
 #include <QSyntaxHighlighter>
 #include "qorderedmap.h"
 
 class QTextCharFormat;
-class QeGtkSourceViewLangDef;
-class kateItemDataManager;
+class QsvLangDef;
+class QsvColorDefFactory;
 
-class QeGTK_Highlighter: public QSyntaxHighlighter
+class QsvSyntaxHighlighter: public QSyntaxHighlighter
 {
 public:
-	QeGTK_Highlighter( QTextDocument *parent = 0, kateItemDataManager *manager=0, QeGtkSourceViewLangDef *lang=0 );
-	QeGTK_Highlighter( QTextEdit *parent = 0, kateItemDataManager *manager=0, QeGtkSourceViewLangDef *lang=0 );
-	void setHighlight( QeGtkSourceViewLangDef *lang );
+	QsvSyntaxHighlighter( QTextDocument *parent = 0, QsvColorDefFactory *colors=0, QsvLangDef *lang=0 );
+	QsvSyntaxHighlighter( QTextEdit *parent = 0, QsvColorDefFactory *colors=0, QsvLangDef *lang=0 );
+	void setHighlight( QsvLangDef *lang );
 
 protected:
 	void highlightBlock(const QString &text);
@@ -26,9 +26,10 @@ private:
 	void drawRegExp  ( QString text, QString s, QTextCharFormat &format );
 	void drawKeywords( QString text, QString s, QTextCharFormat &format );
 
+	QsvColorDefFactory	*colors;
+	QsvLangDef	*language;
+
 	QOrderedMap<QString,QTextCharFormat> mappings;
-	kateItemDataManager *manager;
-	QeGtkSourceViewLangDef *language;
 };
 
 #endif  // __QE_GTK_HIGHLIGHTER_H__

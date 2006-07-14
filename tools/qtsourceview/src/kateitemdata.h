@@ -1,18 +1,21 @@
-#ifndef __KATE_ITEM_DATA_H__
-#define __KATE_ITEM_DATA_H__
+#ifndef __QSV_COLOR_DEF_H__
+#define __QSV_COLOR_DEF_H__
 
-#include <QDomNode>
-#include <QColor>
-#include <QTextCharFormat>
+//#include <QDomNode>
+//#include <QColor>
+//#include <QTextCharFormat>
+#include <QMap>
 
-#include "kateqtglobal.h"
+class QDomNode;
+class QColor;
+class QTextCharFormat;
+class QString;
 
-
-class kateItemData
+class QsvColorDef
 {
 public:
-	kateItemData();
-	kateItemData( QDomNode node );
+	QsvColorDef();
+	QsvColorDef( QDomNode node );
 	bool load( QDomNode node );
 	bool save( QDomNode node );
 
@@ -25,8 +28,6 @@ public:
 	QString getStyleNum();
 	QTextCharFormat toCharFormat();
 private:
-	QStringMap attributes;
+	QMap<QString,QString> attributes;
 };
-
-#endif // __KATE_ITEM_DATA_H__
-
+#endif // __QSV_COLOR_DEF_H__

@@ -1,5 +1,5 @@
-#ifndef __QE_GTK_LANG_DEF_H__
-#define __QE_GTK_LANG_DEF_H__
+#ifndef __QSV_LANG_DEF__
+#define __QSV_LANG_DEF__
 
 class QDomDocument;
 class QString;
@@ -9,37 +9,37 @@ class QDomNode;
 class QDomNodeList;
 
 ///////////////////
-struct  QeEntityDef
+struct  QsvEntityDef
 {
 	QString type;
 	QString name;
 	QString style;
 };
 
-struct QeEntityString : QeEntityDef
+struct QsvEntityString : QsvEntityDef
 {
 	bool	atEOL;
 	QString	startRegex;
 	QString	endRegex;
 };
 
-struct QeEntityLineComment : QeEntityDef
+struct QsvEntityLineComment : QsvEntityDef
 {
 	QString	start;
 };
 
-struct QeEntityBlockComment : QeEntityDef
+struct QsvEntityBlockComment : QsvEntityDef
 {
 	QString	startRegex;
 	QString	endRegex;
 };
 
-struct QeEntityPatternItem : QeEntityDef
+struct QsvEntityPatternItem : QsvEntityDef
 {
 	QString regex;
 };
 
-struct QeEntityKeywordList : QeEntityDef
+struct QsvEntityKeywordList : QsvEntityDef
 {
 	bool		caseSensitive;
 	bool		matchEmptyStringAtBeginning;
@@ -54,30 +54,30 @@ struct QeEntityKeywordList : QeEntityDef
 
 class QeGTK_Highlighter;
 
-class QeGtkSourceViewLangDef
+class QsvLangDef
 {
-friend class QeGTK_Highlighter;
+friend class QsvSyntaxHighlighter;
 // friend class QeLangDefFactory;
 
 public:
-	QeGtkSourceViewLangDef( QDomDocument doc );
-	QeGtkSourceViewLangDef( QString fileName );
-	virtual ~QeGtkSourceViewLangDef();
+	QsvLangDef( QDomDocument doc );
+	QsvLangDef( QString fileName );
+	virtual ~QsvLangDef();
 
 	bool	load( QString fileName );
 	bool	load( QDomDocument doc );
 
 	QString	getName(){ return name; };
-	QStringList	getMimeTypes(){ return mimeTypes; };
+	QStringList getMimeTypes(){ return mimeTypes; };
 	
 private:
 	bool	isTrue( QString s );
 
-	bool	loadEntity(QDomNode node, QeEntityDef &entity );
+	bool	loadEntity(QDomNode node, QsvEntityDef &entity );
 	bool	loadLineComments( QDomNodeList nodes );
 	bool	loadStrings( QDomNodeList nodes );
 	bool	loadPatternItems( QDomNodeList nodes );
-	bool	loadBlockComments( QDomNodeList nodes, QList<QeEntityBlockComment> &list );
+	bool	loadBlockComments( QDomNodeList nodes, QList<QsvEntityBlockComment> &list );
 	bool	loadKeywordList( QDomNodeList nodes );
 
 	QString		name;
@@ -87,13 +87,13 @@ private:
 	QStringList	extensions;
 
 	QString				escapeChar;
-	QList<QeEntityString>		stringsDefs; 
-	QList<QeEntityLineComment>	lineCommentsDefs; 
-	QList<QeEntityBlockComment>	blockCommentsDefs;
-	QList<QeEntityKeywordList>	keywordListDefs; 
-	QList<QeEntityPatternItem>	patternItems; 
-	QList<QeEntityBlockComment>	syntaxItemDefs; 
+	QList<QsvEntityString>		stringsDefs; 
+	QList<QsvEntityLineComment>	lineCommentsDefs; 
+	QList<QsvEntityBlockComment>	blockCommentsDefs;
+	QList<QsvEntityKeywordList>	keywordListDefs; 
+	QList<QsvEntityPatternItem>	patternItems; 
+	QList<QsvEntityBlockComment>	syntaxItemDefs; 
 };
 
-#endif // __QE_GTK_LANG_DEF_H__
+#endif // __QSV_LANG_DEF__
 
