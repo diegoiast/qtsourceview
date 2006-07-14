@@ -3,8 +3,10 @@
 
 #include <QMainWindow>
 
-class QSyntaxHighlighter;
 class QTextEdit;
+class QSyntaxHighlighter;
+class QsvColorDefFactory;
+class QsvLangDef;
 
 class MainWindow1: public QMainWindow
 {
@@ -23,7 +25,9 @@ public slots:
 	void fileOpen();
 	
 private:
-	QSyntaxHighlighter *highlight;
+	QsvColorDefFactory	*defColors;
+	QsvLangDef		*langCpp;
+	QSyntaxHighlighter	*highlight;
 	QTextEdit	*textEditor;
 	QToolBar	*toolbar;
 

@@ -18,10 +18,14 @@
 MainWindow1::MainWindow1(QWidget *parent, Qt::WFlags flags)
     : QMainWindow(parent, flags)
 {
-	QString			 dataPath  = QApplication::applicationDirPath() + "/../../";
-	QsvColorDefFactory	*defColors = new QsvColorDefFactory( dataPath + "/data/colors/kate.xml" );
-	QsvLangDef		*langCpp   = new QsvLangDef( dataPath + "/data/langs/cpp.lang" );
-
+	QString	dataPath  = QApplication::applicationDirPath() + "/../../../";
+	
+	// load a default color set
+	defColors = new QsvColorDefFactory( dataPath + "/data/colors/kate.xml" );
+	
+	// load a default language definition
+	langCpp   = new QsvLangDef( dataPath + "/data/langs/cpp.lang" );
+	
 	// create a new text editor
 	textEditor = new QTextEdit;
 	textEditor->setAcceptRichText(false);
@@ -39,8 +43,8 @@ MainWindow1::MainWindow1(QWidget *parent, Qt::WFlags flags)
 
 MainWindow1::~MainWindow1()
 {
-// 	delete defColors;	
-// 	delete configDialog;
+	delete defColors;
+	delete langCpp;
 }
 
 void MainWindow1::setupActions()
@@ -101,6 +105,7 @@ void MainWindow1::createToolbars()
 
 void MainWindow1::fileNew()
 {
+	textEditor->clear();
 }
 
 void MainWindow1::fileOpen()
