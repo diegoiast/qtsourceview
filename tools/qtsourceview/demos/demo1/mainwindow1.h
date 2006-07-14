@@ -1,8 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QtGui/QMainWindow>
-// #include <QMainWindow>
+#include <QMainWindow>
 
 class QSyntaxHighlighter;
 class QTextEdit;
@@ -25,8 +24,8 @@ public slots:
 	
 private:
 	QSyntaxHighlighter *highlight;
-	QTextEdit   *textEditor;
-	QToolBar    *toolbar;
+	QTextEdit	*textEditor;
+	QToolBar	*toolbar;
 
 	QAction		*actionNew;
 	QAction		*actionOpen;

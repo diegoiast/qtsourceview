@@ -1,4 +1,4 @@
-#include <QtGui/QApplication>
+#include <QApplication>
 #include <QTextEdit>
 #include <QFileDialog>
 #include <QFile>
@@ -18,16 +18,16 @@
 MainWindow1::MainWindow1(QWidget *parent, Qt::WFlags flags)
     : QMainWindow(parent, flags)
 {
-	QString                 dataPath  = QApplication::applicationDirPath() + "/../../";
-	kateItemDataManager    *defColors = new kateItemDataManager( dataPath + "/data/colors/kate.xml" );
-	QeGtkSourceViewLangDef *langCpp   = new QeGtkSourceViewLangDef( dataPath + "/data/langs/cpp.lang" );
+	QString			 dataPath  = QApplication::applicationDirPath() + "/../../";
+	QsvColorDefFactory	*defColors = new QsvColorDefFactory( dataPath + "/data/colors/kate.xml" );
+	QsvLangDef		*langCpp   = new QsvLangDef( dataPath + "/data/langs/cpp.lang" );
 
 	// create a new text editor
 	textEditor = new QTextEdit;
 	textEditor->setAcceptRichText(false);
 
 	// assign to it the new syntax highlighter, with the default colors and language
- 	highlight = new QeGTK_Highlighter( textEditor, defColors, langCpp );
+ 	highlight = new QsvSyntaxHighlighter( textEditor, defColors, langCpp );
 
 	setCentralWidget( textEditor );
 	setupActions();
@@ -85,7 +85,6 @@ void MainWindow1::createMenus()
 	
 	QMenu *help = menuBar()->addMenu( "&Help" );
 	help->addAction( aboutQtAct );
-
 }
 
 void MainWindow1::createToolbars()
@@ -112,7 +111,8 @@ void MainWindow1::fileOpen()
 		return;
 	
 	QFile file(fileName);
-	if (!file.open(QFile::ReadOnly | QFile::Text)) {
+	if (!file.open(QFile::ReadOnly | QFile::Text))
+	{
 		QMessageBox::warning(this, tr("Application"),
 		       tr("Cannot read file %1:\n%2.")
 		       .arg(fileName)
