@@ -13,7 +13,8 @@
 #include <QString>
 #include <QList>
 
-#include "kateitemdata.h"
+//#include "qsvcolordef.h"
+class QsvColorDef;
 
 class QsvColorDefFactory
 {

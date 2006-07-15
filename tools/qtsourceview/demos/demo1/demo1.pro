@@ -1,31 +1,28 @@
-TARGET = demo1
-TEMPLATE = app
-
-QT += xml
-#unix:LIBS  += -L../../ -lqtsourceview
-
-INCLUDEPATH += . ../../src/ 
-#DESTDIR=../../
-TMP_DIR = ../../tmp
-UI_DIR = ../../tmp
-MOC_DIR = ../../tmp
-OBJECTS_DIR = ../../tmp
-
-# Input
-HEADERS += mainwindow1.h
-SOURCES += main1.cpp mainwindow1.cpp
-
-
-# Input - library
-HEADERS += ../../src/kateitemdata.h \
-           ../../src/kateitemdatamanager.h \
-           ../../src/kateqtglobal.h \
-           ../../src/qegtkhighlighter.h \
-           ../../src/qegtklangdef.h \
-           ../../src/qelangdeffactory.h
-SOURCES += ../../src/kateitemdata.cpp \
-           ../../src/kateitemdatamanager.cpp \
-           ../../src/qegtkhighlighter.cpp \
-           ../../src/qegtklangdef.cpp \
-           ../../src/qelangdeffactory.cpp
-
+TARGET =   demo1
+TEMPLATE =   app
+QT =   xml \
+  gui \
+  core
+INCLUDEPATH =   . \
+  ../../src/
+TMP_DIR =   ../../tmp
+UI_DIR =   ../../tmp
+MOC_DIR =   ../../tmp
+OBJECTS_DIR =   ../../tmp
+HEADERS =   mainwindow1.h \
+  ../../src/debug_info.h \
+  ../../src/qorderedmap.h \
+  ../../src/qsvcolordef.h \
+  ../../src/qsvcolordeffactory.h \
+  ../../src/qsvlangdef.h \
+  ../../src/qsvlangdeffactory.h \
+  ../../src/qsvsyntaxhighlighter.h
+SOURCES =   main1.cpp \
+  mainwindow1.cpp \
+  ../../src/qsvcolordef.cpp \
+  ../../src/qsvcolordeffactory.cpp \
+  ../../src/qsvlangdef.cpp \
+  ../../src/qsvlangdeffactory.cpp \
+  ../../src/qsvsyntaxhighlighter.cpp
+CONFIG +=   qt \
+  release

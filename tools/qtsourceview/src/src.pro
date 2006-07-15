@@ -16,14 +16,15 @@ OBJECTS_DIR = ../tmp
 
 
 # Input
-HEADERS += kateitemdata.h \
-           kateitemdatamanager.h \
-           kateqtglobal.h \
-           qegtkhighlighter.h \
-           qegtklangdef.h \
-           qelangdeffactory.h
-SOURCES += kateitemdata.cpp \
-           kateitemdatamanager.cpp \
-           qegtkhighlighter.cpp \
-           qegtklangdef.cpp \
-           qelangdeffactory.cpp
+HEADERS += qorderedmap.h \
+           qsvcolordef.h \
+           qsvcolordeffactory.h \
+           qsvlangdef.h \
+           qsvlangdeffactory.h \
+           qsvsyntaxhighlighter.h
+           
+SOURCES += qsvcolordef.cpp \
+           qsvcolordeffactory.cpp \
+           qsvlangdef.cpp \
+           qsvlangdeffactory.cpp \
+           qsvsyntaxhighlighter.cpp

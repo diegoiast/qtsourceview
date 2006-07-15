@@ -12,8 +12,8 @@
 #include <QDir>
 #include <QTextStream>
 
-#include "qelangdeffactory.h"
-#include "qegtklangdef.h"
+#include "qsvlangdeffactory.h"
+#include "qsvlangdef.h"
 
 #include "debug_info.h"
 

@@ -14,7 +14,7 @@
 
 #include <QtDebug>
 
-#include "qegtklangdef.h"
+#include "qsvlangdef.h"
 
 
 /**

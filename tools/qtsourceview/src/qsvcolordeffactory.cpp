@@ -9,7 +9,8 @@
 #include <QtDebug>
 #include <QFile>
 
-#include "kateitemdatamanager.h"
+#include "qsvcolordef.h"
+#include "qsvcolordeffactory.h"
 #include "debug_info.h"
 
 QsvColorDefFactory::QsvColorDefFactory()

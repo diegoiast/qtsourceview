@@ -7,20 +7,19 @@ CONFIG +=   qt \
 TEMPLATE =   app
 SOURCES =   main2.cpp \
   mainwindow2.cpp \
-  ../../src/kateitemdata.cpp \
-  ../../src/kateitemdatamanager.cpp \
-  ../../src/qegtkhighlighter.cpp \
-  ../../src/qegtklangdef.cpp \
-  ../../src/qelangdeffactory.cpp
+  ../../src/qsvcolordef.cpp \
+  ../../src/qsvcolordeffactory.cpp \
+  ../../src/qsvlangdef.cpp \
+  ../../src/qsvlangdeffactory.cpp \
+  ../../src/qsvsyntaxhighlighter.cpp
 HEADERS =   mainwindow2.h \
   ../../src/debug_info.h \
-  ../../src/kateitemdata.h \
-  ../../src/kateitemdatamanager.h \
-  ../../src/kateqtglobal.h \
-  ../../src/qegtkhighlighter.h \
-  ../../src/qegtklangdef.h \
-  ../../src/qelangdeffactory.h \
-  ../../src/qorderedmap.h
+  ../../src/qorderedmap.h \
+  ../../src/qsvcolordef.h \
+  ../../src/qsvcolordeffactory.h \
+  ../../src/qsvlangdef.h \
+  ../../src/qsvlangdeffactory.h \
+  ../../src/qsvsyntaxhighlighter.h
 INCLUDEPATH =   ../../src/ \
   .
 RESOURCES =   demo2.qrc

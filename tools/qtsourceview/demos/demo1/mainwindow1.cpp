@@ -9,9 +9,10 @@
 #include <QToolBar>
 #include <QMessageBox>
 
-#include "kateitemdatamanager.h"
-#include "qegtklangdef.h"
-#include "qegtkhighlighter.h"
+#include "qsvcolordef.h"
+#include "qsvcolordeffactory.h"
+#include "qsvlangdef.h"
+#include "qsvsyntaxhighlighter.h"
 
 #include "mainwindow1.h"
 

@@ -6,9 +6,18 @@
  * \see qmdiActionGroup
  */
 
-#include "qegtkhighlighter.h"
-#include "qegtklangdef.h"
-#include "kateitemdatamanager.h"
+#include <QString>
+#include <QStringList>
+#include <QDomDocument>
+#include <QDomNode>
+#include <QFile>
+#include <QTextCharFormat>
+
+#include "qorderedmap.h"
+#include "qsvlangdef.h"
+#include "qsvcolordef.h"
+#include "qsvcolordeffactory.h"
+#include "qsvsyntaxhighlighter.h"
 
 #include "debug_info.h"
 
