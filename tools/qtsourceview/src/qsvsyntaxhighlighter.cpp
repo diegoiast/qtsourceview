@@ -109,7 +109,9 @@ void QsvSyntaxHighlighter::highlightBlock(const QString &text)
 {
 	if (language == NULL)
 	{
+#ifdef		__DEBUG_HIGHLIGHT__		
 		qDebug( "%s %d - no language defined", __FILE__, __LINE__ );
+#endif		
 		return;
 	}
 

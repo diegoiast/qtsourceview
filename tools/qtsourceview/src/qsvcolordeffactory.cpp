@@ -52,7 +52,7 @@ QsvColorDef QsvColorDefFactory::getColorDef( QString name )
 
 bool QsvColorDefFactory::load( QDomDocument doc )
 {
-	/* load the attributes of this language */
+	// load the attributes of this language
 	QDomNodeList list = doc.elementsByTagName("itemData");
 
 	for( uint n=0; n<list.length(); n++ )

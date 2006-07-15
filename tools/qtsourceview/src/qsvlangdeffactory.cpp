@@ -73,8 +73,6 @@ QsvLangDef *QsvLangDefFactory::getHighlight( QString fileName )
 	}
 
 	qDebug( "%s %d : Not found any highlighter for [%s]", __FILE__, __LINE__, qPrintable(fileName) );
-	QMessageBox::information(0, "Application name", "Not found any highlighter for " + fileName );
-		
 	return NULL;
 }
 
@@ -122,16 +120,17 @@ QsvLangDefFactory::QsvLangDefFactory(void)
 {
 	// TODO: fix the code to use
 	// /usr/share/mime/globs
-	//
-
 
 	// load mime types
 	QFile file( ":/mime.types" );
 
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
 	{
-		QMessageBox::information(0, "Application name",
-		    "The factory default will be used instead.");
+		qDebug("%s %d - Error: could not load the default mime.types [%s]",
+			__FILE__, __LINE__,
+			":/mime.types"
+		);
+		return;
 	}
 	
 	// parse built in mime types definitions

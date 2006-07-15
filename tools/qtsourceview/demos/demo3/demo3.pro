@@ -1,20 +1,19 @@
-TARGET =   demo1
 TEMPLATE =   app
+CONFIG +=   release \
+  warn_on
 QT =   xml \
   gui \
   core
 INCLUDEPATH =   . \
   ../../src/
-  
-DESTDIR=../../
 TMP_DIR =   ../../tmp
 UI_DIR =   ../../tmp
 MOC_DIR =   ../../tmp
 OBJECTS_DIR =   ../../tmp
-HEADERS =   mainwindow1.h
-SOURCES =   main1.cpp \
-  mainwindow1.cpp
+SOURCES =   main3.cpp \
+  mainwindow3.cpp
+HEADERS =   mainwindow3.h
 unix:LIBS =   -L../../ \
   -lqtsourceview
-CONFIG +=   debug \
-  warn_on
+RESOURCES =   ../../src/qtsourceview.qrc
+DESTDIR=../../

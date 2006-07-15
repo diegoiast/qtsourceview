@@ -19,7 +19,8 @@
 MainWindow1::MainWindow1(QWidget *parent, Qt::WFlags flags)
     : QMainWindow(parent, flags)
 {
-	QString	dataPath  = QApplication::applicationDirPath() + "/../../../";
+//	QString	dataPath  = QApplication::applicationDirPath() + "/../../../";
+	QString	dataPath  = QApplication::applicationDirPath();
 	
 	// load a default color set
 	defColors = new QsvColorDefFactory( dataPath + "/data/colors/kate.xml" );

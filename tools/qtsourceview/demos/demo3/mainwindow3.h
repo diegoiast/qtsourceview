@@ -8,13 +8,13 @@ class QsvSyntaxHighlighter;
 class QsvColorDefFactory;
 class QsvLangDef;
 
-class MainWindow2: public QMainWindow
+class MainWindow3: public QMainWindow
 {
     Q_OBJECT
 
 public:
-	MainWindow2(QWidget *parent = 0, Qt::WFlags flags = 0);
-	~MainWindow2();
+	MainWindow3(QWidget *parent = 0, Qt::WFlags flags = 0);
+	~MainWindow3();
 
 	void setupActions();
 	void createMenus();
