@@ -12,7 +12,7 @@ class MainWindow1: public QMainWindow, private Ui::MainWindow1
 {
 	Q_OBJECT
 public:	
-	MainWindow2( QMainWindow *parent=0 ); 
+	MainWindow1( QMainWindow *parent=0 ); 
 	
 public slots:
 	void on_action_New_triggered();

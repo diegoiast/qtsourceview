@@ -9,7 +9,7 @@
 #include "qsvcolordeffactory.h"
 #include "qsvlangdef.h"
 #include "qsvsyntaxhighlighter.h"
-#include "mainwindow2.h"
+#include "mainwindow1.h"
 
 MainWindow1::MainWindow1( QMainWindow *parent )
 :QMainWindow( parent )
