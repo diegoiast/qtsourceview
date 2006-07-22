@@ -24,24 +24,35 @@ There are 2 abstract factories on this code:
  
 To use this code in your application:
 
-1) Intiailize the hilight factory with a directory
+1) Generate a colors definition class and load a file:
 
-    QeLangDefFactory::getInstanse()->loadDirectory( QApplication::applicationDirPath() + "/langs" );
-
-2) Generate a colors definition class and load a file:
-
-    defColors = new kateItemDataManager();
-    defColors->load( QApplication::applicationDirPath() + "/langs/kate.xml" );
+    QsvColorDefFactory *defaultColors = new QsvColorDefFactory( dataPath + "/data/colors/kate.xml" );
     
-3) Query for a language definition, and a generate a QSyntaxHighliter:
+2) Intiailize the highlight factory with a directory to load the language definitions from:
 
-    QeGtkSourceViewLangDef myLang    = QeLangDefFactory::getInstanse()->getHighlight( fileName );
-    QeGTK_Highlighter	   highlight = new QeGTK_Highlighter( editor, defColors );
-    highlight->setHighlight( myLang );
-    highlight->setDocument( editor->document() );
+    QsvLangDefFactory::getInstanse()->loadDirectory( dataPath + "/data/langs/" )
+
+3) Query for a language definition: 
+
+    QsvLangDef *lang = QsvLangDefFactory::getInstanse()->getHighlight( fileName );
+        
+
+   Another alternative, is to load the language definition yourself, in this case
+   step (2) is not needed:
+   
+    QsvLangDef *lang   = new QsvLangDef( dataPath + "/data/langs/cpp.lang" );
     
-All code is GPL V2, but will probably be modified to LGPL in the future.
+4) Generate a QSyntaxHighliter:
 
+    QSyntaxHighliter *highlight = new QsvSyntaxHighlighter( textEdit, defColors, langCpp );
+
+    
+All code is licensed under the terms of the LGPL.
+
+The tests available in this release are taken from the Kate project.
+
+The color definitions are self made, and released to the public domain (the 
+syntax is part of the kate syntax definitions)
 
 The highlight definitions are part of the gtksourceview library:
     http://gtksourceview.sourceforge.net/
@@ -49,5 +60,8 @@ The highlight definitions are part of the gtksourceview library:
 The idea for highliting the current line was discussed here:
     http://www.qtcentre.org/forum/showthread.php?t=456
 
+The code does not contain anything from the GTK source view library. In fact, I have not still
+seen the code, nor used it once. I am planing of pikking inside when my library is stable and
+usable enough, to see how they did it, maybe I can get some better ideas, maybe they can :)
 
-Diego Iastrubni <elcuco@kde.org>,  4-2-2006
+Diego Iastrubni <elcuco@kde.org>,  4-2-2006, 22-7-2006
