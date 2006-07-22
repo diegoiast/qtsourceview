@@ -1,42 +1,30 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef __MAINWINDOW2_H__
+#define __MAINWINDOW2_H__
 
 #include <QMainWindow>
+#include "ui_mainwindow1.h"
 
-class QTextEdit;
-class QSyntaxHighlighter;
 class QsvColorDefFactory;
 class QsvLangDef;
+class QSyntaxHighlighter;
 
-class MainWindow1: public QMainWindow
+class MainWindow1: public QMainWindow, private Ui::MainWindow1
 {
-    Q_OBJECT
-
-public:
-	MainWindow1(QWidget *parent = 0, Qt::WFlags flags = 0);
-	~MainWindow1();
-
-	void setupActions();
-	void createMenus();
-	void createToolbars();
-
+	Q_OBJECT
+public:	
+	MainWindow2( QMainWindow *parent=0 ); 
+	
 public slots:
-	void fileNew();
-	void fileOpen();
+	void on_action_New_triggered();
+	void on_action_Open_triggered();
+	void on_action_About_triggered();
+	void on_actionAbout_Qt_triggered();
+	void on_actionE_xit_triggered();
 	
 private:
 	QsvColorDefFactory	*defColors;
 	QsvLangDef		*langCpp;
 	QSyntaxHighlighter	*highlight;
-	QTextEdit	*textEditor;
-	QToolBar	*toolbar;
-
-	QAction		*actionNew;
-	QAction		*actionOpen;
-	QAction		*actionSave;
-	QAction		*actionSaveAs;
-	QAction		*actionConfigure;
-	QAction		*actionQuit;
 };
 
-#endif // MAINWINDOW_H
+#endif //__MAINWINDOW1_H__

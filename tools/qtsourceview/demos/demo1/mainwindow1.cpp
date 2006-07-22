@@ -1,136 +1,79 @@
 #include <QApplication>
-#include <QTextEdit>
 #include <QFileDialog>
-#include <QFile>
-#include <QTextStream>
-#include <QMenu>
-#include <QMenuBar>
-#include <QStatusBar>
-#include <QToolBar>
 #include <QMessageBox>
+#include <QTextStream>
+#include <QSyntaxHighlighter>
+#include <QFile>
 
 #include "qsvcolordef.h"
 #include "qsvcolordeffactory.h"
 #include "qsvlangdef.h"
 #include "qsvsyntaxhighlighter.h"
+#include "mainwindow2.h"
 
-#include "mainwindow1.h"
-
-MainWindow1::MainWindow1(QWidget *parent, Qt::WFlags flags)
-    : QMainWindow(parent, flags)
+MainWindow1::MainWindow1( QMainWindow *parent )
+:QMainWindow( parent )
 {
-//	QString	dataPath  = QApplication::applicationDirPath() + "/../../../";
-	QString	dataPath  = QApplication::applicationDirPath();
+	setupUi( this );
+//	QString dataPath  = QApplication::applicationDirPath();
+	QString dataPath  = QApplication::applicationDirPath() + "/../../";
 	
 	// load a default color set
 	defColors = new QsvColorDefFactory( dataPath + "/data/colors/kate.xml" );
-	
-	// load a default language definition
-	langCpp   = new QsvLangDef( dataPath + "/data/langs/cpp.lang" );
-	
-	// create a new text editor
-	textEditor = new QTextEdit;
-	textEditor->setAcceptRichText(false);
 
+        // load a default language definition
+        langCpp   = new QsvLangDef( dataPath + "/data/langs/cpp.lang" );
+        
 	// assign to it the new syntax highlighter, with the default colors and language
- 	highlight = new QsvSyntaxHighlighter( textEditor, defColors, langCpp );
-
-	setCentralWidget( textEditor );
-	setupActions();
-	createMenus();
-	createToolbars();
-
-	statusBar()->showMessage( "Welcome", 5000 );
-}
-
-MainWindow1::~MainWindow1()
-{
-	delete defColors;
-	delete langCpp;
-}
-
-void MainWindow1::setupActions()
-{
-	actionNew = new QAction( QIcon(":images/filenew.png"), tr("&New"), this );
-	actionNew->setShortcut(tr("Ctrl+N"));
-	actionNew->setStatusTip(tr("Create a new file"));
-	connect( actionNew, SIGNAL(triggered()), this, SLOT(fileNew()) );
+	highlight = new QsvSyntaxHighlighter( textEdit, defColors, langCpp );
 	
-	actionOpen = new QAction( QIcon(":images/fileopen.png"), tr("&Open..."), this );
-	actionOpen->setShortcut(tr("Ctrl+O"));
-	actionOpen->setStatusTip(tr("Open a new file"));
-	connect( actionOpen, SIGNAL(triggered()), this, SLOT(fileOpen()) );
-
-	actionSave = new QAction( QIcon(":images/filesave.png"), tr("&Save"), this);
-	actionSave->setShortcut(tr("Ctrl+S"));
-	actionSave->setStatusTip(tr("Save the file"));
-// 	connect( actionSave, SIGNAL(triggered()), this, SLOT(save()) );
-
-	actionSaveAs = new QAction( QIcon(":images/filesaveas.png"), tr("&Save as..."), this);
-	actionSaveAs->setStatusTip(tr("Save the file under a new name"));
-//  	connect( actionSaveAs, SIGNAL(triggered()), this, SLOT(saveAs()) );
-
-	actionQuit = new QAction( QIcon(":images/exit.png"), tr("&Quit"), this);
-	actionQuit->setShortcut(tr("Ctrl+Q"));
-	actionQuit->setStatusTip(tr("Quit the application"));
-	connect( actionQuit, SIGNAL(triggered()), this, SLOT(close()) );
+        statusBar()->showMessage(tr("Welcome, the default syntax is C++"), 10000);
+		
 }
 
-void MainWindow1::createMenus()
-{	
-	QAction *aboutQtAct = new QAction(tr("About &Qt"), this);
-	connect(aboutQtAct, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
-	
-	QMenu *file = menuBar()->addMenu( "&File" );
-	file->addAction( actionNew );
-	file->addAction( actionOpen );
-	file->addAction( actionSave );
-	file->addAction( actionSaveAs );
-	file->addSeparator();
-	file->addAction( actionQuit );
-	
-	QMenu *help = menuBar()->addMenu( "&Help" );
-	help->addAction( aboutQtAct );
-}
-
-void MainWindow1::createToolbars()
+void MainWindow1::on_action_New_triggered()
 {
-	toolbar = new QToolBar;
-	toolbar->addAction( actionNew );
-	toolbar->addAction( actionOpen );
-	toolbar->addAction( actionSave );
-	toolbar->addSeparator();
-	toolbar->addAction( actionQuit );
-
-	addToolBar( toolbar );
+	textEdit->clear();
 }
 
-void MainWindow1::fileNew()
-{
-	textEditor->clear();
-}
-
-void MainWindow1::fileOpen()
-{
+void MainWindow1::on_action_Open_triggered()
+{        
 	QString fileName = QFileDialog::getOpenFileName( this, "Open file", "", "*" );
-	
-	if (fileName.isEmpty() )
-		return;
-	
-	QFile file(fileName);
-	if (!file.open(QFile::ReadOnly | QFile::Text))
-	{
-		QMessageBox::warning(this, tr("Application"),
-		       tr("Cannot read file %1:\n%2.")
-		       .arg(fileName)
-		       .arg(file.errorString()));
-		return;
-	}
 
-	QTextStream in(&file);
-	QApplication::setOverrideCursor(Qt::WaitCursor);
-	textEditor->setPlainText(in.readAll());
-	QApplication::restoreOverrideCursor();
+        if (fileName.isEmpty() )
+                return;
 
-	statusBar()->showMessage(tr("File loaded"), 2000);
+        QFile file(fileName);
+        if (!file.open(QFile::ReadOnly | QFile::Text))
+        {
+                QMessageBox::warning(this, tr("Application"),
+                       tr("Cannot read file %1:\n%2.")
+                       .arg(fileName)
+                       .arg(file.errorString()));
+                return;
+        }
+
+        QTextStream in(&file);
+        QApplication::setOverrideCursor(Qt::WaitCursor);
+        textEdit->setPlainText(in.readAll());
+        QApplication::restoreOverrideCursor();
+
+        statusBar()->showMessage(tr("File loaded"), 2000);
+}
+
+void MainWindow1::on_action_About_triggered()
+{
+	QMessageBox::information(this, "Demo 1",
+    "First demo of the qtsourceview library.\n"
+    "Diego Iastrubni <elcuco@kde.org> 2006, lincensed under the terms of the LGPL.");
+}
+
+void MainWindow1::on_actionAbout_Qt_triggered()
+{
+	QMessageBox::aboutQt( this, "diego" );
+}
+
+void MainWindow1::on_actionE_xit_triggered()
+{
+	this->close();
 }
