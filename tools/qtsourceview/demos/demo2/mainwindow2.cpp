@@ -3,6 +3,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QTextStream>
+#include <QPalette>
 #include <QSyntaxHighlighter>
 #include <QFile>
 
@@ -18,24 +19,20 @@ QString dataPath;
 MainWindow2::MainWindow2( QMainWindow *parent )
 :QMainWindow( parent )
 {
+	defColors = NULL;
+	defLang  = NULL;
+	highlight  = NULL;
+		
 	dataPath  = QApplication::applicationDirPath() + "/../../";	
 	setupUi( this );
         statusBar()->showMessage(tr("Welcome, the default syntax is C++"), 10000);
 	QTimer::singleShot( 0, this, SLOT(fillComboBoxes()));
-	
-	// load a default color set
-	defColors = new QsvColorDefFactory( dataPath + "/data/colors/kate.xml" );
-
-        // load a default language definition
-        langCpp   = new QsvLangDef( dataPath + "/data/langs/cpp.lang" );
-        
-	// assign to it the new syntax highlighter, with the default colors and language
-	highlight = new QsvSyntaxHighlighter( textEdit, defColors, langCpp );
 }
 
 //comboBox_colors
 void MainWindow2::fillComboBoxes()
 {
+	disable_combo_updates = true;
 	textEdit->setPlainText("done");
 	QString directory = dataPath + "/data/langs/";
 	QDir dir;
@@ -47,6 +44,12 @@ void MainWindow2::fillComboBoxes()
 	dir = QDir( dataPath + "/data/colors/", "*.xml");
 	colorFiles = dir.entryList(QDir::Files);	
 	comboBox_colors->addItems( colorFiles );
+
+	disable_combo_updates = false;
+	// now set the default language to c++, and use kate color definitions
+	comboBox_syntax->setCurrentIndex( comboBox_syntax->findText("test_.lang" ) );
+//	comboBox_syntax->setCurrentIndex( comboBox_syntax->findText("cpp.lang" ) );
+	comboBox_colors->setCurrentIndex( comboBox_colors->findText("kate.xml" ) );
 }
 
 void MainWindow2::on_action_New_triggered()
@@ -76,7 +79,7 @@ void MainWindow2::on_action_Open_triggered()
         textEdit->setPlainText(in.readAll());
         QApplication::restoreOverrideCursor();
 
-        statusBar()->showMessage(tr("File loaded"), 2000);
+        statusBar()->showMessage(tr("File loaded"), 2000);        
 }
 
 void MainWindow2::on_action_About_triggered()
@@ -94,4 +97,57 @@ void MainWindow2::on_actionAbout_Qt_triggered()
 void MainWindow2::on_actionE_xit_triggered()
 {
 	this->close();
+}
+
+
+void MainWindow2::on_comboBox_colors_currentIndexChanged( const QString & text )
+{
+	if (disable_combo_updates)
+		return;
+			
+#if 0
+	delete defColors;
+	defColors = new QsvColorDefFactory( dataPath + "/data/colors/" + text );
+	highlight->setColorsDef( defColors );
+#else
+	QTimer::singleShot( 0, this, SLOT(update_syntax_color()) );
+#endif	
+	
+	statusBar()->showMessage(tr("New color: %1").arg(text), 3000 );
+}
+
+void MainWindow2::on_comboBox_syntax_currentIndexChanged( const QString & text )
+{
+	if (disable_combo_updates)
+		return;
+		
+#if 0
+	delete defLang;
+	defLang = new QsvLangDef( dataPath + "/data/langs/" + text );
+	highlight->setHighlight( defLang );
+#else
+	QTimer::singleShot( 0, this, SLOT(update_syntax_color()) );
+#endif
+
+	statusBar()->showMessage(tr("New syntax: %1").arg(text), 3000 );
+}
+
+void MainWindow2::update_syntax_color()
+{
+	delete highlight;
+	delete defLang;
+	delete defColors;	
+	
+	defColors = new QsvColorDefFactory( dataPath + "/data/colors/" + comboBox_colors->currentText() );	
+
+	// set the background of the texteditor, to the same as the syntax		
+	// also set the default color of the syntax
+	// this must be done before setting the new syntax highlighter
+	QPalette p( textEdit->palette() );
+	p.setColor( QPalette::Base, defColors->getColorDef("dsNormal").getBackground() );
+	textEdit->setPalette( p );
+	textEdit->setTextColor( defColors->getColorDef("dsNormal").getColor() );
+	
+        defLang   = new QsvLangDef( dataPath + "/data/langs/" + comboBox_syntax->currentText() );
+	highlight = new QsvSyntaxHighlighter( textEdit, defColors, defLang );
 }

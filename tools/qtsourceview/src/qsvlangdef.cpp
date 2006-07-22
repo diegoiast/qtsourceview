@@ -16,18 +16,45 @@
 
 #include "qsvlangdef.h"
 
+/**
+ * \class QsvEntityDef 
+ * \brief A container for a syntax entity definition
+ *
+ */
 
 /**
- * \file    qegtklangdef.cpp
- * \brief   Implementation of the QeGtkSourceViewLangDef
- * \author  Diego Iastrubni (elcuco@kde.org)
- * \date    6-1-2006
- * \
+ * \class QsvEntityString
+ * \brief 
+ *
+ */
+
+/**
+ * \class QsvEntityLineComment
+ * \brief 
+ *
+ */
+
+/**
+ * \class QsvEntityBlockComment
+ * \brief 
+ *
+ */
+
+/**
+ * \class QsvEntityPatternItem
+ * \brief 
+ *
+ */
+
+/**
+ * \class QsvEntityKeywordList
+ * \brief 
+ *
  */
 
 
 /**
- * \class QeGtkSourceViewLangDef
+ * \class QsvLangDef
  * \brief A container class for GtkSourceView syntax definitions
  * 
  * GtkSourceView is a text widget that extends the standard gtk+ 2.x text widget:
@@ -36,23 +63,18 @@
  * The syntax definitions used by that library are stored as XML files.
  * This class provides an OO way of loading those definitions, and later on
  * use them for syntax highlighter classes.
- * 
+ *
+ * This class is an abstruction of the language definitions of found on the XML
+ * files supplied by that library, in Qt4 syntax.
  */
 
 
 /**
- * \brief Constructor for the QeGtkSourceViewLangDef class
- * 
- */
-QsvLangDef::QsvLangDef( QDomDocument doc )
-{
-	load( doc );
-};
-
-
-/**
- * \brief Constructor for the QeGtkSourceViewLangDef class
- * 
+ * \brief Constructor for the QsvLangDef class
+ * \param fileName the file from which the definitions should be loaded
+ *
+ * This constructor builds the language definition by loading the definitions
+ * from a file.
  */
 QsvLangDef::QsvLangDef( QString fileName )
 {
@@ -61,7 +83,20 @@ QsvLangDef::QsvLangDef( QString fileName )
 
 
 /**
- * \brief Destructor for the QeGtkSourceViewLangDef class
+ * \brief Constructor for the QsvLangDef class
+ * \param doc the dom document from which the definitions should be loaded
+ *
+ * This constructor builds the language definition by loading the definitions
+ * from a QDomDocument class.
+ */
+QsvLangDef::QsvLangDef( QDomDocument doc )
+{
+	load( doc );
+};
+
+
+/**
+ * \brief Destructor for the QsvLangDef class
  * 
  */
 QsvLangDef::~QsvLangDef()
@@ -70,11 +105,15 @@ QsvLangDef::~QsvLangDef()
 
 
 /**
- * \brief Loads a language definition from an XML file stored on the disk
+ * \brief load a language definition from an XML file stored on the disk
  * \param fileName The file from which the synatx should be loads
  * \return true on sucess, false on any error
  * 
- * 
+ * Loads the language definitions from a file by constructing a QDomDocument
+ * class with \b fileName and then calling load() with the new constructed
+ * QDomDocument.
+ *
+ * \see load( QDomDocument )
  */
 bool QsvLangDef::load( QString fileName )
 {
@@ -99,10 +138,20 @@ bool QsvLangDef::load( QString fileName )
 		return false;
 	}
 	file.close();
-
+	
 	return load( doc );
 }
 
+/**
+ * \brief load a language definition from an XML file stored on the disk
+ * \param doc the dom document from which the language should be loaded.
+ * \return true on sucess, false on any error
+ *
+ * Loads the language definition from the XML document \b doc.
+ * Basic checks are done on the synatx, the error checking is very
+ * minimal, so having a good valid XML is a good idea with this
+ * implementation.
+ */
 bool QsvLangDef::load( QDomDocument doc )
 {
 	QDomNodeList list, l;
@@ -147,6 +196,20 @@ bool QsvLangDef::load( QDomDocument doc )
 	return true;
 };
 
+
+/**
+ * \brief helper function for checking the boolean value of a node
+ * \param s the value to check
+ * \return true if the strings is a valid "true"
+ *
+ * This is a helper function to check the value of a string. The
+ * syntax of GTK source view demands that the value "TRUE" will be
+ * logical true, but this function extends that definition by returning "true"
+ * on these conditions:
+ *  - the string equals "true" (non case sensitive, "True" and "TrUe" also valid)
+ *  - the string equals "yes" (non case sensitive, "yeS" and "YES" also valid)
+ *  - the string equals "1"
+ */
 bool	QsvLangDef::isTrue( QString s )
 {
 	bool b = false;
@@ -159,7 +222,15 @@ bool	QsvLangDef::isTrue( QString s )
 	return b;
 }
 
-bool	QsvLangDef::loadEntity(QDomNode node, QsvEntityDef &entity )
+/**
+ * \brief load the value of an entity from a XML node
+ * \param node the dom node from which the value should be read
+ * \return true on sucess, false on any error
+ *
+ * Load an entity from the dom node passed on as a parameter.
+ * The value of the entity will be filled from the attributes of the node.
+ */
+bool	QsvLangDef::loadEntity( QDomNode node, QsvEntityDef &entity )
 {
 	try
 	{
@@ -175,6 +246,15 @@ bool	QsvLangDef::loadEntity(QDomNode node, QsvEntityDef &entity )
 	return true;
 }
 
+/**
+ * \brief load the definition of the line commends from the node list
+ * \param nodes the node list from which the definition of the line comments should be loaded
+ * \return true on sucess, false on any error
+ *
+ * This function loads the definition of the line comments on this syntax from the list of
+ * node list passed as a parameter.
+ * 
+ */
 bool	QsvLangDef::loadLineComments( QDomNodeList nodes )
 {
 	QDomNode node;
@@ -197,6 +277,13 @@ bool	QsvLangDef::loadLineComments( QDomNodeList nodes )
 	return true;
 }
 
+/**
+ * \brief load the definition of the strings from the node list
+ * \param nodes the node list from which the definition of the line comments should be loaded
+ * \return true on sucess, false on any error
+ *
+ * This function loads the definition of the strings on this syntax from the node list passed as a parameter.
+ */
 bool	QsvLangDef::loadStrings( QDomNodeList nodes )
 {
 	QDomNode node;
@@ -224,6 +311,16 @@ bool	QsvLangDef::loadStrings( QDomNodeList nodes )
 	return true;
 }
 
+/**
+ * \brief load the definition of the patterns in this syntax
+ * \param nodes the node list from which the definition of the patterns should be loaded
+ * \return true on sucess, false on any error
+ *
+ * This function loads the definition of the patterns on this syntax from the node list passed as a parameter.
+ *
+ * TODO
+ *   define what are patterns
+ */
 bool	QsvLangDef::loadPatternItems( QDomNodeList nodes )
 {
 	QDomNode node;
@@ -249,6 +346,15 @@ bool	QsvLangDef::loadPatternItems( QDomNodeList nodes )
 	return true;
 }
 
+/**
+ * \brief load the definition of the block comments in this syntax
+ * \param nodes the node list from which the definition of the block comments should be loaded
+ * \param list the links of block comment definitions
+ * \return true on sucess, false on any error
+ *
+ * This function loads the definition of the block comments on this syntax from the node list passed as a parameter
+ * into the list of block comments passed as a parameter.
+ */
 bool	QsvLangDef::loadBlockComments( QDomNodeList nodes, QList<QsvEntityBlockComment> &list )
 {
 	QDomNode node;
@@ -275,6 +381,13 @@ bool	QsvLangDef::loadBlockComments( QDomNodeList nodes, QList<QsvEntityBlockComm
 	return true;
 }
 
+/**
+ * \brief load the keyword definition list from
+ * \param nodes the node list from which the definition of the block comments should be loaded
+ * \return true on sucess, false on any error
+ *
+ * This function loads the definition of the keywords list on this syntax from the node list passed as a parameter.
+ */
 bool	QsvLangDef::loadKeywordList( QDomNodeList nodes )
 {
 	QDomNodeList strs;

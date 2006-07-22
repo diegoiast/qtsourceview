@@ -59,17 +59,14 @@ struct QsvEntityKeywordList : QsvEntityDef
 
 
 ///////////////////
-
-class QeGTK_Highlighter;
-
 class QsvLangDef
 {
 friend class QsvSyntaxHighlighter;
 // friend class QeLangDefFactory;
 
 public:
-	QsvLangDef( QDomDocument doc );
 	QsvLangDef( QString fileName );
+	QsvLangDef( QDomDocument doc );
 	virtual ~QsvLangDef();
 
 	bool	load( QString fileName );

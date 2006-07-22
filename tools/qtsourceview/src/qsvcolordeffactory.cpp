@@ -2,6 +2,7 @@
  * \file qsvcolordeffactory.cpp
  * \brief Implementation of the color defintion factory
  * \author Diego Iastrubni (elcuco@kde.org)
+ * \date 2006-07-22 01:58:07
  * License LGPL
  * \see qmdiActionGroup
  */
@@ -9,9 +10,21 @@
 #include <QtDebug>
 #include <QFile>
 
+#include <QBrush>
+#include <QTextCharFormat>
+#include <QColor>
+
 #include "qsvcolordef.h"
 #include "qsvcolordeffactory.h"
 #include "debug_info.h"
+
+/**
+ * \class QsvColorDefFactory
+ * \brief An abstract factory for languages definitions
+ *
+ *
+ * \see QsvColorDef
+ */
 
 QsvColorDefFactory::QsvColorDefFactory()
 {
@@ -33,19 +46,28 @@ QsvColorDefFactory::~QsvColorDefFactory()
 
 QsvColorDef QsvColorDefFactory::getColorDef( QString name )
 {
-#ifdef __DEBUG_NO_ITEM_FOUND__
+#ifdef __DEBUG_NO_ITEM_FOUND
 	qDebug( "%s %d", __FILE__, __LINE__ );
 #endif
 
-	foreach(QsvColorDef item, colorDefs)
+	foreach(QsvColorDef color, colorDefs)
 	{	
-		if (item.getStyleNum() == name )
-			return item;
+		if (color.getStyleNum() == name )
+		{
+#ifdef __DEBUG_NO_ITEM_FOUND__
+	// new empthy one	
+	qDebug( "%s %d - fond a color definition named %s - %s", __FILE__, __LINE__, 
+		qPrintable(name), 
+		qPrintable(color.toCharFormat().foreground().color().name()) 
+	);
+#endif				
+			return color;
+		}
 	}
 
 #ifdef __DEBUG_NO_ITEM_FOUND__
 	// new empthy one	
-	qDebug( "%s $d - could not find a color definition named (%s)", __FILE__, __LINE__, qPrintable(fileName) );
+	qDebug( "%s %d - could not find a color definition named (%s)", __FILE__, __LINE__, qPrintable(name) );
 #endif	
 	return QsvColorDef();
 }

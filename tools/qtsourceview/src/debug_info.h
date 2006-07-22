@@ -3,7 +3,7 @@
 // this will also enable a LOT of debug output, depending on
 // which options are you enabling
 
-// #define __DEBUG_NO_ITEM_FOUND
+// #define __DEBUG_NO_ITEM_FOUND__
 // #define __DEBUG_LANGS_MIMES__
 // #define __DEBUG_HIGHLIGHT__
 // #define __DEBUG_ADD_MAPPING__

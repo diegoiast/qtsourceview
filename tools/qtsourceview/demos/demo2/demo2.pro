@@ -5,7 +5,7 @@ CONFIG +=   qt \
   warn_on \
   release
 TEMPLATE =   app
-SOURCES =   main.cpp \
+SOURCES =   main2.cpp \
   mainwindow2.cpp
 FORMS =   mainwindow2.ui
 HEADERS =   mainwindow2.h

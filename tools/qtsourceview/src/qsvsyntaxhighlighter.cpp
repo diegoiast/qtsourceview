@@ -43,19 +43,19 @@ QsvSyntaxHighlighter::~QsvSyntaxHighlighter()
 {
 }
 
-void QsvSyntaxHighlighter::setHighlight( QsvLangDef *lang )
+void QsvSyntaxHighlighter::setHighlight( QsvLangDef *newLang )
 {
 	QString str;
-	language = lang;
+	language = newLang;
 
 	mappings.clear();
 	
-	if (lang == NULL)
+	if (language == NULL)
 		return;
 
 	//first match keyword lists
 	// TODO: optimizations
-	foreach( QsvEntityKeywordList l, lang->keywordListDefs )
+	foreach( QsvEntityKeywordList l, language->keywordListDefs )
 	{
 		foreach( QString s, l.list )
 		{
@@ -69,7 +69,7 @@ void QsvSyntaxHighlighter::setHighlight( QsvLangDef *lang )
 	}
 
 	// syntax itmes...
-	foreach( QsvEntityBlockComment l, lang->syntaxItemDefs )
+	foreach( QsvEntityBlockComment l, language->syntaxItemDefs )
 	{
 		QString s;
 		if (l.endRegex == "\\n")
@@ -81,13 +81,13 @@ void QsvSyntaxHighlighter::setHighlight( QsvLangDef *lang )
 
 	// later, pattern items
 	// TODO: optimizations
-	foreach( QsvEntityPatternItem l, lang->patternItems )
+	foreach( QsvEntityPatternItem l, language->patternItems )
 	{
 		addMapping( l.regex, l.style, !true );
 	}
 
 	// strings...
-	foreach( QsvEntityString l, lang->stringsDefs )
+	foreach( QsvEntityString l, language->stringsDefs )
 	{
 		if (!l.atEOL)
 			continue;
@@ -98,10 +98,22 @@ void QsvSyntaxHighlighter::setHighlight( QsvLangDef *lang )
 
 	// and finally... line comments...
 	// block comments are handeled in the drawing function	
-	foreach( QsvEntityLineComment l, lang->lineCommentsDefs )
+	foreach( QsvEntityLineComment l, language->lineCommentsDefs )
 	{
 		addMapping( QString("%1.*").arg(l.start), l.style );
 	}
+
+	// now we need to re-highlight, how the hell can we do this?
+	setDocument( document() );
+}
+
+void QsvSyntaxHighlighter::setColorsDef( QsvColorDefFactory *newColors )
+{
+	delete colors;
+	colors = newColors;
+	
+	// now we need to re-highlight, how the hell can we do this?
+	setDocument( document() );
 }
 
 // called when need to update a paragraph
@@ -114,13 +126,14 @@ void QsvSyntaxHighlighter::highlightBlock(const QString &text)
 #endif		
 		return;
 	}
-
+	
+	// set the whole text to the defautl format to begin with
 	QOrderedMapNode<QString,QTextCharFormat> pattern;
 	
 	// optimizations...
 	if (text.simplified().isEmpty())
 		goto HANDLE_BLOCK_COMMENTS;
-
+		
 	foreach( QsvEntityLineComment l, language->lineCommentsDefs )
 	{
 		if (text.startsWith( l.start ))
@@ -129,6 +142,7 @@ void QsvSyntaxHighlighter::highlightBlock(const QString &text)
 			return;
 		}
 	}
+	setFormat( 0, text.length(), colors->getColorDef("dsNormal").toCharFormat() );
 
 	// this code draws each line
 	foreach ( pattern, mappings.keys())
@@ -175,7 +189,10 @@ void QsvSyntaxHighlighter::addMapping(const QString &pattern, const QTextCharFor
 		p = "\\b" + p + "\\b";
 		
 #ifdef __DEBUG_ADD_MAPPING__
-	qDebug( "%s %d - %s", __FILE__, __LINE__, qPrintable(pattern) );
+	qDebug( "%s %d new mapping - [%s] %s - ", __FILE__, __LINE__, 
+		qPrintable(pattern), 
+		qPrintable(format.foreground().color().name()) 		
+	);
 #endif
 
 	mappings.add( p, format );
@@ -216,7 +233,12 @@ void QsvSyntaxHighlighter::addMapping(const QString &pattern, const QString form
 
 void QsvSyntaxHighlighter::drawText( QString text, QString s, QTextCharFormat &format )
 {
-	if (s.contains( QRegExp("[^*+()?]") ))
+//	using regex is a smart idea, but slow
+//	if (s.contains( QRegExp("[^\\\\*+()?]") )){
+	if  (
+		s.contains('^') || s.contains('+') || s.contains('*') || s.contains('?') || 
+		s.contains('(') || s.contains(')') || s.contains('[') || s.contains(']')
+	     )
 		drawRegExp( text, s, format );
 	else
 		drawKeywords( text, s, format );
@@ -242,22 +264,26 @@ void QsvSyntaxHighlighter::drawRegExp( QString text, QString s, QTextCharFormat 
 void QsvSyntaxHighlighter::drawKeywords( QString text, QString s, QTextCharFormat &format )
 {
 #ifdef __DEBUG_HIGHLIGHT__
-	qDebug( "%s %d - %s", __FILE__, __LINE__, qPrintable(s) );
+	qDebug( "%s %d drawing - %s", __FILE__, __LINE__, qPrintable(s) );
 #endif
 
 	int index = text.indexOf(s);
 	int length = s.length();
 	int txtLen = text.length();
 	
-	while (index >= 0)
+	while ( (index >= 0) && (index < txtLen) )
 	{
+		
 		// paint keyword, only if its suoorunded by white chars
-		// regexp are bad :)
+		// regexp are slow, this code looks bad, but faster :)
 		if (
-		   ((index==0) || (!text[index-1].isLetterOrNumber())) &&
-		   ((index+length>=txtLen) || (!text[index+length].isLetterOrNumber()))
-		   )
+                   ((index==0) || 
+                   	(!text[index-1].isLetterOrNumber() && (text[index-1] != '_'))) &&
+                   ((index+length>=txtLen) || 
+                   	(!text[index+length].isLetterOrNumber() && (text[index+length] != '_') ))
+                   )
 			setFormat(index, length, format );
 		index = text.indexOf(s, index + length);
 	}
 }
+

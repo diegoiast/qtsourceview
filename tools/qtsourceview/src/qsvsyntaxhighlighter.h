@@ -22,7 +22,8 @@ public:
 	QsvSyntaxHighlighter( QTextDocument *parent = 0, QsvColorDefFactory *colors=0, QsvLangDef *lang=0 );
 	QsvSyntaxHighlighter( QTextEdit *parent = 0, QsvColorDefFactory *colors=0, QsvLangDef *lang=0 );
 	~QsvSyntaxHighlighter();
-	void setHighlight( QsvLangDef *lang );
+	void setHighlight( QsvLangDef *newLang=0 );
+	void setColorsDef( QsvColorDefFactory *newColors=0 );
 
 protected:
 	void highlightBlock(const QString &text);
