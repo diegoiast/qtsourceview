@@ -23,7 +23,8 @@ MainWindow2::MainWindow2( QMainWindow *parent )
 	defLang  = NULL;
 	highlight  = NULL;
 		
-	dataPath  = QApplication::applicationDirPath() + "/../../";	
+//	dataPath  = QApplication::applicationDirPath() + "/../../";	
+	dataPath  = QApplication::applicationDirPath();
 	setupUi( this );
         statusBar()->showMessage(tr("Welcome, the default syntax is C++"), 10000);
 	QTimer::singleShot( 0, this, SLOT(fillComboBoxes()));
@@ -47,8 +48,8 @@ void MainWindow2::fillComboBoxes()
 
 	disable_combo_updates = false;
 	// now set the default language to c++, and use kate color definitions
-	comboBox_syntax->setCurrentIndex( comboBox_syntax->findText("test_.lang" ) );
-//	comboBox_syntax->setCurrentIndex( comboBox_syntax->findText("cpp.lang" ) );
+//	comboBox_syntax->setCurrentIndex( comboBox_syntax->findText("test_.lang" ) );
+	comboBox_syntax->setCurrentIndex( comboBox_syntax->findText("cpp.lang" ) );
 	comboBox_colors->setCurrentIndex( comboBox_colors->findText("kate.xml" ) );
 }
 

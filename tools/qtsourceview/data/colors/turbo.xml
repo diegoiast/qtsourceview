@@ -12,7 +12,7 @@
 	<itemData defStyleNum="dsComment"  name="Comment"        color="#777777" selColor="#0000ff" bold="0" italic="0" />
 	<itemData defStyleNum="dsOthers"   name="Others"         color="#B218B2" selColor="#00ff00" bold="0" italic="0" />
 	<itemData defStyleNum="dsAlert"    name="Alert"          color="#ffffff" selColor="#ffcccc" bold="0" italic="0" />
-	<itemData defStyleNum="dsFunction" name="Function"       color="#0000b0" selColor="#ffffff" bold="0" italic="0" />
+	<itemData defStyleNum="dsFunction" name="Function"       color="#00B0B0" selColor="#ffffff" bold="0" italic="0" />
 	<itemData defStyleNum="dsRegion"   name="Region marker"  color="#ffffff" selColor="#A0A0A4" bold="0" italic="0" />
 	<itemData defStyleNum="dsError"    name="Error "         color="#ff0000" selColor="#ff0000" bold="0" italic="0" underline="1" />
 </itemDatas>

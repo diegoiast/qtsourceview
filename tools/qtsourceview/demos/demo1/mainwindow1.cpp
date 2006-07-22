@@ -15,8 +15,8 @@ MainWindow1::MainWindow1( QMainWindow *parent )
 :QMainWindow( parent )
 {
 	setupUi( this );
-//	QString dataPath  = QApplication::applicationDirPath();
-	QString dataPath  = QApplication::applicationDirPath() + "/../../";
+	QString dataPath  = QApplication::applicationDirPath();
+//	QString dataPath  = QApplication::applicationDirPath() + "/../../";
 	
 	// load a default color set
 	defColors = new QsvColorDefFactory( dataPath + "/data/colors/kate.xml" );
@@ -28,7 +28,6 @@ MainWindow1::MainWindow1( QMainWindow *parent )
 	highlight = new QsvSyntaxHighlighter( textEdit, defColors, langCpp );
 	
         statusBar()->showMessage(tr("Welcome, the default syntax is C++"), 10000);
-		
 }
 
 void MainWindow1::on_action_New_triggered()

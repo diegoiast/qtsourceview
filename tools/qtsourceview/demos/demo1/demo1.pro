@@ -13,3 +13,8 @@ INCLUDEPATH =   ../../src \
   .
 LIBS =   -L../../ \
   -lqtsourceview
+TMP_DIR =   ../../tmp/
+UI_DIR =   ../../tmp/
+MOC_DIR =   ../../tmp/
+OBJECTS_DIR =   ../../tmp/
+DESTDIR=../../
