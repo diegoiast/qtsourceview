@@ -24,9 +24,9 @@ public:
 	QsvColorDefFactory( QString fileName );
 	virtual ~QsvColorDefFactory();
 
-	QsvColorDef getColorDef( QString name );
 	bool load( QDomDocument doc );
 	bool load( QString fileName );
+	QsvColorDef getColorDef( QString name );
 private:
 	QList<QsvColorDef> colorDefs;
 };

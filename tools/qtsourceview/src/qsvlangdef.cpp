@@ -16,6 +16,11 @@
 
 #include "qsvlangdef.h"
 
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+
+// non documented classes, yet
+
 /**
  * \class QsvEntityDef 
  * \brief A container for a syntax entity definition
@@ -51,7 +56,7 @@
  * \brief 
  *
  */
-
+#endif DOXYGEN_SHOULD_SKIP_THIS
 
 /**
  * \class QsvLangDef
@@ -115,7 +120,7 @@ QsvLangDef::~QsvLangDef()
  *
  * \see load( QDomDocument )
  */
-bool QsvLangDef::load( QString fileName )
+bool	QsvLangDef::load( QString fileName )
 {
 	QDomDocument doc("language");
 	QFile file(fileName);
@@ -152,7 +157,7 @@ bool QsvLangDef::load( QString fileName )
  * minimal, so having a good valid XML is a good idea with this
  * implementation.
  */
-bool QsvLangDef::load( QDomDocument doc )
+bool	QsvLangDef::load( QDomDocument doc )
 {
 	QDomNodeList list, l;
 	QDomNode n,m;
@@ -196,7 +201,28 @@ bool QsvLangDef::load( QDomDocument doc )
 	return true;
 };
 
+/**
+ * \fn 	QString	QsvLangDef::getName()
+ * \brief returns the name of this syntax
+ * 
+ * This return a descriptive name for this syntax. You can use it for displaying 
+ * the in GUIs instead of the file name.
+ */
 
+/**
+ * \fn QStringList QsvLangDef::getMimeTypes()
+ * \brief Get the supported mime types of this syntax definition
+ * \return a string list, which represents the all the mime types supported by this syntax
+ * 
+ * Each syntax definition includes a list of mime types supported by this
+ * syntax definition. For more information about mime types look in RFC 2045, 2046, 2047,
+ * 2048, and 2077.
+ * 
+ * It's up to an upper level API to match file names into mime types, and
+ * this class does not take 
+ * 
+ */
+	
 /**
  * \brief helper function for checking the boolean value of a node
  * \param s the value to check

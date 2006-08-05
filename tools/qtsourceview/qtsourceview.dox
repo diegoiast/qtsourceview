@@ -1,0 +1,51 @@
+/**
+
+\mainpage
+
+QtSourceView is a library which enables you to define basic syntax
+highliters for your Qt4 based editors. 
+
+The library is splited into 2 main parts:
+- Syntax definitions
+- Colors definitions
+
+This separation between definition and on screen rendering makes the
+highliter flexible enough to disable a lot of syntax in very different schemes.
+
+A very minimal example for using this library:
+\code
+QString dataPath  = QApplication::applicationDirPath();
+
+// load a default color set
+defColors = new QsvColorDefFactory( dataPath + "/data/colors/kate.xml" );
+
+// load a default language definition
+langCpp   = new QsvLangDef( dataPath + "/data/langs/cpp.lang" );
+
+// assign to it the new syntax highlighter, with the default colors and language
+highlight = new QsvSyntaxHighlighter( textEdit, defColors, langCpp );
+\endcode
+
+\section SyntaxDef Syntax definitions
+
+The syntax definitions are the same ones used by the project GtkSourceView
+(http://gtksourceview.sourceforge.net/). From GtkSourceView 's home page
+
+\verbatim
+GtkSourceView is a text widget that extends the standard gtk+ 2.x text widget.
+It improves the gtk+ text widget by implementing syntax highlighting and other 
+features typical of a source editor.
+It is part of the GNOME Desktop Environment and it is currently 
+being used by gedit, MonoDevelop, Glimmer and several other projects.
+\endverbatim
+
+This class only implements the syntax drawing, while leaving the other parts to different
+projects (like line numbering, completition auto-brackets... etc). You can also have a 
+color definition factory and match a file name to a definition ot have a more dynamic
+syntax coloring. For more details see QsvColorDefFactory
+
+You can set the syntax definition manually or use a factory for
+getting a specific syntax definition for a filename.
+
+\section ColorsDef Colors definition
+*/

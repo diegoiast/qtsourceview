@@ -21,6 +21,60 @@
 
 #include "debug_info.h"
 
+/**
+ * \class QsvSyntaxHighlighter
+ * \brief a simple syntax highlighter for Qt4
+ * 
+ * QsvSyntaxHighlighter is a simple syntax highlighter for Qt4, base on QSyntaxHighlighter.
+ * 
+ * This class depends on 2 different inputs in order to paint a text files:
+ * 
+ * - The syntax definitions 
+ * - The color definitions
+ * 
+ * This separation gives you the freedom to choose different syntaxs and different
+ * colors schemes.
+ * 
+ * \section  SyntaxDefinitions Syntax definitions
+ * The syntax definitions are the same ones used by the project GtkSourview 
+ * (http://gtksourceview.sourceforge.net/). From GtkSourview 's home page
+ * 
+ * \verbatim
+GtkSourceView is a text widget that extends the standard gtk+ 2.x text widget.
+It improves the gtk+ text widget by implementing syntax highlighting and other 
+features typical of a source editor.
+It is part of the GNOME Desktop Environment and it is currently 
+being used by gedit, MonoDevelop, Glimmer and several other projects.
+  \endverbatim
+ *
+ * This class only implements the syntax drawing, while leaving the other parts to different
+ * projects (like line numbering, completition auto-brackets... etc). You can also have a 
+ * color definition factory and match a file name to a definition ot have a more dynamic
+ * syntax coloring. For more details see QsvColorDefFactory
+ * 
+ * \section ColorDefinitions Color definitions
+ * This class also relies on an external color definition. The color definitions can
+ * be loaded from XML files by the class QsvColorDefFactory.
+ * 
+ * \section HowItWorks The way the highling internally works
+ * 
+ * The way this syntax highlighter works, is pretty simple. The idea is based
+ * on the example from Qt4.1.0. The syntax highlighter contains a group of mappings
+ * which define what to draw and how to color it. Those matches are grabbed from the QsvLangDef
+ * and the colors come from the QsvColorDefFactory. Generally there is no reason to mess
+ * arround with those internal functions, and you need only to create new syntax definitions
+ * by writing XML files.
+ */
+ 
+/**
+ * \brief construct a syntax highlighter 
+ * \param parent the document to which the highlight will be applied
+ * \param colors the colors definition for drawing the syntax
+ * \param lang the syntax definition of the text in this text editor
+ * 
+ * This function constructs a syntax highlighter and applies it to the
+ * document passed. It will use the colors and language defined.
+ */
 QsvSyntaxHighlighter::QsvSyntaxHighlighter( QTextDocument *parent, QsvColorDefFactory *colors, QsvLangDef *lang )
 	:QSyntaxHighlighter(parent)
 {
@@ -30,6 +84,15 @@ QsvSyntaxHighlighter::QsvSyntaxHighlighter( QTextDocument *parent, QsvColorDefFa
 	setHighlight( lang );
 }
 
+/**
+ * \brief construct a syntax highlighter 
+ * \param parent the text editor to which the highlight will be applied
+ * \param colors the colors definition for drawing the syntax
+ * \param lang the syntax definition of the text in this text editor
+ * 
+ * This function constructs a syntax highlighter and applies it to the
+ * document of the text editor passed. It will use the colors and language defined.
+ */
 QsvSyntaxHighlighter::QsvSyntaxHighlighter( QTextEdit *parent, QsvColorDefFactory *colors, QsvLangDef *lang )
 	:QSyntaxHighlighter(parent)
 {
@@ -39,10 +102,27 @@ QsvSyntaxHighlighter::QsvSyntaxHighlighter( QTextEdit *parent, QsvColorDefFactor
 	setHighlight( lang );
 }
 
+/**
+ * \brief default destructor
+ * 
+ * destructors the syntax highlighter
+ */
 QsvSyntaxHighlighter::~QsvSyntaxHighlighter()
 {
 }
 
+/**
+ * \brief change the syntax definition to be used
+ * \param newLang the new langauge definition
+ * 
+ * This function changes the definition of the syntax highlighter. 
+ * The old definition is not disposed, you should take care of freeing 
+ * the allocated memory yourself.
+ * 
+ * You should also re-highlight the editor yourself.
+ * 
+ * \bug No way of re-highligting the editor On Qt < 4.2.0
+ */
 void QsvSyntaxHighlighter::setHighlight( QsvLangDef *newLang )
 {
 	QString str;
@@ -107,6 +187,18 @@ void QsvSyntaxHighlighter::setHighlight( QsvLangDef *newLang )
 	setDocument( document() );
 }
 
+/**
+ * \brief change the colors used to paint the text
+ * \param newColors the new colors to be used
+ * 
+ * This function changes the colors definition of the syntax highlighter. 
+ * The old colros are not disposed, you should take care of freeing 
+ * the allocated memory yourself.
+ * 
+ * You should also re-highlight the editor yourself.
+ * 
+ * \bug No way of re-highligting the editor On Qt < 4.2.0
+ */
 void QsvSyntaxHighlighter::setColorsDef( QsvColorDefFactory *newColors )
 {
 	delete colors;
@@ -116,7 +208,15 @@ void QsvSyntaxHighlighter::setColorsDef( QsvColorDefFactory *newColors )
 	setDocument( document() );
 }
 
-// called when need to update a paragraph
+/**
+ * \brief Highlights the given text block. 
+ * \param text the text of the current chunck to colorize
+ * 
+ * This function is called when necessary by the rich text engine, 
+ * i.e. on text blocks which have changed.
+ * 
+ * \see QSyntaxHighlighter::highlightBlock(const QString &text)
+ */
 void QsvSyntaxHighlighter::highlightBlock(const QString &text)
 {
 	if (language == NULL)
@@ -127,7 +227,7 @@ void QsvSyntaxHighlighter::highlightBlock(const QString &text)
 		return;
 	}
 	
-	// set the whole text to the defautl format to begin with
+	// set the whole text to the default format to begin with
 	QOrderedMapNode<QString,QTextCharFormat> pattern;
 	
 	// optimizations...
@@ -181,6 +281,7 @@ HANDLE_BLOCK_COMMENTS:
 		startIndex = text.indexOf( startExpression, startIndex + commentLength );
 	}
 }
+
 
 void QsvSyntaxHighlighter::addMapping(const QString &pattern, const QTextCharFormat &format, bool fullWord )
 {	

@@ -18,16 +18,19 @@ class QsvLangDefFactory
 {
 public:
 	static QsvLangDefFactory *getInstanse();
-	QsvLangDef *getHighlight( QString fileName );
-	void loadDirectory( QString directory );
+	QsvLangDef*	getHighlight( QString fileName );
+	void		loadDirectory( QString directory );
+	void		clearMimeTypes();
+	bool		addDefaultMimeTypes();
+	bool		addMimeTypes( QString fileName );
 
 private:	
 	QsvLangDefFactory(void);
 	~QsvLangDefFactory(void);
 	
-	static QsvLangDefFactory *LangFactory;
-	QList<QsvLangDef*> langList;
-	QMap<QString,QStringList> mimeTypes;
+	static	QsvLangDefFactory	*LangFactory;
+	QList<QsvLangDef*>		langList;
+	QMap<QString,QStringList>	mimeTypes;
 };
 
 #endif // __QE_LANGDEF_FACTORY_H__
