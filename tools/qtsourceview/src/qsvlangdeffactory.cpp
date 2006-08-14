@@ -70,6 +70,12 @@ QsvLangDefFactory *QsvLangDefFactory::getInstanse()
 		LangFactory = new QsvLangDefFactory();
 	}
 
+#ifdef __DEBUG_FOUND_LANG_DEF__	
+	qDebug( "%s %d - gettng instanse %p",
+		__FILE__, __LINE__,
+	       LangFactory
+	);
+#endif	
 	return LangFactory;
 }
 
@@ -107,9 +113,9 @@ QsvLangDef* QsvLangDefFactory::getHighlight( QString fileName )
 			// if do we recognize the mime type defined in that
 			// syntax highligh definition, check if matches this file
 
-			if ( mimeTypes.find(langMimeType) )
+			if ( !mimeTypes.find(langMimeType) )
 			{
-				qDebug( "%s %d : Unknown mimetype [%s] at highlight file %s",
+				qDebug( "%s %d - Unknown mimetype [%s] at highlight file %s",
 					__FILE__, __LINE__, qPrintable(langMimeType), qPrintable(langDef->getName()) );
 				continue;
 			}
@@ -139,7 +145,9 @@ QsvLangDef* QsvLangDefFactory::getHighlight( QString fileName )
 		}
 	}
 
-	qDebug( "%s %d : Not found any highlighter for [%s]", __FILE__, __LINE__, qPrintable(fileName) );
+#ifdef __DEBUG_FOUND_LANG_DEF__
+	qDebug( "%s %d - Error: Not found any highlighter for [%s]", __FILE__, __LINE__, qPrintable(fileName) );
+#endif
 	return NULL;
 }
 
@@ -182,14 +190,13 @@ void QsvLangDefFactory::loadDirectory( QString directory )
 		langList << langDef;
 		QString langMimeType;
 
-#ifdef __DEBUG_LANGS_MIMES__
+#ifdef __DEBUG_LANGS_MIMES_
 		foreach( langMimeType, langDef->getMimeTypes() )
 		{
 			if ( mimeTypes.find(langMimeType) == mimeTypes.end() )
 			{
- 				qDebug("%s %d - Warning: highlight file %s - unknown mimetype [%s]",
-		 
-				       צריך להתקין את כל הדסקים האלה יש שם איזה 8 ג'יגה להתקין			__FILE__, __LINE__,
+				qDebug("%s %d - Warning: highlight file %s - unknown mimetype [%s]",
+				       __FILE__, __LINE__,
 					qPrintable(langDef->getName()), qPrintable(langMimeType)
 				);
 			}
@@ -254,13 +261,15 @@ bool	QsvLangDefFactory::addMimeTypes( QString fileName )
 
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
 	{
-		qDebug("%s %d - Error: could not load the default mime.types [%s]",
-		       __FILE__, __LINE__,
-		       qPrintable(fileName)
-		      );
+#ifdef __DEBUG_LANGS_MIMES__
+		qDebug("%s %d - Error: could not load mime.types [%s]",
+			__FILE__, __LINE__,
+			qPrintable(fileName)
+		);
+#endif
 		return false;
 	}
-	
+		
 	// parse built in mime types definitions
 	QTextStream in(&file);
 	while (!in.atEnd())
@@ -279,13 +288,19 @@ bool	QsvLangDefFactory::addMimeTypes( QString fileName )
 #ifdef __DEBUG_LANGS_MIMES__
 			QString s;
 			for ( int j=0; j<l.count(); j ++ ) s = s + "*." + l[j] + ",";
-			qDebug( "%s -> %s", qPrintable(name), qPrintable(s) );
+			qDebug( "%s %d - Info: loaded mime type %s -> %s", __FILE__, __LINE__, qPrintable(name), qPrintable(s) );
 #endif
 			mimeTypes[name] = l;
 		}
 	}
 	file.close();
 	
+#ifdef __DEBUG_LANGS_MIMES__
+	qDebug("%s %d - Info: loaded mime.types [%s]",
+		__FILE__, __LINE__,
+		qPrintable(fileName)
+	);
+#endif
 	return true;
 }
 
