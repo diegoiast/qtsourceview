@@ -1,19 +1,20 @@
+QT =   gui \
+  core \
+  xml
+CONFIG +=   qt \
+  warn_on \
+  release
 TEMPLATE =   app
-CONFIG +=   release \
-  warn_on
-QT =   xml \
-  gui \
-  core
-INCLUDEPATH =   . \
-  ../../src/
-TMP_DIR =   ../../tmp
-UI_DIR =   ../../tmp
-MOC_DIR =   ../../tmp
-OBJECTS_DIR =   ../../tmp
 SOURCES =   main3.cpp \
   mainwindow3.cpp
+FORMS =   mainwindow3.ui
 HEADERS =   mainwindow3.h
-unix:LIBS =   -L../../ \
+INCLUDEPATH =   ../../src \
+  .
+LIBS =   -L../../ \
   -lqtsourceview
-RESOURCES =   ../../src/qtsourceview.qrc
+TMP_DIR =   ../../tmp/
+UI_DIR =   ../../tmp/
+MOC_DIR =   ../../tmp/
+OBJECTS_DIR =   ../../tmp/
 DESTDIR=../../
