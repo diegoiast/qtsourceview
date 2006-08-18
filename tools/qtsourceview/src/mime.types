@@ -211,8 +211,7 @@ application/x-ini-file		ini
 
 
 #makefile
-text/x-makefile			make makefile Makefile
-text/x-makefile			make makefile Makefile
+text/x-makefile			make makefile Makefile Makefile.*
 text/x-pro			pro pri
 
 # shell

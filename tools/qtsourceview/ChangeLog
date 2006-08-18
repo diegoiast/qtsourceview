@@ -1,0 +1,10 @@
+QtSourceView - 18 Aug 06 - 0.0.2
+ * Second release
+ * Added 3 new language definitions from GtkSourceView: scheme, octave, changelog
+ * Added 1 new original language: Qt project file
+ * Several bug fixes
+ * All examples are made with the designer now
+ * Minimal doxygen documentation
+ 
+QtSourceView - 22 Jul 06 - 0.0.1
+ * First release
