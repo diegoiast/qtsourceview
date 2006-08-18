@@ -212,6 +212,8 @@ application/x-ini-file		ini
 
 #makefile
 text/x-makefile			make makefile Makefile
+text/x-makefile			make makefile Makefile
+text/x-pro			pro pri
 
 # shell
 text/x-sh			sh bash
@@ -233,3 +235,13 @@ text/x-tex			tex latex
 # patch or diff
 text/x-diff			diff patch
 text/x-patch			diff patch
+
+# scheme
+text/x-scheme			scheme
+
+# octave
+text/x-octave			octave m M
+text/x-matlab			octave m M
+
+# changelog
+text/x-changelog		ChangeLog
