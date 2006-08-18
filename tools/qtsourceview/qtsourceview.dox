@@ -12,7 +12,7 @@ The library is splited into 2 main parts:
 This separation between definition and on screen rendering makes the
 highliter flexible enough to disable a lot of syntax in very different schemes.
 
-A very minimal example for using this library:
+A very minimal example for using this library (this is teh code behind demo1):
 \code
 QString dataPath  = QApplication::applicationDirPath();
 
