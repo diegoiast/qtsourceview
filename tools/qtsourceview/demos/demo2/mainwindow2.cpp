@@ -34,7 +34,6 @@ MainWindow2::MainWindow2( QMainWindow *parent )
 void MainWindow2::fillComboBoxes()
 {
 	disable_combo_updates = true;
-	textEdit->setPlainText("done");
 	QString directory = dataPath + "/data/langs/";
 	QDir dir;
 	
