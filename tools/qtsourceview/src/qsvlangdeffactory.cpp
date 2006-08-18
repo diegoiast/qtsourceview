@@ -105,7 +105,15 @@ QsvLangDef* QsvLangDefFactory::getHighlight( QString fileName )
 {
 	QsvLangDef *langDef;
 	QString langMimeType;
-
+	QString trimmedFileName = fileName;
+	
+	// try to find the file name, without directory
+	int i = fileName.lastIndexOf( '/' );
+	if (i == -1 )
+		i = fileName.lastIndexOf( '\\' );	
+	if (i != -1 )
+		trimmedFileName = fileName.right( fileName.length() - i - 1 );
+	
 	foreach( langDef, langList )
 	{
 		foreach( langMimeType, langDef->getMimeTypes() )
@@ -124,21 +132,20 @@ QsvLangDef* QsvLangDefFactory::getHighlight( QString fileName )
 			{
 				QString s = "*." + mimeTypes[langMimeType][j];
 				
-				if (QDir::match( s, fileName) || 
-					QDir::match( mimeTypes[langMimeType][j], fileName) ||
-					(fileName == mimeTypes[langMimeType][j])
-				   ) // still the "if"
-
-// 					QString s = "*" + mimeTypes[langMimeType][j];
-// 					if (QDir::match( s, fileName))
+				if	(
+						// match full names like Makefile, Doyxgen, Changelog, etc
+						(mimeTypes[langMimeType][j] == trimmedFileName) ||
+						// otherwise match by extensions
+						QDir::match( s, fileName) 
+					) // still the "if"
 				{
-#ifdef __DEBUG_FOUND_LANG_DEF__	
+#ifdef __DEBUG_FOUND_LANG_DEF__
 					qDebug( "%s %d - Found language definition %s [%s,%s]",
 						__FILE__, __LINE__,
 						qPrintable(langDef->getName()),
 						qPrintable(fileName), qPrintable( "*" + mimeTypes[langMimeType][j] )
 					);
-#endif						
+#endif
 					return langDef;
 				}
 			}

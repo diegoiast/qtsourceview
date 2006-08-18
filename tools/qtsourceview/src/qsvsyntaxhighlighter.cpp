@@ -336,10 +336,11 @@ void QsvSyntaxHighlighter::drawText( QString text, QString s, QTextCharFormat &f
 {
 //	using regex is a smart idea, but slow
 //	if (s.contains( QRegExp("[^\\\\*+()?]") )){
-	if  (
-		s.contains('^') || s.contains('+') || s.contains('*') || s.contains('?') || 
-		s.contains('(') || s.contains(')') || s.contains('[') || s.contains(']')
-	     )
+	if	(
+			s.contains('^') || s.contains('+') || s.contains('*') || s.contains('?') || 
+			s.contains('(') || s.contains(')') || s.contains('[') || s.contains(']') ||
+			s.contains('\\') 
+		)
 		drawRegExp( text, s, format );
 	else
 		drawKeywords( text, s, format );
@@ -351,7 +352,7 @@ void QsvSyntaxHighlighter::drawRegExp( QString text, QString s, QTextCharFormat 
 	int index = text.indexOf(expression);
 
 #ifdef __DEBUG_HIGHLIGHT__
-	qDebug( "%s %d -  %s )", __FILE__, __LINE__, qPrintable(s) );
+	qDebug( "%s %d (drawing regex)	-  %s )", __FILE__, __LINE__, qPrintable(s) );
 #endif
 
 	while (index >= 0)
@@ -365,7 +366,7 @@ void QsvSyntaxHighlighter::drawRegExp( QString text, QString s, QTextCharFormat 
 void QsvSyntaxHighlighter::drawKeywords( QString text, QString s, QTextCharFormat &format )
 {
 #ifdef __DEBUG_HIGHLIGHT__
-	qDebug( "%s %d drawing - %s", __FILE__, __LINE__, qPrintable(s) );
+	qDebug( "%s %d (drawing keyword)	- %s", __FILE__, __LINE__, qPrintable(s) );
 #endif
 
 	int index = text.indexOf(s);
@@ -377,12 +378,18 @@ void QsvSyntaxHighlighter::drawKeywords( QString text, QString s, QTextCharForma
 		
 		// paint keyword, only if its suoorunded by white chars
 		// regexp are slow, this code looks bad, but faster :)
-		if (
-                   ((index==0) || 
-                   	(!text[index-1].isLetterOrNumber() && (text[index-1] != '_'))) &&
-                   ((index+length>=txtLen) || 
-                   	(!text[index+length].isLetterOrNumber() && (text[index+length] != '_') ))
-                   )
+		if 
+		(
+			(
+				(index==0) || 
+				(!text[index-1].isLetterOrNumber() && (text[index-1] != '_'))
+			)
+			       &&
+			(
+				(index+length>=txtLen) || 
+				(!text[index+length].isLetterOrNumber() && (text[index+length] != '_') )
+			)
+		)
 			setFormat(index, length, format );
 		index = text.indexOf(s, index + length);
 	}
