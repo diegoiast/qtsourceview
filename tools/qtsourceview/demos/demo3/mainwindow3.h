@@ -2,7 +2,7 @@
 #define __MAINWINDOW2_H__
 
 #include <QMainWindow>
-#include "ui_mainwindow1.h"
+#include "ui_mainwindow3.h"
 
 class QsvColorDefFactory;
 class QsvLangDef;
