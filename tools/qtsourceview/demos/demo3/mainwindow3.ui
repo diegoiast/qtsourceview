@@ -1,5 +1,5 @@
 <ui version="4.0" >
- <class>MainWindow1</class>
+ <class>MainWindow3</class>
  <widget class="QMainWindow" name="MainWindow3" >
   <property name="geometry" >
    <rect>
@@ -45,7 +45,7 @@
       <property name="html" >
        <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
 p, li { white-space: pre-wrap; }
-&lt;/style>&lt;/head>&lt;body style=" font-family:FreeMono; font-size:10pt; font-weight:400; font-style:normal; text-decoration:none;">
+&lt;/style>&lt;/head>&lt;body style=" font-family:'FreeMono'; font-size:10pt; font-weight:400; font-style:normal; text-decoration:none;">
 &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">#include &amp;lt;sstdio.h&amp;gt;&lt;/p>
 &lt;p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;/p>
 &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">int main( int argc, char *argv[] )&lt;/p>
@@ -69,7 +69,7 @@ p, li { white-space: pre-wrap; }
      <x>0</x>
      <y>0</y>
      <width>495</width>
-     <height>35</height>
+     <height>27</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_Help" >
@@ -118,10 +118,16 @@ p, li { white-space: pre-wrap; }
    <property name="text" >
     <string>&amp;New</string>
    </property>
+   <property name="shortcut" >
+    <string>Ctrl+N</string>
+   </property>
   </action>
   <action name="action_Open" >
    <property name="text" >
     <string>&amp;Open...</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+O</string>
    </property>
   </action>
   <action name="actionE_xit" >

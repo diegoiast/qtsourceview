@@ -43,8 +43,9 @@ void MainWindow3::on_action_New_triggered()
 }
 
 void MainWindow3::on_action_Open_triggered()
-{        
-	QString fileName = QFileDialog::getOpenFileName( this, "Open file", "", "*" );
+{
+	static QString lastDir;
+	QString fileName = QFileDialog::getOpenFileName( this, "Open file", lastDir, "*" );
 	
 	if (fileName.isEmpty() )
 		return;
@@ -59,6 +60,9 @@ void MainWindow3::on_action_Open_triggered()
 		return;
 	}
 
+	QFileInfo info(file);
+	lastDir = info.absolutePath();
+	
 	// detect the best hightlight for this file type
 	// clear the document, so it will not get painted as well
 	textEdit->clear();

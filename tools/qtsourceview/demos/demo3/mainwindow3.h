@@ -8,7 +8,7 @@ class QsvColorDefFactory;
 class QsvLangDef;
 class QsvSyntaxHighlighter;
 
-class MainWindow3: public QMainWindow, private Ui::MainWindow1
+class MainWindow3: public QMainWindow, private Ui::MainWindow3
 {
 	Q_OBJECT
 public:	
