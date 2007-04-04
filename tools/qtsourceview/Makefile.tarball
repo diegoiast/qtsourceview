@@ -1,0 +1,14 @@
+SVN_RELEASE	=	$(shell svn info | grep Revision | awk '{ print $$2 }' )
+DIR_NAME	=	$(shell basename `pwd`)
+TMP_DIR		:=	$(shell mktemp /tmp/svn-export.XXXXXXXXXX -d -q)
+OUTPUT_DIR_NAME	=	$(TMP_DIR)/$(DIR_NAME)-r$(SVN_RELEASE)
+FILE_NAME	=	$(DIR_NAME)-r$(SVN_RELEASE).tar.gz
+
+
+all:
+	rm -fr $(TMP_DIR)
+	mkdir -p $(TMP_DIR)
+	svn export . $(OUTPUT_DIR_NAME)
+	cd $(OUTPUT_DIR_NAME) && doxygen
+	tar -czf $(FILE_NAME) -C $(TMP_DIR)/ .
+	rm -fr $(TMP_DIR)
