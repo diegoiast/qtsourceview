@@ -1,7 +1,7 @@
 <!-- default data items for kate -->
 
 <itemDatas>
-	<itemData defStyleNum="dsNormal"   name="Normal"         color="#000000" selColor="#ffffff" background="#ffffff"  bold="0" italic="0" />
+	<itemData defStyleNum="dsNormal"   name="Normal"         color="#000000" selColor="#ffffff" bold="0" italic="0" />
 	<itemData defStyleNum="dsKeyword"  name="Keyword"        color="#000000" selColor="#ffffff" bold="1" italic="0" />
 	<itemData defStyleNum="dsDataType" name="Data type"      color="#800000" selColor="#ffffff" bold="0" italic="0" />
 	<itemData defStyleNum="dsDecVal"   name="Decimal/Value"  color="#0000ff" selColor="#00ffff" bold="0" italic="0" />
@@ -18,4 +18,9 @@
 
         <itemData defStyleNum="dsOthers2"  name="Diff added"     color="#008000" selColor="#00ff00" bold="0" italic="0" />
         <itemData defStyleNum="dsOthers3"  name="Diff removed"   color="#800000" selColor="#00ff00" bold="0" italic="0" />
+	
+	<!-- these are not syntax definitions, but defintions for the text editor -->
+	<itemData defStyleNum="dsWidgetBackground"   name="Widget background"         background="#ffffff"  />
+	<itemData defStyleNum="dsWidgetCurLine"      name="Widget current line"       background="#EEF6FF"  />
+	<itemData defStyleNum="dsWidgetLinesPanel"   name="Widget lines marker"       background="#ffffd0"  />
 </itemDatas>
