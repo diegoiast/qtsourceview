@@ -17,25 +17,24 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
 	: QMainWindow(parent, f)
 {
 	setupUi(this);
-	QString dataPath  = QApplication::applicationDirPath() + "/../../";
+	QString dataPath  = QApplication::applicationDirPath() + "/../..";
 
-
-	QsvLangDefFactory::getInstanse()->addMimeTypes( dataPath  + "src/mime.types" );
-	QsvLangDefFactory::getInstanse()->loadDirectory( dataPath + "data/langs/" );
-// 	EditorConfig::getInstance()->loadColorsDirectory( dataPath + "data/colors/" );
-
+	QsvLangDefFactory::getInstanse()->addMimeTypes( dataPath  + "/src/mime.types" );
+	QsvLangDefFactory::getInstanse()->loadDirectory( dataPath + "/data/langs/" );
+	EditorConfig::getInstance()->loadColorsDirectory( dataPath + "/data/colors/" );
 	
-	defColors = new QsvColorDefFactory( dataPath + "data/colors/turbo.xml" );
+	defColors = new QsvColorDefFactory( dataPath + "/data/colors/turbo.xml" );
 	langDefinition = QsvLangDefFactory::getInstanse()->getHighlight("1.cpp");
 	highlight = new QsvSyntaxHighlighter( textEdit, defColors, langDefinition );
 	
 	// set the background color of the text widget:
 	QPalette p( textEdit->palette() );
 	p.setColor( QPalette::Base, defColors->getColorDef("dsWidgetBackground").getBackground() );
-	textEdit->setCurrentLineColor( defColors->getColorDef("dsWidgetCurLine").getBackground() );
-	textEdit->setLinesPanelColor( defColors->getColorDef("dsWidgetLinesPanel").getBackground() );
-	textEdit->setTextColor( defColors->getColorDef("dsNormal").getColor() );
 	textEdit->setPalette( p );
+	textEdit->setTextColor( defColors->getColorDef("dsNormal").getColor() );
+
+	textEdit->setItemColor( LinesPanel, defColors->getColorDef("dsWidgetLinesPanel").getBackground() );
+	textEdit->setItemColor( CurrentLine, defColors->getColorDef("dsWidgetCurLine").getBackground() );
 
 	textEdit->loadFile( "mainwindowimpl.cpp" );
 	connect( action_find, SIGNAL(triggered()), textEdit, SLOT(showFindWidget()) );

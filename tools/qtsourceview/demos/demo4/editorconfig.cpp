@@ -36,7 +36,7 @@ EditorConfig::EditorConfig()
 }
 
 void EditorConfig::showConfigDialog()
-{
+{	
 	// the construction of the syntax highlighter must be postponded
 	// to the last possible moment - so the programmer
 	// will ask to load the colors directory
@@ -53,9 +53,6 @@ void EditorConfig::showConfigDialog()
 
 void EditorConfig::loadColorsDirectory( QString directory )
 {
-	
-	qDebug("1111111111");
-	
 	if (directory.isEmpty())
 		directory = QDir::currentPath();
 	QDir dir(directory, "*.xml");
@@ -71,7 +68,6 @@ void EditorConfig::loadColorsDirectory( QString directory )
 
 	for (int i = 0; i < fileCount; ++i)
 	{
-		qDebug( "loading file %s/%s", qPrintable(directory), qPrintable(files[i] ) );
 		QsvColorDefFactory *c = new QsvColorDefFactory( directory + "/" + files[i] );
 		colorSchemes << c;
 	}
@@ -96,7 +92,11 @@ EditorConfigData  EditorConfig::getDefaultConfiguration()
 	c.tabSize		= 8;
 	c.matchBrackesList	= "()[]{}";
 	c.currentFont		= QFont( DEFAULT_FONT_NAME, DEFAULT_FONT_SIZE );
-	c.currentColorScheme	= colorSchemes[0];
+	
+	if (colorSchemes.isEmpty())
+		c.currentColorScheme	= NULL;
+	else
+		c.currentColorScheme	= colorSchemes[0];
 	
 	return c;
 }
@@ -132,6 +132,12 @@ void EditorConfig::on_buttonBox_clicked( QAbstractButton * button )
 	{
 		// set the configuration internally and emit signal
 		qDebug("pressed ok");
+		dialog->close();		
+	}
+	if (b == buttonBox->button(QDialogButtonBox::Apply))
+	{
+		// set the configuration internally and emit signal
+		qDebug("pressed apply");
 	}
 	else if (b == buttonBox->button(QDialogButtonBox::Cancel))
 	{

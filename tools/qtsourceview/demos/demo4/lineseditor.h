@@ -7,20 +7,24 @@
 class SamplePanel;
 class TransparentWidget;
 
+enum ItemColors {
+	 LinesPanel, CurrentLine, MatchBrackets, NoText, TextFound, TextNoFound
+};
+
 class LinesEditor: public QTextEdit
 {
 	Q_OBJECT
 public:
+	
 	LinesEditor( QWidget *p=NULL );
 	void setupActions();
-	QColor getLinesPanelColor();
-	QColor getCurrentLineColor();
+	QColor getItemColor( ItemColors role );
+	void   setItemColor( ItemColors role, QColor );
+	
 	virtual void findMatching( QChar c1, QChar c2, bool forward, QTextBlock &block); 
 
 public slots:
 	void on_searchText_textChanged( const QString & text );
-	void setLinesPanelColor( QColor c );
-	void setCurrentLineColor( QColor c );
 	void showFindWidget();
 	int loadFile( QString );
 	
@@ -41,11 +45,13 @@ protected:
 
 	QPixmap tabPixmap;
 	QPixmap spacePixmap;
+	
 	QColor	currentLineColor;
-	QColor	linesPanelColor;
 	QColor	matchBracesColor;
 	QColor	searchFoundColor;
 	QColor	searchNotFoundColor;
+	QColor	searchNoText;
+	
 	bool	highlightCurrentLine;
 	bool	showWhiteSpaces;
 	bool	showMatchingBraces;

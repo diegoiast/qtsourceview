@@ -71,10 +71,11 @@ LinesEditor::LinesEditor( QWidget *p ) :QTextEdit(p)
 	tabPixmap		= QPixmap( tabPixmap_img ); 
 	spacePixmap		= QPixmap( spacePixmap_img ); 
 	currentLineColor	= QColor( "#EEF6FF" );
-	linesPanelColor		= QColor( "#FFFFD0" );
+	//linesPanelColor		= QColor( "#FFFFD0" );
 	matchBracesColor	= QColor( "#FF0000" );
 	searchFoundColor	= QColor( "#DDDDFF" ); //QColor::fromRgb( 220, 220, 255)
 	searchNotFoundColor	= QColor( "#FFAAAA" ); //QColor::fromRgb( 255, 102, 102) "#FF6666"
+	//setItemColor( LinesPanel, QColor( "#EEF6FF" ) );
 	highlightCurrentLine	= true;
 	showWhiteSpaces		= true;
 	showMatchingBraces	= true;
@@ -89,7 +90,7 @@ LinesEditor::LinesEditor( QWidget *p ) :QTextEdit(p)
 #endif
 	
 	panel = new SamplePanel( this );
-	panel->panelColor = linesPanelColor;
+	panel->panelColor = QColor( "#EEF6FF" );
 	setViewportMargins( panel->width()-1, 0, 0, 0);
 	setFrameStyle( QFrame::NoFrame );	
 	adjustMarginWidgets();
@@ -117,15 +118,53 @@ void LinesEditor::setupActions()
 	addAction( actionFind );
 }
 
-QColor LinesEditor::getLinesPanelColor()
+QColor LinesEditor::getItemColor( ItemColors role )
 {
-	return linesPanelColor;
+	switch (role)
+	{
+		case LinesPanel:	return panel->panelColor; 
+		case CurrentLine:	return currentLineColor;
+		case MatchBrackets:	return matchBracesColor;
+		case NoText:		return searchNoText;
+		case TextFound:		return searchFoundColor;
+		case TextNoFound:	return searchNotFoundColor;
+	}
+	
+	// just to keep gcc happy
+	return QColor();
 }
 
-QColor LinesEditor::getCurrentLineColor()
+void   LinesEditor::setItemColor( ItemColors role, QColor c )
 {
-	return currentLineColor;
+	switch (role)
+	{
+		case LinesPanel:	
+			panel->panelColor = c;
+			panel->update();
+			break;
+		case CurrentLine:	
+			currentLineColor = c;
+			update();
+			break;
+		case MatchBrackets:
+			matchBracesColor = c;
+			update();
+			break;
+		case NoText:	
+			searchNoText = c;
+			update();
+			break;
+		case TextFound:
+			searchFoundColor = c;
+			update();
+			break;
+		case TextNoFound:
+			searchNotFoundColor = c;
+			update();
+			break;
+	}	
 }
+
 
 void LinesEditor::findMatching( QChar c1, QChar c2, bool forward, QTextBlock &block )
 {
@@ -262,19 +301,6 @@ void LinesEditor::on_searchText_textChanged( const QString & text )
 		autoHideTimer->start();*/
 }
 #endif
-
-void LinesEditor::setLinesPanelColor( QColor c )
-{
-	linesPanelColor = c;
-	panel->panelColor = linesPanelColor;
-	panel->update();
-}
-
-void LinesEditor::setCurrentLineColor( QColor c )
-{
-	currentLineColor = c;
-	update();
-}
 
 void LinesEditor::showFindWidget()
 {	
