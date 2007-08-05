@@ -75,7 +75,7 @@ void EditorConfig::loadColorsDirectory( QString directory )
 
 #ifdef WIN32
 #	define DEFAULT_FONT_NAME "Courier New"
-#	define DEFAULT_FONT_SIZe 10
+#	define DEFAULT_FONT_SIZE 10
 #else
 #	define DEFAULT_FONT_NAME "Monospace"
 #	define DEFAULT_FONT_SIZE 10
