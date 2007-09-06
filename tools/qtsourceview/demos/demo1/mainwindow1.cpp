@@ -30,6 +30,13 @@ MainWindow1::MainWindow1( QMainWindow *parent )
         statusBar()->showMessage(tr("Welcome, the default syntax is C++"), 10000);
 }
 
+MainWindow1::~MainWindow1()
+{
+	delete langCpp;
+	delete defColors;
+}
+
+
 void MainWindow1::on_action_New_triggered()
 {
 	textEdit->clear();

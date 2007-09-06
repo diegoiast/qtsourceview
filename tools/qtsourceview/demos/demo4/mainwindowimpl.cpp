@@ -2,6 +2,8 @@
 #include <QFileDialog>
 #include <QDir>
 
+#include <QDebug>
+
 // qt source view includes
 #include "qsvcolordef.h"
 #include "qsvcolordeffactory.h"
@@ -37,11 +39,17 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
 	textEdit->setPalette( p );
 	textEdit->setTextColor( defColors->getColorDef("dsNormal").getColor() );
 
+	//textEdit->setCurrentLineColor( defColors->getColorDef("dsWidgetCurLine").getBackground() );
+	//textEdit->setLinesPanelColor( defColors->getColorDef("dsWidgetLinesPanel").getBackground() );
 	textEdit->setItemColor( LinesPanel, defColors->getColorDef("dsWidgetLinesPanel").getBackground() );
 	textEdit->setItemColor( CurrentLine, defColors->getColorDef("dsWidgetCurLine").getBackground() );
 
 	textEdit->loadFile( "mainwindowimpl.cpp" );
 	connect( action_find, SIGNAL(triggered()), textEdit, SLOT(showFindWidget()) );
+	
+	connect( EditorConfig::getInstance(), SIGNAL(configurationModified()),
+		this, SLOT(configuration_updated()) );
+
 }
 
 void MainWindowImpl::on_action_New_triggered()
@@ -85,4 +93,33 @@ void MainWindowImpl::on_actionE_xit_triggered()
 void MainWindowImpl::on_action_setup_triggered()
 {
 	EditorConfig::getInstance()->showConfigDialog();
+}
+
+void MainWindowImpl::configuration_updated()
+{
+	//qDebug() << config->showLineNumbers;
+	qDebug() << "reloading configuration";
+#if 0	
+	EditorConfigData configuration = EditorConfig::getInstance()->getCurrentConfiguration();
+	
+	//textEdit->setAutoBrackets( currentConfig.autoBrackets );
+	textEdit->setDisplayCurrentLine( configuration.markCurrentLine );
+	//currentConfig.showLineNumbers
+	textEdit->getPanel()->setVisible( configuration.showLineNumbers );
+	textEdit->setDisplayWhiteSpaces( configuration.showWhiteSpaces );
+	textEdit->setDisplatMatchingBrackets( configuration.matchBrackes );
+	textEdit->setMatchingString( configuration.matchBrackesList );
+	
+	//currentConfig.tabSize		= sbTabSize->value();
+	textEdit->document()->setDefaultFont( configuration.currentFont );
+	textEdit->getPanel()->setFont( configuration.currentFont );
+	
+	//currentConfig.currentColorScheme= colorSchemes[0];
+
+	textEdit->adjustMarginWidgets();
+	textEdit->update();
+	textEdit->viewport()->update();
+#else
+	EditorConfig::getInstance()->applyCurrentConfiguration( textEdit );
+#endif
 }

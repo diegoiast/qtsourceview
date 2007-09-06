@@ -7,6 +7,7 @@ class QString;
 class QsvColorDefFactory;
 class QsvLangDef;
 class QsvSyntaxHighlighter;
+struct EditorConfigData;
 
 class MainWindowImpl : public QMainWindow, public Ui::MainWindow
 {
@@ -18,9 +19,13 @@ private slots:
 	void on_action_Open_triggered();
 	void on_actionE_xit_triggered();
 	void on_action_setup_triggered();
+	
+	// not auto-connected
+public slots:
+	void configuration_updated();
 
 private:
-	QString lastDir;
+	QString			lastDir;
 	QsvColorDefFactory	*defColors;
 	QsvLangDef		*langDefinition;
 	QsvSyntaxHighlighter	*highlight;

@@ -17,35 +17,42 @@ class LinesEditor: public QTextEdit
 public:
 	
 	LinesEditor( QWidget *p=NULL );
-	void setupActions();
-	QColor getItemColor( ItemColors role );
-	void   setItemColor( ItemColors role, QColor );
-	
+	void	setupActions();
+	QColor	getItemColor( ItemColors role );
+	void	setItemColor( ItemColors role, QColor );
 	virtual void findMatching( QChar c1, QChar c2, bool forward, QTextBlock &block); 
 
 public slots:
-	void on_searchText_textChanged( const QString & text );
-	void showFindWidget();
-	int loadFile( QString );
+	void	on_searchText_textChanged( const QString & text );
+	void	showFindWidget();
+	int	loadFile( QString );
 	
+	void	setDisplayCurrentLine( bool );
+	void	setDisplayWhiteSpaces( bool );
+	void	setDisplatMatchingBrackets( bool );
+	void	setMatchingString( QString );
+	
+	QWidget*	getPanel();
+	void	adjustMarginWidgets();
+		
 protected slots:
-	void cursorPositionChanged();
-	void updateCurrentLine();
-	void adjustMarginWidgets();
+	void	cursorPositionChanged();
+	void	updateCurrentLine();
+	//void	showPanel( bool visible );
 	
 protected:
-	void keyReleaseEvent ( QKeyEvent * event );
-	void resizeEvent ( QResizeEvent *event );
-	void paintEvent(QPaintEvent *e);
-	void printWhiteSpaces( QPainter &p );
-	void printCurrentLine( QPainter &p );
-	void printMatchingBraces( QPainter &p );
-	void widgetToBottom( QWidget *w );
-	void widgetToTop( QWidget *w );
+	void	keyReleaseEvent ( QKeyEvent * event );
+	void	resizeEvent ( QResizeEvent *event );
+	void	paintEvent(QPaintEvent *e);
+	void	printWhiteSpaces( QPainter &p );
+	void	printCurrentLine( QPainter &p );
+	void	printMatchingBraces( QPainter &p );
+	void	widgetToBottom( QWidget *w );
+	void	widgetToTop( QWidget *w );
 
-	QPixmap tabPixmap;
+private:
+	QPixmap	tabPixmap;
 	QPixmap spacePixmap;
-	
 	QColor	currentLineColor;
 	QColor	matchBracesColor;
 	QColor	searchFoundColor;
@@ -55,18 +62,18 @@ protected:
 	bool	highlightCurrentLine;
 	bool	showWhiteSpaces;
 	bool	showMatchingBraces;
+	QString matchingString;
+
 	int	matchStart;
 	int	matchEnd;
 	QChar	currentChar;
 	QChar	matchChar;
-	QString matchingString;
 	QString	fileName;
-	SamplePanel	*panel;
 	
-	QAction	*actionFind;
-	
-	TransparentWidget *findWidget;
-	Ui::FindWidget	ui_findWidget;
+	SamplePanel		*panel;
+	QAction			*actionFind;
+	TransparentWidget	*findWidget;
+	Ui::FindWidget		ui_findWidget;
 };
 
 #endif // __LINESEDITOR_H__

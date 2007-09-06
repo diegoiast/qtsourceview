@@ -82,19 +82,23 @@ LinesEditor::LinesEditor( QWidget *p ) :QTextEdit(p)
 	matchStart		= -1;
 	matchEnd		= -1;
 	matchingString		= "(){}[]";
-	
-#ifdef WIN32
-	setFont( QFont("Courier New", 10) );
-#else
-	setFont( QFont("Monospace", 9) );
-#endif
-	
+		
 	panel = new SamplePanel( this );
 	panel->panelColor = QColor( "#EEF6FF" );
-	setViewportMargins( panel->width()-1, 0, 0, 0);
+	panel->setVisible( true );
+
 	setFrameStyle( QFrame::NoFrame );	
-	adjustMarginWidgets();
 	setLineWrapMode( QTextEdit::NoWrap );
+	setAcceptRichText( false );
+	QTimer::singleShot( 0, this, SLOT(adjustMarginWidgets()));
+
+#ifdef WIN32
+	QFont f("Courier New", 10);
+#else
+	QFont f("Monospace", 9);
+#endif
+	setFont( f );
+	panel->setFont( f );
 	
 	findWidget = new TransparentWidget( this, 0.8 );
 	ui_findWidget.setupUi( findWidget );
@@ -164,7 +168,6 @@ void   LinesEditor::setItemColor( ItemColors role, QColor c )
 			break;
 	}	
 }
-
 
 void LinesEditor::findMatching( QChar c1, QChar c2, bool forward, QTextBlock &block )
 {
@@ -328,6 +331,29 @@ int LinesEditor::loadFile( QString s )
 	return 0;
 }
 
+void LinesEditor::setDisplayCurrentLine( bool b )
+{
+	highlightCurrentLine = b;
+
+}
+
+void LinesEditor::setDisplayWhiteSpaces( bool b )
+{
+	showWhiteSpaces = b;
+}
+
+void LinesEditor::setDisplatMatchingBrackets( bool b )
+{
+	
+	showMatchingBraces = b;
+}
+
+void LinesEditor::setMatchingString( QString s )
+{
+	matchingString = s;	
+}
+
+
 void LinesEditor::keyReleaseEvent( QKeyEvent * event )
 {
 	switch (event->key())
@@ -446,6 +472,11 @@ void LinesEditor::printCurrentLine( QPainter &p )
 	p.fillRect( r, currentLineColor );
 }
 
+QWidget* LinesEditor::getPanel()
+{
+	return panel;
+}
+
 void LinesEditor::cursorPositionChanged()
 {
 	QTextCursor cursor = textCursor();
@@ -491,14 +522,17 @@ void LinesEditor::updateCurrentLine()
 
 void LinesEditor::adjustMarginWidgets()
 {
-	QRect viewportRect = viewport()->geometry();
-	QRect lrect = QRect(viewportRect.topLeft(), viewportRect.bottomLeft());
-	lrect.adjust( -panel->width(), 0, 0, 0 );
-	panel->setGeometry(lrect);
-	
-	//QRect trect = QRect(viewportRect.topLeft(), viewportRect.topRight());
-	//trect.adjust(-DEFAULT_MARGIN, -DEFAULT_MARGIN, 0, 0);
-	//mTopWidget->setGeometry(trect);
+	if (panel->isVisible())
+	{
+		setViewportMargins( panel->width()-1, 0, 0, 0);
+		QRect viewportRect = viewport()->geometry();
+		QRect lrect = QRect(viewportRect.topLeft(), viewportRect.bottomLeft());
+		lrect.adjust( -panel->width(), 0, 0, 0 );
+		panel->setGeometry(lrect);		
+	}
+	else{
+		setViewportMargins( 0, 0, 0, 0);
+	}
 }
 
 void LinesEditor::printMatchingBraces( QPainter &p )
@@ -506,7 +540,7 @@ void LinesEditor::printMatchingBraces( QPainter &p )
 	if (matchStart == -1)
 		return;
 		
-	QFont f = font();
+	QFont f = document()->defaultFont();
 	QTextCursor cursor = textCursor();
 
 	f.setBold( true );
@@ -514,14 +548,14 @@ void LinesEditor::printMatchingBraces( QPainter &p )
 	p.setPen( matchBracesColor );
 	cursor.setPosition(matchStart+1, QTextCursor::MoveAnchor);
 	QRect r = cursorRect( cursor );
-	p.drawText(r.x()-2, r.y(), r.width(), r.height(), Qt::AlignLeft | Qt::AlignVCenter, currentChar );
+	p.drawText(r.x()-1, r.y(), r.width(), r.height(), Qt::AlignLeft | Qt::AlignVCenter, currentChar );
 
 	if (matchEnd == -1)
 		return;
 		
 	cursor.setPosition(matchEnd+1, QTextCursor::MoveAnchor);
 	r = cursorRect( cursor );
-		p.drawText(r.x(), r.y(), r.width(), r.height(), Qt::AlignLeft | Qt::AlignVCenter, matchChar );
+		p.drawText(r.x()-1, r.y(), r.width(), r.height(), Qt::AlignLeft | Qt::AlignVCenter, matchChar );
 }
 
 void LinesEditor::widgetToBottom( QWidget *w )

@@ -5,6 +5,7 @@
 #include <QList>
 #include "ui_configdialog.h"
 #include "qsvcolordeffactory.h"
+#include "lineseditor.h"
 
 class QFont;
 class QString;
@@ -31,21 +32,36 @@ class EditorConfig : public QObject, public Ui::ConfigDialog
 	
 public:
 	static EditorConfig *getInstance();
+	static void applyConfiguration( EditorConfigData c, LinesEditor *editor );
+	
 	void showConfigDialog();
+	void closeConfigDialog();
 	void loadColorsDirectory( QString directory );
+	
+	EditorConfigData getCurrentConfiguration();
 	EditorConfigData getDefaultConfiguration();
+	EditorConfigData getUserConfiguration();
 	void setConfiguration( EditorConfigData c );
+	
+	void applyCurrentConfiguration( LinesEditor *editor );
+	void updateConfiguration();
+	
 	
 public slots:
 	void on_buttonBox_clicked( QAbstractButton * button );
 	void on_btnChooseFont_clicked();
-	
+	void on_tabWidget_currentChanged(int index);
+
+signals:
+	void configurationModified();
+     
 private:
 	EditorConfig();
 	
 	static EditorConfig *instance;
 	QList<QsvColorDefFactory*> colorSchemes;
 	QsvSyntaxHighlighter	*highlight;
+
 	QDialog *dialog;
 	EditorConfigData currentConfig;
 };
