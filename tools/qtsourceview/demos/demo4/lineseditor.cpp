@@ -37,16 +37,7 @@ static const char * tabPixmap_img[] =
 	"  X     X       ",
 	"                ",
 };
-/*
-	"        X     X ",
-	"      X     X   ",
-	"    X     X     ",
-	"  X     X       ",
-	"    X     X     ",
-	"      X     X   ",
-	"        X     X ",
-	"                ",
-*/
+
 static const char * spacePixmap_img[] = 
 {
 /* width height ncolors cpp [x_hot y_hot] */
@@ -71,11 +62,9 @@ LinesEditor::LinesEditor( QWidget *p ) :QTextEdit(p)
 	tabPixmap		= QPixmap( tabPixmap_img ); 
 	spacePixmap		= QPixmap( spacePixmap_img ); 
 	currentLineColor	= QColor( "#EEF6FF" );
-	//linesPanelColor		= QColor( "#FFFFD0" );
 	matchBracesColor	= QColor( "#FF0000" );
 	searchFoundColor	= QColor( "#DDDDFF" ); //QColor::fromRgb( 220, 220, 255)
 	searchNotFoundColor	= QColor( "#FFAAAA" ); //QColor::fromRgb( 255, 102, 102) "#FF6666"
-	//setItemColor( LinesPanel, QColor( "#EEF6FF" ) );
 	highlightCurrentLine	= true;
 	showWhiteSpaces		= true;
 	showMatchingBraces	= true;
@@ -84,10 +73,10 @@ LinesEditor::LinesEditor( QWidget *p ) :QTextEdit(p)
 	matchingString		= "(){}[]";
 		
 	panel = new SamplePanel( this );
-	panel->panelColor = QColor( "#EEF6FF" );
+	panel->panelColor = QColor( "#FFFFD0" );
 	panel->setVisible( true );
 
-	setFrameStyle( QFrame::NoFrame );	
+	setFrameStyle( QFrame::NoFrame );
 	setLineWrapMode( QTextEdit::NoWrap );
 	setAcceptRichText( false );
 	QTimer::singleShot( 0, this, SLOT(adjustMarginWidgets()));
@@ -138,7 +127,7 @@ QColor LinesEditor::getItemColor( ItemColors role )
 	return QColor();
 }
 
-void   LinesEditor::setItemColor( ItemColors role, QColor c )
+void LinesEditor::setItemColor( ItemColors role, QColor c )
 {
 	switch (role)
 	{

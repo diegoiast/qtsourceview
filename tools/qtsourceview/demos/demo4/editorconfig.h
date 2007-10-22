@@ -26,7 +26,7 @@ struct EditorConfigData
 	QsvColorDefFactory	*currentColorScheme;	
 };
 
-class EditorConfig : public QObject, public Ui::ConfigDialog
+class EditorConfig : public QObject
 {
 	Q_OBJECT
 	
@@ -45,8 +45,7 @@ public:
 	
 	void applyCurrentConfiguration( LinesEditor *editor );
 	void updateConfiguration();
-	
-	
+
 public slots:
 	void on_buttonBox_clicked( QAbstractButton * button );
 	void on_btnChooseFont_clicked();
@@ -54,7 +53,7 @@ public slots:
 
 signals:
 	void configurationModified();
-     
+
 private:
 	EditorConfig();
 	
@@ -63,6 +62,7 @@ private:
 	QsvSyntaxHighlighter	*highlight;
 
 	QDialog *dialog;
+	Ui::ConfigDialog ui;
 	EditorConfigData currentConfig;
 };
 

@@ -20,7 +20,7 @@ public:
 	void	setupActions();
 	QColor	getItemColor( ItemColors role );
 	void	setItemColor( ItemColors role, QColor );
-	virtual void findMatching( QChar c1, QChar c2, bool forward, QTextBlock &block); 
+	virtual void findMatching( QChar c1, QChar c2, bool forward, QTextBlock &block );
 
 public slots:
 	void	on_searchText_textChanged( const QString & text );

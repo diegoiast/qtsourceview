@@ -24,6 +24,7 @@ EditorConfig *EditorConfig::getInstance()
 
 void EditorConfig::applyConfiguration( EditorConfigData c, LinesEditor *editor )
 {
+	qDebug("applying configuration");
 	//textEdit->setAutoBrackets( c.autoBrackets );
 	editor->setDisplayCurrentLine( c.markCurrentLine );
 	//currentConfig.showLineNumbers
@@ -46,11 +47,11 @@ void EditorConfig::applyConfiguration( EditorConfigData c, LinesEditor *editor )
 EditorConfig::EditorConfig()
 {
 	dialog = new QDialog;
-	setupUi(dialog);
+	ui.setupUi(dialog);
 
-	connect( buttonBox, SIGNAL(clicked(QAbstractButton *)), this, SLOT(on_buttonBox_clicked(QAbstractButton*)));
-	connect( btnChooseFont, SIGNAL(clicked()), this, SLOT(on_btnChooseFont_clicked()));
-	connect( tabWidget, SIGNAL(currentChanged(int)), this, SLOT(on_tabWidget_currentChanged(int)) );
+	connect( ui.buttonBox	, SIGNAL(clicked(QAbstractButton *))	, this, SLOT(on_buttonBox_clicked(QAbstractButton*)));
+	connect( ui.btnChooseFont	, SIGNAL(clicked())			, this, SLOT(on_btnChooseFont_clicked()));
+	connect( ui.tabWidget	, SIGNAL(currentChanged(int))		, this, SLOT(on_tabWidget_currentChanged(int)));
 	
 	// set configuration will be done on display	
 	currentConfig = getDefaultConfiguration();
@@ -66,13 +67,13 @@ void EditorConfig::showConfigDialog()
 	{
 		QsvLangDef *langDefinition = QsvLangDefFactory::getInstanse()->getHighlight("1.cpp");
 		//QsvColorDefFactory defColors = colorSchemes[0];
-		highlight = new QsvSyntaxHighlighter( sampleEdit, (colorSchemes[0]), langDefinition );		
+		highlight = new QsvSyntaxHighlighter( ui.sampleEdit, (colorSchemes[0]), langDefinition );		
 	}
 	
 	setConfiguration( currentConfig );
 //	QTimer::singleShot( 1000, sampleEdit,SLOT(adjustMarginWidgets()));
 	dialog->show();
-	sampleEdit->adjustMarginWidgets();
+	ui.sampleEdit->adjustMarginWidgets();
 }
 
 void EditorConfig::closeConfigDialog()
@@ -136,17 +137,17 @@ EditorConfigData  EditorConfig::getDefaultConfiguration()
 	return c;
 }
 
-void EditorConfigData::getUserConfiguration()
+EditorConfigData EditorConfig::getUserConfiguration()
 {
 	EditorConfigData c;
-	c.autoBrackets		= cbAutoBrackets->isChecked();
-	c.markCurrentLine	= cbMarkCurrentLine->isChecked();
-	c.showLineNumbers	= cbShowLineNumbers->isChecked();
-	c.showWhiteSpaces	= cbShowWhiteSpaces->isChecked();
-	c.matchBrackes		= cbMatchBrackets->isChecked();
-	c.matchBrackesList	= leMatchCraketsList->text();
-	c.tabSize		= sbTabSize->value();
-	c.currentFont		= labelFontPreview->font();
+	c.autoBrackets		= ui.cbAutoBrackets->isChecked();
+	c.markCurrentLine	= ui.cbMarkCurrentLine->isChecked();
+	c.showLineNumbers	= ui.cbShowLineNumbers->isChecked();
+	c.showWhiteSpaces	= ui.cbShowWhiteSpaces->isChecked();
+	c.matchBrackes		= ui.cbMatchBrackets->isChecked();
+	c.matchBrackesList	= ui.leMatchCraketsList->text();
+	c.tabSize		= ui.sbTabSize->value();
+	c.currentFont		= ui.labelFontPreview->font();
 	
 	c.tabSize		= 8;
 	c.matchBrackesList	= "()[]{}";
@@ -161,18 +162,18 @@ void EditorConfigData::getUserConfiguration()
 
 void EditorConfig::setConfiguration( EditorConfigData c  )
 {
-	cbAutoBrackets->setChecked( c.autoBrackets );
-	cbMarkCurrentLine->setChecked( c.markCurrentLine );
-	cbShowLineNumbers->setChecked( c.showLineNumbers );
-	cbShowWhiteSpaces->setChecked( c.showWhiteSpaces );
-	cbMatchBrackets->setChecked( c.matchBrackes );
-	//cbMatchBrackets->setChecked ( c.tabSize	 );
+	ui.cbAutoBrackets->setChecked( c.autoBrackets );
+	ui.cbMarkCurrentLine->setChecked( c.markCurrentLine );
+	ui.cbShowLineNumbers->setChecked( c.showLineNumbers );
+	ui.cbShowWhiteSpaces->setChecked( c.showWhiteSpaces );
+	ui.cbMatchBrackets->setChecked( c.matchBrackes );
+	//ui.cbMatchBrackets->setChecked ( c.tabSize	 );
 
-	leMatchCraketsList->setText( c.matchBrackesList );
-	sbTabSize->setValue( c.tabSize );
-	labelFontPreview->setText( c.currentFont.toString() );
-	labelFontPreview->setFont( c.currentFont );
-	//c.currentFont		= QFont( DEFAULT_FONT_NAME, DEFAULT_FONT_SIZE );
+	ui.leMatchCraketsList->setText( c.matchBrackesList );
+	ui.sbTabSize->setValue( c.tabSize );
+	ui.labelFontPreview->setText( c.currentFont.toString() );
+	ui.labelFontPreview->setFont( c.currentFont );
+	//ui.c.currentFont		= QFont( DEFAULT_FONT_NAME, DEFAULT_FONT_SIZE );
 }
 
 void EditorConfig::applyCurrentConfiguration( LinesEditor *editor ) 
@@ -182,14 +183,14 @@ void EditorConfig::applyCurrentConfiguration( LinesEditor *editor )
 
 void EditorConfig::updateConfiguration()
 {
-	currentConfig.autoBrackets	= cbAutoBrackets->isChecked();
-	currentConfig.markCurrentLine	= cbMarkCurrentLine->isChecked();
-	currentConfig.showLineNumbers	= cbShowLineNumbers->isChecked();
-	currentConfig.showWhiteSpaces	= cbShowWhiteSpaces->isChecked();
-	currentConfig.matchBrackes	= cbMatchBrackets->isChecked();
-	currentConfig.matchBrackesList	= leMatchCraketsList->text();
-	currentConfig.tabSize		= sbTabSize->value();
-	currentConfig.currentFont	= labelFontPreview->font();
+	currentConfig.autoBrackets	= ui.cbAutoBrackets->isChecked();
+	currentConfig.markCurrentLine	= ui.cbMarkCurrentLine->isChecked();
+	currentConfig.showLineNumbers	= ui.cbShowLineNumbers->isChecked();
+	currentConfig.showWhiteSpaces	= ui.cbShowWhiteSpaces->isChecked();
+	currentConfig.matchBrackes	= ui.cbMatchBrackets->isChecked();
+	currentConfig.matchBrackesList	= ui.leMatchCraketsList->text();
+	currentConfig.tabSize		= ui.sbTabSize->value();
+	currentConfig.currentFont	= ui.labelFontPreview->font();
 
 	// TODO
 	if (colorSchemes.isEmpty())
@@ -209,26 +210,26 @@ void EditorConfig::on_buttonBox_clicked( QAbstractButton * button )
 		return;
 	}
 	
-	if (b == buttonBox->button(QDialogButtonBox::Ok))
+	if (b == ui.buttonBox->button(QDialogButtonBox::Ok))
 	{
 		// set the configuration internally and emit signal
 		updateConfiguration();
 		emit( configurationModified() );
 		dialog->close();		
 	} 
-	else if (b == buttonBox->button(QDialogButtonBox::Apply))
+	else if (b == ui.buttonBox->button(QDialogButtonBox::Apply))
 	{
 		// set the configuration internally and emit signal
 		updateConfiguration();
-		applyCurrentConfiguration( sampleEdit );
+		applyCurrentConfiguration( ui.sampleEdit );
 		emit( configurationModified() );
 	}
-	else if (b == buttonBox->button(QDialogButtonBox::Cancel))
+	else if (b == ui.buttonBox->button(QDialogButtonBox::Cancel))
 	{
 		// lets abort
 		dialog->close();
 	}
-	else if (b == buttonBox->button(QDialogButtonBox::RestoreDefaults))
+	else if (b == ui.buttonBox->button(QDialogButtonBox::RestoreDefaults))
 	{
 		// restore default values
 		setConfiguration( getDefaultConfiguration() );
@@ -238,21 +239,20 @@ void EditorConfig::on_buttonBox_clicked( QAbstractButton * button )
 void EditorConfig::on_btnChooseFont_clicked()
 {
 	bool ok;
-	QFont font = QFontDialog::getFont(&ok, labelFontPreview->font(), dialog );
+	QFont font = QFontDialog::getFont(&ok, ui.labelFontPreview->font(), dialog );
 	if (!ok)
 		return;
-	labelFontPreview->setText( font.toString() );
-	labelFontPreview->setFont( font );
+	ui.labelFontPreview->setText( font.toString() );
+	ui.labelFontPreview->setFont( font );
 }
 
 void EditorConfig::on_tabWidget_currentChanged(int index)
 {
+	qDebug("tab changed - %d", index);
 	// TODO why does the editor not show the lines widget 
 	// when not applying configuration...?
 	if (index == 1)
 	{
-		//applyCurrentConfiguration( sampleEdit );	
-		applyConfiguration( getCurrentConfiguration(), sampleEdit );
+		applyConfiguration( getCurrentConfiguration(), ui.sampleEdit );
 	}
-
 }
