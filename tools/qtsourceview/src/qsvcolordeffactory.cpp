@@ -75,6 +75,7 @@ QsvColorDefFactory::QsvColorDefFactory( QString fileName )
  */
 QsvColorDefFactory::~QsvColorDefFactory()
 {
+	qDebug( "%s %d - destructed %s", __FILE__, __LINE__, qPrintable(name) );
 }
 
 /**
@@ -86,6 +87,12 @@ QsvColorDefFactory::~QsvColorDefFactory()
  * a list of elements called "itemData". The attributes of the node
  * will represent the values of the color defintion.
  * 
+ * This function will also load the meta data available at the itemDatas
+ * node (only the first one matched). This generally contains information
+ * like the author, version, descriotion and name of the color factory.
+ *
+ * This function will also clear the filename.
+ * 
  * For more details look at QsvColorDef::load( QDomNode node )
  * 
  * \see QsvColorDef::load( QDomNode node )
@@ -94,8 +101,23 @@ QsvColorDefFactory::~QsvColorDefFactory()
  */
 bool	QsvColorDefFactory::load( QDomDocument doc )
 {
+	QDomNodeList list;
+	
+	// loaded from memory, no filename
+	fileName.clear();
+	
+	// read information about this file
+	list = doc.elementsByTagName("itemDatas");	
+	if ((!list.isEmpty()) && (list.at(0).hasAttributes()))
+	{
+		name		=	list.at(0).attributes().namedItem("name").nodeValue();
+		description	=	list.at(0).attributes().namedItem("description").nodeValue();
+		version		=	list.at(0).attributes().namedItem("version").nodeValue();
+		author		=	list.at(0).attributes().namedItem("author").nodeValue();
+	}
+	
 	// load the attributes of this language
-	QDomNodeList list = doc.elementsByTagName("itemData");
+	list = doc.elementsByTagName("itemData");
 
 	for( uint n=0; n<list.length(); n++ )
 	{
@@ -113,12 +135,15 @@ bool	QsvColorDefFactory::load( QDomDocument doc )
  * 
  * Loads the color definitions from an external XML file.
  * This is a convenience overloaded function which behaves like the above function.
+ *
+ * This function will set the filename of the loaded file.
  * 
  * \see load( QDomNode )
  */
 bool	QsvColorDefFactory::load( QString fileName )
 {
 	QFile file(fileName);
+	bool b;
 
 	if (!file.open(QIODevice::ReadOnly))
 	{
@@ -135,7 +160,9 @@ bool	QsvColorDefFactory::load( QString fileName )
 	}
 	file.close();
 
-	return load( doc );
+	b = load( doc );
+	this->fileName = fileName;
+	return b;
 }
 
 /**
@@ -159,14 +186,14 @@ QsvColorDef QsvColorDefFactory::getColorDef( QString name )
 #ifdef __DEBUG_NO_ITEM_FOUND
 	qDebug( "%s %d", __FILE__, __LINE__ );
 #endif
-
-	foreach(QsvColorDef color, colorDefs)
+	QsvColorDef color;
+	foreach(color, colorDefs)
 	{	
 		if (color.getStyleNum() == name )
 		{
 #ifdef __DEBUG_NO_ITEM_FOUND__
 	// new empthy one	
-	qDebug( "%s %d - fond a color definition named %s - %s", __FILE__, __LINE__, 
+	qDebug( "%s %d - found color definition named %s - %s", __FILE__, __LINE__, 
 		qPrintable(name), 
 		qPrintable(color.toCharFormat().foreground().color().name()) 
 	);
@@ -177,7 +204,7 @@ QsvColorDef QsvColorDefFactory::getColorDef( QString name )
 
 #ifdef __DEBUG_NO_ITEM_FOUND__
 	// new empthy one	
-	qDebug( "%s %d - could not find a color definition named (%s)", __FILE__, __LINE__, qPrintable(name) );
+	qDebug( "%s %d - could not find a color definition named (%s) in (%s)", __FILE__, __LINE__, qPrintable(name), qPrintable(this->name) );
 #endif	
 	return QsvColorDef();
 }

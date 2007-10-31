@@ -80,7 +80,6 @@ QsvSyntaxHighlighter::QsvSyntaxHighlighter( QTextDocument *parent, QsvColorDefFa
 {
 	language = NULL;
 	this->colors = colors;
-
 	setHighlight( lang );
 }
 
@@ -201,11 +200,12 @@ void QsvSyntaxHighlighter::setHighlight( QsvLangDef *newLang )
  */
 void QsvSyntaxHighlighter::setColorsDef( QsvColorDefFactory *newColors )
 {
-	delete colors;
 	colors = newColors;
 	
-	// now we need to re-highlight, how the hell can we do this?
-	setDocument( document() );
+	// now we need to re-highlight, on qt 4.1, we can use this code:
+	// setDocument( document() );
+	// but since 4.2 we can use this code:
+	rehighlight();
 }
 
 /**
@@ -219,9 +219,17 @@ void QsvSyntaxHighlighter::setColorsDef( QsvColorDefFactory *newColors )
  */
 void QsvSyntaxHighlighter::highlightBlock(const QString &text)
 {
+	QsvColorDef lll;
+	
+	if (!colors)
+	{
+		qDebug("%s %d - No color factory found" , __FILE__, __LINE__ );
+		return;
+	}
+	
 	if (language == NULL)
 	{
-#ifdef		__DEBUG_HIGHLIGHT__		
+#ifdef		__DEBUG_HIGHLIGHT__
 		qDebug( "%s %d - no language defined", __FILE__, __LINE__ );
 #endif		
 		return;
@@ -242,7 +250,8 @@ void QsvSyntaxHighlighter::highlightBlock(const QString &text)
 			return;
 		}
 	}
-	setFormat( 0, text.length(), colors->getColorDef("dsNormal").toCharFormat() );
+	lll = colors->getColorDef("dsNormal");
+	setFormat( 0, text.length(), lll.toCharFormat() );
 
 	// this code draws each line
 	foreach ( pattern, mappings.keys())

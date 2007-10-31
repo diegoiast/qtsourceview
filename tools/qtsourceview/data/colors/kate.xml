@@ -1,6 +1,6 @@
-<!-- default data items for kate -->
+<?xml version="1.0" encoding="UTF-8"?>
 
-<itemDatas>
+<itemDatas name="Kate" description="Color scheme compatible with Kate" version="1.0" author="Diego Iastrubni (elcuco@kde.org)" >
 	<itemData defStyleNum="dsNormal"   name="Normal"         color="#000000" selColor="#ffffff" bold="0" italic="0" />
 	<itemData defStyleNum="dsKeyword"  name="Keyword"        color="#000000" selColor="#ffffff" bold="1" italic="0" />
 	<itemData defStyleNum="dsDataType" name="Data type"      color="#800000" selColor="#ffffff" bold="0" italic="0" />
@@ -16,10 +16,10 @@
 	<itemData defStyleNum="dsRegion"   name="Region marker"  color="#ffffff" selColor="#A0A0A4" bold="0" italic="0" />
 	<itemData defStyleNum="dsError"    name="Error "         color="#ff0000" selColor="#ff0000" bold="0" italic="0" underline="1" />
 
-        <itemData defStyleNum="dsOthers2"  name="Diff added"     color="#008000" selColor="#00ff00" bold="0" italic="0" />
-        <itemData defStyleNum="dsOthers3"  name="Diff removed"   color="#800000" selColor="#00ff00" bold="0" italic="0" />
+	<itemData defStyleNum="dsOthers2"  name="Diff added"     color="#008000" selColor="#00ff00" bold="0" italic="0" />
+	<itemData defStyleNum="dsOthers3"  name="Diff removed"   color="#800000" selColor="#00ff00" bold="0" italic="0" />
 	
-	<!-- these are not syntax definitions, but defintions for the text editor -->
+<!-- these are not syntax definitions, but defintions for the text editor -->
 	<itemData defStyleNum="dsWidgetBackground"   name="Widget background"         background="#ffffff"  />
 	<itemData defStyleNum="dsWidgetCurLine"      name="Widget current line"       background="#EEF6FF"  />
 	<itemData defStyleNum="dsWidgetLinesPanel"   name="Widget lines marker"       background="#ffffd0"  />

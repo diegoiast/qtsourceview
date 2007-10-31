@@ -244,3 +244,10 @@ text/x-matlab			octave m M
 
 # changelog
 text/x-changelog		ChangeLog
+
+# ada
+text/x-ada			ada
+text/x-adasrc			ada
+
+# VHDL
+text/x-vhdl			vhd

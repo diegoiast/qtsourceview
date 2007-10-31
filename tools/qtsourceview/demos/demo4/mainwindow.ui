@@ -14,10 +14,19 @@
   </property>
   <widget class="QWidget" name="centralwidget" >
    <layout class="QVBoxLayout" >
-    <property name="margin" >
+    <property name="spacing" >
      <number>0</number>
     </property>
-    <property name="spacing" >
+    <property name="leftMargin" >
+     <number>0</number>
+    </property>
+    <property name="topMargin" >
+     <number>0</number>
+    </property>
+    <property name="rightMargin" >
+     <number>0</number>
+    </property>
+    <property name="bottomMargin" >
      <number>0</number>
     </property>
     <item>
@@ -31,7 +40,7 @@
      <x>0</x>
      <y>0</y>
      <width>562</width>
-     <height>29</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File" >
@@ -99,6 +108,9 @@
   <action name="action_setup" >
    <property name="text" >
     <string>&amp;Setup</string>
+   </property>
+   <property name="shortcut" >
+    <string>F7</string>
    </property>
   </action>
  </widget>

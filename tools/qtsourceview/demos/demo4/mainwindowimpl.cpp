@@ -51,7 +51,7 @@ void MainWindowImpl::on_action_Open_triggered()
 		tr("C/C++ source files")	+ " (*.c *.cpp *.h *.hpp );;" + 
 		tr("Perl scripts")		+ " (*.pl);;" +
 		tr("Shell scripts")		+ " (*.sh);;" +
-		tr("All files")          + " (*)"
+		tr("All files")			+ " (*)"
 	);
 	
 	if (s.isEmpty())
@@ -84,6 +84,6 @@ void MainWindowImpl::on_action_setup_triggered()
 
 void MainWindowImpl::configuration_updated()
 {
-	qDebug() << "reloading configuration";
-	EditorConfig::getInstance()->applyCurrentConfiguration( textEdit );
+	EditorConfigData data = EditorConfig::getInstance()->getCurrentConfiguration();
+	EditorConfig::applyConfiguration( data, textEdit );
 }

@@ -27,8 +27,13 @@ public:
 	bool load( QDomDocument doc );
 	bool load( QString fileName );
 	QsvColorDef getColorDef( QString name );
-private:
+public:
 	QList<QsvColorDef> colorDefs;
+	QString fileName;
+	QString name;
+	QString description;
+	QString version;
+	QString author;
 };
 
 #endif // __KATE_ITEM_DATA_MANAGER__
