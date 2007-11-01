@@ -116,16 +116,16 @@ EditorConfigData  EditorConfig::getDefaultConfiguration()
 	c.matchBrackesList	= "()[]{}";
 	c.currentFont		= QFont( DEFAULT_FONT_NAME, DEFAULT_FONT_SIZE );
 	if (colorSchemes.isEmpty())
-		currentConfig.currentColorScheme = NULL;
-	else		
-		currentConfig.currentColorScheme = colorSchemes[0];
-	
+		c.currentColorScheme = NULL;
+	else
+		c.currentColorScheme = colorSchemes[0];
 	return c;
 }
 
 EditorConfigData EditorConfig::getUserConfiguration()
 {
 	EditorConfigData c;
+
 	c.autoBrackets		= ui.cbAutoBrackets->isChecked();
 	c.markCurrentLine	= ui.cbMarkCurrentLine->isChecked();
 	c.showLineNumbers	= ui.cbShowLineNumbers->isChecked();
@@ -272,14 +272,11 @@ void EditorConfig::on_colorsCombo_currentIndexChanged( int index )
 	EditorConfigData c = getUserConfiguration();
 
 	applyConfiguration( c , ui.sampleEdit );	
-#if 1
 	if (highlight)
 	{
-		qDebug() << "comboBox_currentIndexChanged()" << c.currentColorScheme->name;
 		highlight->setColorsDef( c.currentColorScheme );
 		highlight->rehighlight();
 	}
-#endif
 
 	// remove gcc warnings
 	(void)(index);

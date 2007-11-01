@@ -75,7 +75,6 @@ QsvColorDefFactory::QsvColorDefFactory( QString fileName )
  */
 QsvColorDefFactory::~QsvColorDefFactory()
 {
-	qDebug( "%s %d - destructed %s", __FILE__, __LINE__, qPrintable(name) );
 }
 
 /**
