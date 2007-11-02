@@ -187,16 +187,16 @@ QsvColorDef QsvColorDefFactory::getColorDef( QString name )
 #endif
 	QsvColorDef color;
 	foreach(color, colorDefs)
-	{	
+	{
 		if (color.getStyleNum() == name )
 		{
 #ifdef __DEBUG_NO_ITEM_FOUND__
-	// new empthy one	
+	// new empthy one
 	qDebug( "%s %d - found color definition named %s - %s", __FILE__, __LINE__, 
 		qPrintable(name), 
 		qPrintable(color.toCharFormat().foreground().color().name()) 
 	);
-#endif				
+#endif	
 			return color;
 		}
 	}

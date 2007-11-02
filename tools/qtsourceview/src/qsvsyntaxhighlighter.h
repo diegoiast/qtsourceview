@@ -16,6 +16,12 @@ class QTextCharFormat;
 class QsvLangDef;
 class QsvColorDefFactory;
 
+struct LanguageEntity
+{
+	QString name;
+	QTextCharFormat charFormat;
+};
+
 class QsvSyntaxHighlighter: public QSyntaxHighlighter
 {
 public:
@@ -29,8 +35,8 @@ protected:
 	void highlightBlock(const QString &text);
 
 private:
-	void addMapping(const QString &pattern, const QTextCharFormat &format, bool fullWord=false );
-	void addMapping(const QString &pattern, const QString formatName, bool fullWord=false );
+	void addMapping( const QString mappingName, const QString &pattern, const QTextCharFormat &format, bool fullWord=false );
+	void addMappingFromName( const QString &pattern, const QString formatName, bool fullWord=false );
 
 	void drawText    ( QString text, QString s, QTextCharFormat &format );
 	void drawRegExp  ( QString text, QString s, QTextCharFormat &format );
@@ -38,7 +44,7 @@ private:
 
 	QsvColorDefFactory	*colors;
 	QsvLangDef		*language;
-	QOrderedMap<QString,QTextCharFormat> mappings;
+	QOrderedMap<QString,LanguageEntity> mappings;
 };
 
-#endif  // __QE_GTK_HIGHLIGHTER_H__
+#endif  // __QSV_SYNTAXHIGHLIGHTER__

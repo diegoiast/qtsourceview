@@ -143,7 +143,7 @@ void QsvSyntaxHighlighter::setHighlight( QsvLangDef *newLang )
 // 			if (l.matchEmptyStringAtEnd)
 
 			s = l.startRegex + s + l.endRegex;
-			addMapping( s, l.style );
+			addMappingFromName( s, l.style );
 		}
 	}
 
@@ -155,14 +155,14 @@ void QsvSyntaxHighlighter::setHighlight( QsvLangDef *newLang )
 			s  = l.startRegex + ".*$";
 		else
 			s  = l.startRegex + ".*" + l.endRegex;
- 		addMapping( s, l.style );
+ 		addMappingFromName( s, l.style );
 	}
 
 	// later, pattern items
 	// TODO: optimizations
 	foreach( QsvEntityPatternItem l, language->patternItems )
 	{
-		addMapping( l.regex, l.style, !true );
+		addMappingFromName( l.regex, l.style, !true );
 	}
 
 	// strings...
@@ -172,14 +172,14 @@ void QsvSyntaxHighlighter::setHighlight( QsvLangDef *newLang )
 			continue;
 
 		QString s = l.startRegex + QString("[^%1]*").arg(l.startRegex) + l.endRegex;
-		addMapping( s, l.style );
+		addMappingFromName( s, l.style );
 	}
 
 	// and finally... line comments...
 	// block comments are handeled in the drawing function	
 	foreach( QsvEntityLineComment l, language->lineCommentsDefs )
 	{
-		addMapping( QString("%1.*").arg(l.start), l.style );
+		addMappingFromName( QString("%1.*").arg(l.start), l.style );
 	}
 
 	// now we need to re-highlight, how the hell can we do this?
@@ -201,7 +201,15 @@ void QsvSyntaxHighlighter::setHighlight( QsvLangDef *newLang )
 void QsvSyntaxHighlighter::setColorsDef( QsvColorDefFactory *newColors )
 {
 	colors = newColors;
+	LanguageEntity *entity;
 	
+	// update available mappings
+	for(int i = 0; i < mappings.keys().size(); ++i) 
+	{
+		entity = &(mappings.keys()[i].value);
+		entity->charFormat = colors->getColorDef( entity->name ).toCharFormat();
+	}
+
 	// now we need to re-highlight, on qt 4.1, we can use this code:
 	// setDocument( document() );
 	// but since 4.2 we can use this code:
@@ -236,7 +244,7 @@ void QsvSyntaxHighlighter::highlightBlock(const QString &text)
 	}
 	
 	// set the whole text to the default format to begin with
-	QOrderedMapNode<QString,QTextCharFormat> pattern;
+	QOrderedMapNode<QString,LanguageEntity> pattern;
 	
 	// optimizations...
 	if (text.simplified().isEmpty())
@@ -254,8 +262,8 @@ void QsvSyntaxHighlighter::highlightBlock(const QString &text)
 	setFormat( 0, text.length(), lll.toCharFormat() );
 
 	// this code draws each line
-	foreach ( pattern, mappings.keys())
-		drawText( text, pattern.key, pattern.value );
+	foreach ( pattern, mappings.keys() )
+		drawText( text, pattern.key, pattern.value.charFormat );
 
 	setCurrentBlockState(0);
 
@@ -292,9 +300,11 @@ HANDLE_BLOCK_COMMENTS:
 }
 
 
-void QsvSyntaxHighlighter::addMapping(const QString &pattern, const QTextCharFormat &format, bool fullWord )
+void QsvSyntaxHighlighter::addMapping( const QString mappingName, const QString &pattern, const QTextCharFormat &format, bool fullWord )
 {	
 	QString p = pattern;
+	LanguageEntity newEntity;
+	
 	if (fullWord)
 		p = "\\b" + p + "\\b";
 		
@@ -304,11 +314,13 @@ void QsvSyntaxHighlighter::addMapping(const QString &pattern, const QTextCharFor
 		qPrintable(format.foreground().color().name()) 		
 	);
 #endif
+	newEntity.charFormat = format;
+	newEntity.name = mappingName;
 
-	mappings.add( p, format );
+	mappings.add( p, newEntity );
 }
 
-void QsvSyntaxHighlighter::addMapping(const QString &pattern, const QString formatName, bool fullWord )
+void QsvSyntaxHighlighter::addMappingFromName( const QString &pattern, const QString formatName, bool fullWord )
 {
 	QString s = formatName;
 	if (!colors)
@@ -338,7 +350,8 @@ void QsvSyntaxHighlighter::addMapping(const QString &pattern, const QString form
 	else if (s == "Others 3")
 		s = "dsOthers3";
 
-	addMapping( pattern, colors->getColorDef(s).toCharFormat(), fullWord );
+	// at this stage, s is always a Kate color format
+	addMapping( s, pattern, colors->getColorDef(s).toCharFormat(), fullWord );
 }
 
 void QsvSyntaxHighlighter::drawText( QString text, QString s, QTextCharFormat &format )
@@ -384,7 +397,6 @@ void QsvSyntaxHighlighter::drawKeywords( QString text, QString s, QTextCharForma
 	
 	while ( (index >= 0) && (index < txtLen) )
 	{
-		
 		// paint keyword, only if its suoorunded by white chars
 		// regexp are slow, this code looks bad, but faster :)
 		if 
@@ -393,7 +405,7 @@ void QsvSyntaxHighlighter::drawKeywords( QString text, QString s, QTextCharForma
 				(index==0) || 
 				(!text[index-1].isLetterOrNumber() && (text[index-1] != '_'))
 			)
-			       &&
+				&&
 			(
 				(index+length>=txtLen) || 
 				(!text[index+length].isLetterOrNumber() && (text[index+length] != '_') )

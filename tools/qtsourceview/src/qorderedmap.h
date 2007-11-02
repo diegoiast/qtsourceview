@@ -48,9 +48,9 @@ public:
 	bool contains( Key key );
 	int count();
 	bool empty();
-	QList< QOrderedMapNode< Key, Value > > keys();
-	Value operator[]( Key k );
-	Value value( Key k );
+	QList< QOrderedMapNode< Key, Value > > & keys();
+	Value &operator[]( Key k );
+	Value &value( Key k );
 	
 private:
 	QList< QOrderedMapNode< Key, Value > > nodes;
@@ -199,7 +199,7 @@ bool QOrderedMap<Key, Value>::empty()
  * 
  */
 template <class Key, class Value>
-QList< QOrderedMapNode< Key, Value > > QOrderedMap<Key, Value>::keys()
+QList< QOrderedMapNode< Key, Value > >& QOrderedMap<Key, Value>::keys()
 {
 	return nodes;
 }
@@ -214,7 +214,7 @@ QList< QOrderedMapNode< Key, Value > > QOrderedMap<Key, Value>::keys()
  * \see value ( Key )
  */
 template <class Key, class Value>
-Value QOrderedMap<Key, Value>::operator[](Key k)
+Value& QOrderedMap<Key, Value>::operator[](Key k)
 {
 	return value( k );
 }
@@ -232,7 +232,7 @@ Value QOrderedMap<Key, Value>::operator[](Key k)
  * \see contains( Key )
  */
 template <class Key, class Value>
-Value QOrderedMap<Key, Value>::value( Key k )
+Value& QOrderedMap<Key, Value>::value( Key k )
 {
 	QOrderedMapNode<Key, Value> n;
 	foreach( n, nodes )
