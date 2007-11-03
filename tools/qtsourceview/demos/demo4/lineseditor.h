@@ -3,10 +3,12 @@
 
 #include <QTextEdit>
 #include "ui_findwidget.h"
+#include "ui_filemessage.h"
 
 class SamplePanel;
 class TransparentWidget;
 class QsvSyntaxHighlighter;
+class QFileSystemWatcher;
 
 enum ItemColors {
 	 LinesPanel, CurrentLine, MatchBrackets, NoText, TextFound, TextNoFound
@@ -18,7 +20,6 @@ class LinesEditor: public QTextEdit
 public:
 	
 	LinesEditor( QWidget *p=NULL );
-	void	setupActions();
 	QColor	getItemColor( ItemColors role );
 	void	setItemColor( ItemColors role, QColor );
 	virtual void findMatching( QChar c1, QChar c2, bool forward, QTextBlock &block );
@@ -42,12 +43,15 @@ public slots:
 protected slots:
 	void	cursorPositionChanged();
 	void	updateCurrentLine();
+	void	on_fileChanged( const QString &fName );
+	void	on_fileMessage_clicked( QString s );
 	//void	showPanel( bool visible );
 	
 protected:
 	void	keyReleaseEvent ( QKeyEvent * event );
 	void	resizeEvent ( QResizeEvent *event );
 	void	paintEvent(QPaintEvent *e);
+	void	timerEvent( QTimerEvent *event );
 	void	printWhiteSpaces( QPainter &p );
 	void	printCurrentLine( QPainter &p );
 	void	printMatchingBraces( QPainter &p );
@@ -55,6 +59,8 @@ protected:
 	void	widgetToTop( QWidget *w );
 
 private:
+	void	setupActions();
+
 	QPixmap	tabPixmap;
 	QPixmap spacePixmap;
 	QColor	currentLineColor;
@@ -74,11 +80,14 @@ private:
 	QChar	matchChar;
 	QString	fileName;
 	QsvSyntaxHighlighter	*syntaxHighlighter;
+	QFileSystemWatcher	*fileSystemWatcher;
 	
-	SamplePanel		*panel;
 	QAction			*actionFind;
+	SamplePanel		*panel;
 	TransparentWidget	*findWidget;
+	TransparentWidget	*fileMessage;
 	Ui::FindWidget		ui_findWidget;
+	Ui::FileMessage		ui_fileMessage;
 };
 
 #endif // __LINESEDITOR_H__

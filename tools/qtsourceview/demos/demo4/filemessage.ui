@@ -1,25 +1,30 @@
 <ui version="4.0" >
- <author>Diego Iastrubni &lt;elcuco@kde.org></author>
- <class>FindWidget</class>
- <widget class="QWidget" name="FindWidget" >
+ <class>FileMessage</class>
+ <widget class="QWidget" name="FileMessage" >
   <property name="geometry" >
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>623</width>
-    <height>32</height>
+    <width>490</width>
+    <height>34</height>
    </rect>
   </property>
   <property name="sizePolicy" >
-   <sizepolicy vsizetype="Minimum" hsizetype="Preferred" >
+   <sizepolicy vsizetype="Maximum" hsizetype="Preferred" >
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
+  <property name="minimumSize" >
+   <size>
+    <width>16</width>
+    <height>16</height>
+   </size>
+  </property>
   <property name="windowTitle" >
    <string>Form</string>
   </property>
-  <layout class="QHBoxLayout" >
+  <layout class="QVBoxLayout" >
    <property name="spacing" >
     <number>0</number>
    </property>
@@ -47,7 +52,7 @@
       <enum>QFrame::StyledPanel</enum>
      </property>
      <property name="frameShadow" >
-      <enum>QFrame::Sunken</enum>
+      <enum>QFrame::Plain</enum>
      </property>
      <layout class="QHBoxLayout" >
       <property name="spacing" >
@@ -83,49 +88,19 @@
       </item>
       <item>
        <widget class="QLabel" name="label" >
-        <property name="text" >
-         <string>Find:  </string>
+        <property name="sizePolicy" >
+         <sizepolicy vsizetype="Maximum" hsizetype="MinimumExpanding" >
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="NewLineEdit" name="searchText" >
-        <property name="palette" >
-         <palette>
-          <active>
-           <colorrole role="Base" >
-            <brush brushstyle="SolidPattern" >
-             <color alpha="255" >
-              <red>255</red>
-              <green>255</green>
-              <blue>255</blue>
-             </color>
-            </brush>
-           </colorrole>
-          </active>
-          <inactive>
-           <colorrole role="Base" >
-            <brush brushstyle="SolidPattern" >
-             <color alpha="255" >
-              <red>255</red>
-              <green>255</green>
-              <blue>255</blue>
-             </color>
-            </brush>
-           </colorrole>
-          </inactive>
-          <disabled>
-           <colorrole role="Base" >
-            <brush brushstyle="SolidPattern" >
-             <color alpha="255" >
-              <red>255</red>
-              <green>255</green>
-              <blue>255</blue>
-             </color>
-            </brush>
-           </colorrole>
-          </disabled>
-         </palette>
+        <property name="font" >
+         <font>
+          <family>Arial</family>
+         </font>
+        </property>
+        <property name="text" >
+         <string>TextLabel</string>
         </property>
        </widget>
       </item>
@@ -163,13 +138,6 @@
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>NewLineEdit</class>
-   <extends>QLineEdit</extends>
-   <header>newlineedit.h</header>
-  </customwidget>
- </customwidgets>
  <resources>
   <include location="textlines.qrc" />
  </resources>

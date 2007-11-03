@@ -11,6 +11,8 @@
 #include <QFile>
 #include <QTextStream>
 #include <QStyle>
+#include <QFileSystemWatcher>
+#include <QFileInfo>
 
 #include <QDebug>
 
@@ -50,7 +52,7 @@ static const char * spacePixmap_img[] =
 /* pixels */
 	"                ",
 	"                ",
- 	"                ",
+	"                ",
 	"                ",
 	"                ",
 	"      X         ",
@@ -94,23 +96,22 @@ LinesEditor::LinesEditor( QWidget *p ) :QTextEdit(p)
 	findWidget = new TransparentWidget( this, 0.8 );
 	ui_findWidget.setupUi( findWidget );
 	ui_findWidget.searchText->setIcon( QPixmap(":/images/clear_left.png") );
-	ui_findWidget.closeButton->setIcon( QPixmap(":/images/fileclose.png") );
 	findWidget->hide();
+	
+	fileMessage = new TransparentWidget( this, 0.8 );
+	ui_fileMessage.setupUi( fileMessage );
+	connect( ui_fileMessage.label, SIGNAL(linkActivated(const QString&)), this, SLOT(on_fileMessage_clicked(QString)));
+	fileMessage->hide();
+	
+	fileSystemWatcher = new QFileSystemWatcher(this);
 
 	//connect( horizontalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(adjustMarginWidgets()));
 	//connect( verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(adjustMarginWidgets()));
 	connect( this, SIGNAL(cursorPositionChanged()), this, SLOT(cursorPositionChanged()));
 	connect( ui_findWidget.searchText, SIGNAL(textChanged(const QString)), this, SLOT(on_searchText_textChanged(const QString)) );
 	connect( ui_findWidget.closeButton, SIGNAL(clicked()), this, SLOT(showFindWidget()));
-}
-
-void LinesEditor::setupActions()
-{
-	actionFind = new QAction( "Find", this );
-	actionFind->setShortcut( QKeySequence("Ctrl+F") );
-	connect( actionFind, SIGNAL(triggered()), this, SLOT(showFindWidget()) );
-	
-	addAction( actionFind );
+	connect( ui_fileMessage.closeButton, SIGNAL(clicked()), fileMessage, SLOT(hide()));
+	connect( fileSystemWatcher, SIGNAL(fileChanged(const QString&)), this, SLOT(on_fileChanged(const QString&)));
 }
 
 QColor LinesEditor::getItemColor( ItemColors role )
@@ -125,7 +126,7 @@ QColor LinesEditor::getItemColor( ItemColors role )
 		case TextNoFound:	return searchNotFoundColor;
 	}
 	
-	// just to keep gcc happy
+	// just to keep gcc happy, will not get executed
 	return QColor();
 }
 
@@ -157,7 +158,7 @@ void LinesEditor::setItemColor( ItemColors role, QColor c )
 			searchNotFoundColor = c;
 			update();
 			break;
-	}	
+	}
 }
 
 void LinesEditor::findMatching( QChar c1, QChar c2, bool forward, QTextBlock &block )
@@ -317,18 +318,28 @@ void LinesEditor::showFindWidget()
 	}
 	
 	widgetToBottom( findWidget );
-	//widgetToTop( findWidget );		
+	//widgetToTop( findWidget );
 	ui_findWidget.searchText->setFocus();
 }
 
 int LinesEditor::loadFile( QString s )
 {
 	QFile file(s);
+	QFileInfo fileInfo(file);
+	
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-	    return -1;
+		return -1;
 	
 	QTextStream in(&file);
 	setPlainText( in.readAll() );
+	
+	// clear older watches, and add a new one
+	QStringList sl = fileSystemWatcher->directories();
+	if (!sl.isEmpty())
+		fileSystemWatcher->removePaths( sl );
+	
+	fileName = fileInfo.absoluteFilePath();
+	fileSystemWatcher->addPath( fileName );
 	
 	return 0;
 }
@@ -397,7 +408,12 @@ void LinesEditor::resizeEvent ( QResizeEvent *event )
 	{
 		findWidget->hide();
 		showFindWidget();
+	}
 
+	if (fileMessage->isVisible())
+	{
+		fileMessage->hide();
+		widgetToTop( fileMessage );
 	}
 }
 
@@ -422,6 +438,11 @@ void LinesEditor::paintEvent(QPaintEvent *e)
 	}
 	else
 		QTextEdit::paintEvent(e);
+}
+
+void	LinesEditor::timerEvent( QTimerEvent *event )
+{
+	// TODO
 }
 
 void LinesEditor::printWhiteSpaces( QPainter &p )
@@ -523,6 +544,28 @@ void LinesEditor::updateCurrentLine()
 		viewport()->update();
 }
 
+void	LinesEditor::on_fileChanged( const QString &fName )
+{
+	if (fName != fileName)
+		return;
+		
+	QFileInfo f (fileName);
+	
+	if (f.exists())
+		ui_fileMessage.label->setText( tr("File has been modified outside the editor. <a href=':reload'>Click here to reload.</a>") );
+	else
+		ui_fileMessage.label->setText( tr("File has been deleted outside the editor.") );
+	
+	widgetToTop( fileMessage );
+}
+
+void	LinesEditor::on_fileMessage_clicked( QString s )
+{
+	loadFile( fileName );
+	ui_fileMessage.label->setText( "" );
+	fileMessage->hide();
+}
+
 void LinesEditor::adjustMarginWidgets()
 {
 	if (panel->isVisible())
@@ -589,4 +632,13 @@ void LinesEditor::widgetToTop( QWidget *w )
 	
 	w->setGeometry(r2);
 	w->show();	
+}
+
+void LinesEditor::setupActions()
+{
+	actionFind = new QAction( "Find", this );
+	actionFind->setShortcut( QKeySequence("Ctrl+F") );
+	connect( actionFind, SIGNAL(triggered()), this, SLOT(showFindWidget()) );
+	
+	addAction( actionFind );
 }
