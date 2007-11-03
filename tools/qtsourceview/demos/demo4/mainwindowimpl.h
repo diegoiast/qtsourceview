@@ -28,7 +28,6 @@ private:
 	QString			lastDir;
 	QsvColorDefFactory	*defColors;
 	QsvLangDef		*langDefinition;
-	QsvSyntaxHighlighter	*highlight;
 };
 
 #endif

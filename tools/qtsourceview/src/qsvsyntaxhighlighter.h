@@ -6,7 +6,7 @@
  * \brief Definition of the syntax highlighter
  * \author Diego Iastrubni (elcuco@kde.org)
  * License LGPL
- * \see qmdiActionGroup
+ * \see QsvSyntaxHighlighter
  */
 
 #include <QSyntaxHighlighter>

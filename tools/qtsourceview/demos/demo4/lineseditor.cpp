@@ -14,6 +14,7 @@
 
 #include <QDebug>
 
+#include "qsvsyntaxhighlighter.h"
 #include "lineseditor.h"
 #include "samplepanel.h"
 #include "transparentwidget.h"
@@ -80,6 +81,7 @@ LinesEditor::LinesEditor( QWidget *p ) :QTextEdit(p)
 	setLineWrapMode( QTextEdit::NoWrap );
 	setAcceptRichText( false );
 	QTimer::singleShot( 0, this, SLOT(adjustMarginWidgets()));
+	syntaxHighlighter = NULL;
 
 #ifdef WIN32
 	QFont f("Courier New", 10);
@@ -188,6 +190,17 @@ void LinesEditor::findMatching( QChar c1, QChar c2, bool forward, QTextBlock &bl
 	
 	if (n == 0)
 		matchEnd = i;
+}
+
+QsvSyntaxHighlighter* LinesEditor::getSyntaxHighlighter()
+{
+	return syntaxHighlighter;
+}
+
+void LinesEditor::setSyntaxHighlighter( QsvSyntaxHighlighter *newSyntaxHighlighter )
+{
+	syntaxHighlighter = newSyntaxHighlighter;
+	syntaxHighlighter->rehighlight();
 }
 
 #if 1
@@ -390,7 +403,7 @@ void LinesEditor::resizeEvent ( QResizeEvent *event )
 
 void LinesEditor::paintEvent(QPaintEvent *e)
 {
-	// if no special paiting,no need to create the QPainter
+	// if no special paiting, no need to create the QPainter
 	if (highlightCurrentLine || showWhiteSpaces || showMatchingBraces)
 	{		
 		QPainter p( viewport() );
@@ -405,6 +418,7 @@ void LinesEditor::paintEvent(QPaintEvent *e)
 			
 		if (showMatchingBraces)
 			printMatchingBraces( p );
+			
 	}
 	else
 		QTextEdit::paintEvent(e);

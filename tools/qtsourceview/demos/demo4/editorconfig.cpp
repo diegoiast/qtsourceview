@@ -29,7 +29,6 @@ EditorConfig::EditorConfig()
 	ui.setupUi(dialog);
 
 	// set configuration will be done on display	
-	highlight = NULL;
 	colorsModel = NULL;
 	currentConfig = getDefaultConfiguration();	
 
@@ -49,13 +48,17 @@ EditorConfig *EditorConfig::getInstance()
 
 void EditorConfig::showConfigDialog()
 {
-	// the construction of the syntax highlighter must be postponded
+	// The construction of the syntax highlighter must be postponded
 	// to the last possible moment - so the programmer
 	// will be able to load the colors directory manually
-	if (!highlight)
+	// This is also hooked for other initializations
+	if (!ui.sampleEdit->getSyntaxHighlighter())
 	{
 		QsvLangDef *langDefinition = QsvLangDefFactory::getInstanse()->getHighlight("1.cpp");
-		highlight = new QsvSyntaxHighlighter( ui.sampleEdit, colorSchemes[0], langDefinition );		
+		currentConfig = this->getDefaultConfiguration();
+		ui.sampleEdit->setSyntaxHighlighter(
+			new QsvSyntaxHighlighter( ui.sampleEdit, currentConfig.currentColorScheme, langDefinition ) 
+		);
 	}
 	
 	dialog->show();
@@ -106,45 +109,46 @@ EditorConfigData EditorConfig::getCurrentConfiguration()
 
 EditorConfigData  EditorConfig::getDefaultConfiguration()
 {
-	EditorConfigData  c;
-	c.autoBrackets		= true;
-	c.markCurrentLine	= true;
-	c.showLineNumbers	= true;
-	c.showWhiteSpaces	= true;
-	c.matchBrackes		= true;
-	c.tabSize		= 8;
-	c.matchBrackesList	= "()[]{}";
-	c.currentFont		= QFont( DEFAULT_FONT_NAME, DEFAULT_FONT_SIZE );
+	EditorConfigData  defaultConfiguration;
+	defaultConfiguration.autoBrackets	= true;
+	defaultConfiguration.markCurrentLine	= true;
+	defaultConfiguration.showLineNumbers	= true;
+	defaultConfiguration.showWhiteSpaces	= true;
+	defaultConfiguration.matchBrackes	= true;
+	defaultConfiguration.tabSize		= 8;
+	defaultConfiguration.matchBrackesList	= "()[]{}";
+	defaultConfiguration.currentFont	= QFont( DEFAULT_FONT_NAME, DEFAULT_FONT_SIZE );
 	if (colorSchemes.isEmpty())
-		c.currentColorScheme = NULL;
+		defaultConfiguration.currentColorScheme = NULL;
 	else
-		c.currentColorScheme = colorSchemes[0];
-	return c;
+		defaultConfiguration.currentColorScheme = colorSchemes[0];
+		
+	return defaultConfiguration;
 }
 
 EditorConfigData EditorConfig::getUserConfiguration()
 {
-	EditorConfigData c;
+	EditorConfigData userConfig;
 
-	c.autoBrackets		= ui.cbAutoBrackets->isChecked();
-	c.markCurrentLine	= ui.cbMarkCurrentLine->isChecked();
-	c.showLineNumbers	= ui.cbShowLineNumbers->isChecked();
-	c.showWhiteSpaces	= ui.cbShowWhiteSpaces->isChecked();
-	c.matchBrackes		= ui.cbMatchBrackets->isChecked();
-	c.matchBrackesList	= ui.leMatchCraketsList->text();
-	c.tabSize		= ui.sbTabSize->value();
-	c.currentFont		= ui.labelFontPreview->font();
+	userConfig.autoBrackets		= ui.cbAutoBrackets->isChecked();
+	userConfig.markCurrentLine	= ui.cbMarkCurrentLine->isChecked();
+	userConfig.showLineNumbers	= ui.cbShowLineNumbers->isChecked();
+	userConfig.showWhiteSpaces	= ui.cbShowWhiteSpaces->isChecked();
+	userConfig.matchBrackes		= ui.cbMatchBrackets->isChecked();
+	userConfig.matchBrackesList	= ui.leMatchCraketsList->text();
+	userConfig.tabSize		= ui.sbTabSize->value();
+	userConfig.currentFont		= ui.labelFontPreview->font();
 	
-	c.tabSize		= 8;
-	c.matchBrackesList	= "()[]{}";
-	c.currentFont		= QFont( DEFAULT_FONT_NAME, DEFAULT_FONT_SIZE );
+	userConfig.tabSize		= 8;
+	userConfig.matchBrackesList	= ui.leMatchCraketsList->text();
+	userConfig.currentFont		= ui.labelFontPreview->font();
 
 	if (colorSchemes.isEmpty())
-		c.currentColorScheme = NULL;
-	else		
-		c.currentColorScheme = colorSchemes[ ui.colorsCombo->currentIndex() ];
+		userConfig.currentColorScheme = NULL;
+	else
+		userConfig.currentColorScheme = colorSchemes[ui.colorsCombo->currentIndex()];
 	
-	return c;
+	return userConfig;
 }
 
 void EditorConfig::setConfiguration( EditorConfigData c )
@@ -176,8 +180,14 @@ void EditorConfig::applyConfiguration( EditorConfigData c, LinesEditor *editor )
 		editor->setItemColor( LinesPanel, c.currentColorScheme->getColorDef("dsWidgetLinesPanel").getBackground() );
 		editor->setItemColor( CurrentLine, c.currentColorScheme->getColorDef("dsWidgetCurLine").getBackground() );
 		
-		// TODO
-		// how about syntax highlighter?
+		QsvSyntaxHighlighter *sh = editor->getSyntaxHighlighter();
+		if (sh)
+		{
+			sh->setColorsDef( c.currentColorScheme );
+			sh->rehighlight();
+		}
+		/*else
+			qDebug( "%s %d - Warning no syntax highlighter found!", __FILE__, __LINE__ ); */
 	}
 	
 	editor->adjustMarginWidgets();
@@ -199,13 +209,11 @@ void EditorConfig::updateConfiguration()
 	ui.sbTabSize->setValue( currentConfig.tabSize );
 	ui.labelFontPreview->setText( currentConfig.currentFont.toString() );
 	ui.labelFontPreview->setFont( currentConfig.currentFont );
+	
+	int i = colorSchemes.indexOf( currentConfig.currentColorScheme );
+	ui.colorsCombo->setCurrentIndex(i);
 
-	// TODO set the color configuration combo box	
-	if (currentConfig.currentColorScheme)
-	{
-		highlight->setColorsDef( currentConfig.currentColorScheme );
-		highlight->rehighlight();
-	}
+	// the color configuration is set by this function 	
 	applyConfiguration( currentConfig, ui.sampleEdit );
 }
 
@@ -222,16 +230,16 @@ void EditorConfig::on_buttonBox_clicked( QAbstractButton * button )
 	
 	if (b == ui.buttonBox->button(QDialogButtonBox::Ok))
 	{
-		// set the configuration internally and emit signal
-		//updateConfiguration();
-		emit( configurationModified() );
+		// set the configuration internally and emit signal, no need to update GUI
+		currentConfig = getUserConfiguration();
 		dialog->close();
+		emit( configurationModified() );
 	} 
 	else if (b == ui.buttonBox->button(QDialogButtonBox::Apply))
 	{
 		// set the configuration internally and emit signal
-		//updateConfiguration();
-		//applyCurrentConfiguration( ui.sampleEdit );
+		currentConfig = getUserConfiguration();
+		updateConfiguration();
 		emit( configurationModified() );
 	}
 	else if (b == ui.buttonBox->button(QDialogButtonBox::Cancel))
@@ -251,8 +259,10 @@ void EditorConfig::on_btnChooseFont_clicked()
 {
 	bool ok;
 	QFont font = QFontDialog::getFont(&ok, ui.labelFontPreview->font(), dialog );
+	
 	if (!ok)
 		return;
+		
 	ui.labelFontPreview->setText( font.toString() );
 	ui.labelFontPreview->setFont( font );
 }
@@ -268,16 +278,10 @@ void EditorConfig::on_tabWidget_currentChanged(int index)
 
 void EditorConfig::on_colorsCombo_currentIndexChanged( int index )
 {
-	
 	EditorConfigData c = getUserConfiguration();
-
-	applyConfiguration( c , ui.sampleEdit );	
-	if (highlight)
-	{
-		highlight->setColorsDef( c.currentColorScheme );
-		highlight->rehighlight();
-	}
-
+	
+	applyConfiguration( c , ui.sampleEdit );
+	
 	// remove gcc warnings
 	(void)(index);
 }

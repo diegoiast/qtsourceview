@@ -31,9 +31,10 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
 	
 	defColors = new QsvColorDefFactory( dataPath + "/data/colors/kate.xml" );
 	langDefinition = QsvLangDefFactory::getInstanse()->getHighlight("1.cpp");
-	highlight = new QsvSyntaxHighlighter( textEdit, defColors, langDefinition );
+	//highlight = new QsvSyntaxHighlighter( textEdit, defColors, langDefinition );
 	
 	textEdit->loadFile( "mainwindowimpl.cpp" );
+	textEdit->setSyntaxHighlighter( new QsvSyntaxHighlighter( textEdit, defColors, langDefinition ) );
 	connect( action_find, SIGNAL(triggered()), textEdit, SLOT(showFindWidget()) );
 	
 	connect( EditorConfig::getInstance(), SIGNAL(configurationModified()), this, SLOT(configuration_updated()));
@@ -68,8 +69,7 @@ void MainWindowImpl::on_action_Open_triggered()
 	
 	textEdit->loadFile(s);
 	langDefinition = QsvLangDefFactory::getInstanse()->getHighlight( s );
-	highlight->setHighlight( langDefinition );
-	highlight->rehighlight();
+	textEdit->getSyntaxHighlighter()->setHighlight( langDefinition );
 }
 
 void MainWindowImpl::on_actionE_xit_triggered()

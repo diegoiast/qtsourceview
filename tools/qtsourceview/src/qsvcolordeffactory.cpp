@@ -4,7 +4,7 @@
  * \author Diego Iastrubni (elcuco@kde.org)
  * \date 2006-07-22 01:58:07
  * License LGPL
- * \see qmdiActionGroup
+ * \see QsvColorDefFactory
  */
 
 #include <QtDebug>
@@ -191,7 +191,7 @@ QsvColorDef QsvColorDefFactory::getColorDef( QString name )
 		if (color.getStyleNum() == name )
 		{
 #ifdef __DEBUG_NO_ITEM_FOUND__
-	// new empthy one
+	// new empty one
 	qDebug( "%s %d - found color definition named %s - %s", __FILE__, __LINE__, 
 		qPrintable(name), 
 		qPrintable(color.toCharFormat().foreground().color().name()) 
@@ -202,7 +202,7 @@ QsvColorDef QsvColorDefFactory::getColorDef( QString name )
 	}
 
 #ifdef __DEBUG_NO_ITEM_FOUND__
-	// new empthy one	
+	// new empty one	
 	qDebug( "%s %d - could not find a color definition named (%s) in (%s)", __FILE__, __LINE__, qPrintable(name), qPrintable(this->name) );
 #endif	
 	return QsvColorDef();

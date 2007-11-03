@@ -42,5 +42,5 @@ void SamplePanel::paintEvent(QPaintEvent*)
 		const QString txt = QString::number( m_lineNumber );
 		
 		p.drawText( width() -fm.width( txt ) - 2, qRound( position.y() ) -contentsY +ascent, txt ); // -fm.width( "0" ) is an ampty place/indent 
-	}   
+	}
 }

@@ -6,7 +6,7 @@
  * \brief Definition of the color defintion
  * \author Diego Iastrubni (elcuco@kde.org)
  * License LGPL
- * \see qmdiActionGroup
+ * \see QsvColorDef
  */
 
 #include <QMap>

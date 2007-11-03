@@ -6,6 +6,7 @@
 
 class SamplePanel;
 class TransparentWidget;
+class QsvSyntaxHighlighter;
 
 enum ItemColors {
 	 LinesPanel, CurrentLine, MatchBrackets, NoText, TextFound, TextNoFound
@@ -21,6 +22,9 @@ public:
 	QColor	getItemColor( ItemColors role );
 	void	setItemColor( ItemColors role, QColor );
 	virtual void findMatching( QChar c1, QChar c2, bool forward, QTextBlock &block );
+	QsvSyntaxHighlighter* getSyntaxHighlighter();
+	void setSyntaxHighlighter( QsvSyntaxHighlighter *newSyntaxHighlighter );
+	
 
 public slots:
 	void	on_searchText_textChanged( const QString & text );
@@ -69,6 +73,7 @@ private:
 	QChar	currentChar;
 	QChar	matchChar;
 	QString	fileName;
+	QsvSyntaxHighlighter	*syntaxHighlighter;
 	
 	SamplePanel		*panel;
 	QAction			*actionFind;

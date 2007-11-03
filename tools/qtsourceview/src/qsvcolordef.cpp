@@ -1,3 +1,11 @@
+/**
+ * \file qsvcolordef.cpp
+ * \brief Implementation of the color defintion
+ * \author Diego Iastrubni (elcuco@kde.org)
+ * License LGPL
+ * \see QsvColorDef
+ */
+
 #include <QString>
 #include <QDomNode>
 #include <QColor>
@@ -78,7 +86,7 @@ bool	QsvColorDef::load( QDomNode node )
 	for( uint i=0; i< attrCount; i++ )
 	{
 		attributes[node.attributes().item(i).nodeName()] =
-		   node.attributes().item(i).nodeValue();
+			node.attributes().item(i).nodeValue();
 	}
 
 	return true;

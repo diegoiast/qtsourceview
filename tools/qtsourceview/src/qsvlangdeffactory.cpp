@@ -4,7 +4,7 @@
  * \date 2006-07-21 23:15:55
  * \author Diego Iastrubni (elcuco@kde.org)
  * License LGPL
- * \see qmdiActionGroup
+ * \see QsvLangDefFactory
  */
  
 #include <QMessageBox>
@@ -203,7 +203,7 @@ void QsvLangDefFactory::loadDirectory( QString directory )
 			if ( mimeTypes.find(langMimeType) == mimeTypes.end() )
 			{
 				qDebug("%s %d - Warning: highlight file %s - unknown mimetype [%s]",
-				       __FILE__, __LINE__,
+					__FILE__, __LINE__,
 					qPrintable(langDef->getName()), qPrintable(langMimeType)
 				);
 			}
@@ -211,7 +211,6 @@ void QsvLangDefFactory::loadDirectory( QString directory )
 #endif		
 	}
 }
-
 
 /**
  * \brief clear the internal list of suported mime types
@@ -245,6 +244,7 @@ bool	QsvLangDefFactory::addDefaultMimeTypes()
 {
 	return addMimeTypes( ":/mime.types" );
 }
+
 /**
  * \brief install a set of mime types
  * \return true on success, false on any error
@@ -294,7 +294,8 @@ bool	QsvLangDefFactory::addMimeTypes( QString fileName )
 		{
 #ifdef __DEBUG_LANGS_MIMES__
 			QString s;
-			for ( int j=0; j<l.count(); j ++ ) s = s + "*." + l[j] + ",";
+			for ( int j=0; j<l.count(); j ++ )
+				s = s + "*." + l[j] + ",";
 			qDebug( "%s %d - Info: loaded mime type %s -> %s", __FILE__, __LINE__, qPrintable(name), qPrintable(s) );
 #endif
 			mimeTypes[name] = l;

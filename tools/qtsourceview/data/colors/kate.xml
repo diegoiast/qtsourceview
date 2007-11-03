@@ -9,7 +9,7 @@
 	<itemData defStyleNum="dsFloat"    name="Floating point" color="#800080" selColor="#00ffff" bold="0" italic="0" />
 	<itemData defStyleNum="dsChar"     name="Character"      color="#ff00ff" selColor="#ff00ff" bold="0" italic="0" />
 	<itemData defStyleNum="dsString"   name="String"         color="#ff0000" selColor="#ff0000" bold="0" italic="0" />
-	<itemData defStyleNum="dsComment"  name="Comment"        color="#808080" selColor="#A0A0A4" bold="0" italic="1" />
+	<itemData defStyleNum="dsComment"  name="Comment"        color="#808080" selColor="#A0A0A4" bold="0" italic="0" />
 	<itemData defStyleNum="dsOthers"   name="Others"         color="#008000" selColor="#00ff00" bold="0" italic="0" />
 	<itemData defStyleNum="dsAlert"    name="Alert"          color="#0000ff" selColor="#ffcccc" bold="1" italic="0" />
 	<itemData defStyleNum="dsFunction" name="Function"       color="#000080" selColor="#ffffff" bold="0" italic="0" />

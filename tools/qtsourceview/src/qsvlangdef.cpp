@@ -3,7 +3,7 @@
  * \brief Implementation of the language definition, and support structs
  * \author Diego Iastrubni (elcuco@kde.org)
  * License LGPL
- * \see qmdiActionGroup
+ * \see QsvLangDef
  */
 
 #include <QString>
@@ -12,14 +12,11 @@
 #include <QDomNode>
 #include <QFile>
 
-#include <QtDebug>
-
 #include "qsvlangdef.h"
-
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
-// non documented classes, yet
+// not documented classes, yet
 
 /**
  * \class QsvEntityDef 
@@ -66,11 +63,8 @@
  * http://gtksourceview.sourceforge.net/
  * 
  * The syntax definitions used by that library are stored as XML files.
- * This class provides an OO way of loading those definitions, and later on
- * use them for syntax highlighter classes.
- *
- * This class is an abstruction of the language definitions of found on the XML
- * files supplied by that library, in Qt4 syntax.
+ * This class provides an object oriented, Qt4 based way of loading those 
+ * definitions, and later on use them for syntax highlighter classes.
  */
 
 
@@ -86,7 +80,6 @@ QsvLangDef::QsvLangDef( QString fileName )
 	load( fileName );
 };
 
-
 /**
  * \brief Constructor for the QsvLangDef class
  * \param doc the dom document from which the definitions should be loaded
@@ -99,15 +92,14 @@ QsvLangDef::QsvLangDef( QDomDocument doc )
 	load( doc );
 };
 
-
 /**
  * \brief Destructor for the QsvLangDef class
  * 
+ * Destructs the language definition
  */
 QsvLangDef::~QsvLangDef()
 {
 };
-
 
 /**
  * \brief load a language definition from an XML file stored on the disk
@@ -161,7 +153,8 @@ bool	QsvLangDef::load( QDomDocument doc )
 {
 	QDomNodeList list, l;
 	QDomNode n,m;
-
+	uint attrCount; 
+	
 	// read information about this syntax highlight
 	list = doc.elementsByTagName("language");
 	n = list.item(0);
@@ -170,11 +163,20 @@ bool	QsvLangDef::load( QDomDocument doc )
 	if (! n.hasAttributes() ) 
 		return false;
 
-	name		= n.attributes().namedItem("_name").nodeValue();
-	version		= n.attributes().namedItem("_version").nodeValue();
-	section		= n.attributes().namedItem("_section").nodeValue();
-	mimeTypes	= n.attributes().namedItem("mimetypes").nodeValue().split(QRegExp("[;,]"));
-	extensions	= n.attributes().namedItem("extensions").nodeValue().split(";");
+	attrCount = n.attributes().count();
+	
+	for( uint i=0; i<attrCount; i++ )
+	{
+		QString name = n.attributes().item(i).nodeName();
+		QString value = n.attributes().item(i).nodeValue();
+		
+		if (name=="mimetypes")
+			mimeTypes = value.split(QRegExp("[;,]"));
+		else if (name=="extensions")
+			extensions = value.split(";");
+		else
+			attributes[name] = value;
+	}
 
 	// read the entities which define this language/syntax
 	list = doc.elementsByTagName("escape-char");
@@ -202,15 +204,41 @@ bool	QsvLangDef::load( QDomDocument doc )
 };
 
 /**
- * \fn 	QString	QsvLangDef::getName()
+ * \brief returns the version of this syntax
+ * 
+ * This return the version of the syntax definition, as defined in the XML 
+ * file for this syntax. You can use it for displaying the in GUIs instead 
+ * of the file name.
+ */
+QString QsvLangDef::getVersion()
+{
+	return attributes["_version"];
+}
+
+/**
  * \brief returns the name of this syntax
  * 
  * This return a descriptive name for this syntax. You can use it for displaying 
  * the in GUIs instead of the file name.
  */
+QString	QsvLangDef::getName()
+{
+	return attributes["_name"];
+}
 
 /**
- * \fn QStringList QsvLangDef::getMimeTypes()
+ * \brief returns the section of this syntax
+ * 
+ * This return the section to which this syntyax definition belongs to.
+ *
+ * \see getMimeTypes()
+ */
+QString QsvLangDef::getSection()
+{
+	return attributes["_section"];
+}
+
+/**
  * \brief Get the supported mime types of this syntax definition
  * \return a string list, which represents the all the mime types supported by this syntax
  * 
@@ -220,13 +248,16 @@ bool	QsvLangDef::load( QDomDocument doc )
  * 
  * It's up to an upper level API to match file names into mime types, and
  * this class does not take 
- * 
  */
-	
+QStringList QsvLangDef::getMimeTypes()
+{
+	return mimeTypes;
+}
+
 /**
  * \brief helper function for checking the boolean value of a node
  * \param s the value to check
- * \return true if the strings is a valid "true"
+ * \return true if the string is a valid "true"
  *
  * This is a helper function to check the value of a string. The
  * syntax of GTK source view demands that the value "TRUE" will be
@@ -241,9 +272,12 @@ bool	QsvLangDef::isTrue( QString s )
 	bool b = false;
 
 	s  = s.toLower();
-	if (s == "true")	b = true;
-	if (s == "yes")		b = true;
-	if (s == "1")		b = true;
+	if (s == "true")	
+		b = true;
+	else if (s == "yes")
+		b = true;
+	else if (s == "1")
+		b = true;
 	
 	return b;
 }
@@ -266,6 +300,7 @@ bool	QsvLangDef::loadEntity( QDomNode node, QsvEntityDef &entity )
 	}
 	catch( ... )
 	{
+		// does this shite even works on gcc?
 		return false;
 	}
 	
@@ -279,7 +314,6 @@ bool	QsvLangDef::loadEntity( QDomNode node, QsvEntityDef &entity )
  *
  * This function loads the definition of the line comments on this syntax from the list of
  * node list passed as a parameter.
- * 
  */
 bool	QsvLangDef::loadLineComments( QDomNodeList nodes )
 {
@@ -291,7 +325,8 @@ bool	QsvLangDef::loadLineComments( QDomNodeList nodes )
 		QsvEntityLineComment e;
 		node = nodes.at( i );
 
-		if (!loadEntity( node, e )) return false;
+		if (!loadEntity( node, e )) 
+			return false;
 		e.start = node.toElement().elementsByTagName("start-regex").item(0).toElement().text();
 
 		// WTF???
@@ -320,20 +355,19 @@ bool	QsvLangDef::loadStrings( QDomNodeList nodes )
 	{
 		QsvEntityString e;
 		node = nodes.at( i );
-
-		if (!loadEntity( node, e )) return false;
-
+		
+		if (!loadEntity( node, e )) 
+			return false;
+		
 		e.atEOL      = isTrue( node.attributes().namedItem("end-at-line-end").nodeValue() );
 		e.startRegex = node.toElement().elementsByTagName("start-regex").item(0).toElement().text();
 		e.endRegex   = node.toElement().elementsByTagName("end-regex").item(0).toElement().text();
-
 		// WTF???
 		e.startRegex.replace( "\\\\", "\\" );
 		e.endRegex.replace( "\\\\", "\\" );
-		
 		stringsDefs << e;
 	}
-
+	
 	return true;
 }
 
@@ -393,10 +427,12 @@ bool	QsvLangDef::loadBlockComments( QDomNodeList nodes, QList<QsvEntityBlockComm
 		node = nodes.at( i );
 
 		QsvEntityBlockComment e;
-		if (!loadEntity( node, e )) return false;
-		e.startRegex = node.toElement().elementsByTagName("start-regex").item(0).toElement().text();
-		e.endRegex   = node.toElement().elementsByTagName("end-regex").item(0).toElement().text();
-
+		if (!loadEntity( node, e ))
+			return false;
+		
+		e.startRegex	= node.toElement().elementsByTagName("start-regex").item(0).toElement().text();
+		e.endRegex	= node.toElement().elementsByTagName("end-regex").item(0).toElement().text();
+		
 		// WTF???
 		e.startRegex.replace( "\\\\", "\\" );
 		e.endRegex.replace( "\\\\", "\\" );
@@ -428,14 +464,15 @@ bool	QsvLangDef::loadKeywordList( QDomNodeList nodes )
 		QsvEntityKeywordList e;
 		QDomNode node = nodes.at( i );
 		
-		if (!loadEntity( node, e )) return false;
+		if (!loadEntity( node, e ))
+			return false;
 		e.list.clear();
 
-		e.caseSensitive               = isTrue( node.attributes().namedItem("case-sensitive").nodeValue() );
-		e.matchEmptyStringAtBeginning = isTrue( node.attributes().namedItem("match-empty-string-at-beginning").nodeValue() );
-		e.matchEmptyStringAtEnd       = isTrue( node.attributes().namedItem("match-empty-string-at-end").nodeValue() );
-		e.startRegex                  = node.attributes().namedItem("beginning-regex").nodeValue();
-		e.endRegex                    = node.attributes().namedItem("end-regex").nodeValue();
+		e.caseSensitive			= isTrue( node.attributes().namedItem("case-sensitive").nodeValue() );
+		e.matchEmptyStringAtBeginning	= isTrue( node.attributes().namedItem("match-empty-string-at-beginning").nodeValue() );
+		e.matchEmptyStringAtEnd		= isTrue( node.attributes().namedItem("match-empty-string-at-end").nodeValue() );
+		e.startRegex			= node.attributes().namedItem("beginning-regex").nodeValue();
+		e.endRegex			= node.attributes().namedItem("end-regex").nodeValue();
 
 		// WTF???
 		e.startRegex.replace( "\\\\", "\\" );
@@ -448,9 +485,8 @@ bool	QsvLangDef::loadKeywordList( QDomNodeList nodes )
 			str = strs.item( j );
 			e.list << str.toElement().text();
 		}
-		
 		keywordListDefs << e;
-	}	
-
+	}
+	
 	return true;
 }

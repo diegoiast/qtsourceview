@@ -76,7 +76,7 @@ signals:
 private:
 	static EditorConfig *instance;
 	QList<QsvColorDefFactory*> colorSchemes;
-	QsvSyntaxHighlighter	*highlight;
+	//QsvSyntaxHighlighter	*highlight;
 
 	QDialog *dialog;
 	ColorsModel *colorsModel;

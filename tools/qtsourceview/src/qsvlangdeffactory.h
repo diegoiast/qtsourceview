@@ -1,12 +1,12 @@
-#ifndef __QE_LANGDEF_FACTORY_H__
-#define __QE_LANGDEF_FACTORY_H__
+#ifndef __QSV_LANGDEF_FACTORY_H__
+#define __QSV_LANGDEF_FACTORY_H__
 
 /**
  * \file qsvlangdeffactory.h
  * \brief Definition of the language definition factory
  * \author Diego Iastrubni (elcuco@kde.org)
  * License LGPL
- * \see qmdiActionGroup
+ * \see QsvLangDefFactory
  */
 
 #include <QMap>
@@ -33,4 +33,4 @@ private:
 	QMap<QString,QStringList>	mimeTypes;
 };
 
-#endif // __QE_LANGDEF_FACTORY_H__
+#endif // __QSV_LANGDEF_FACTORY_H__

@@ -6,8 +6,10 @@
  * \brief Definition of the language definition, and support structs
  * \author Diego Iastrubni (elcuco@kde.org)
  * License LGPL
- * \see qmdiActionGroup
+ * \see QsvLangDef
  */
+
+#include <QMap>
 
 class QDomDocument;
 class QString;
@@ -72,8 +74,10 @@ public:
 	bool	load( QString fileName );
 	bool	load( QDomDocument doc );
 
-	QString	getName(){ return name; };
-	QStringList getMimeTypes(){ return mimeTypes; };
+	QString getVersion();
+	QString	getName();
+	QString getSection();
+	QStringList getMimeTypes();	
 	
 private:
 	bool	isTrue( QString s );
@@ -85,11 +89,9 @@ private:
 	bool	loadBlockComments( QDomNodeList nodes, QList<QsvEntityBlockComment> &list );
 	bool	loadKeywordList( QDomNodeList nodes );
 
-	QString		name;
-	QString		version;
-	QString 	section;
-	QStringList	mimeTypes;
-	QStringList	extensions;
+	QMap<QString,QString>		attributes;
+	QStringList			mimeTypes;
+	QStringList			extensions;
 
 	QString				escapeChar;
 	QList<QsvEntityString>		stringsDefs; 

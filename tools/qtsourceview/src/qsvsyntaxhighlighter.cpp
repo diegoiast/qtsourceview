@@ -3,7 +3,7 @@
  * \brief Implementation of the syntax highlighter
  * \author Diego Iastrubni (elcuco@kde.org)
  * License LGPL
- * \see qmdiActionGroup
+ * \see QsvSyntaxHighlighter
  */
 
 #include <QString>
@@ -118,19 +118,23 @@ QsvSyntaxHighlighter::~QsvSyntaxHighlighter()
  * The old definition is not disposed, you should take care of freeing 
  * the allocated memory yourself.
  * 
- * You should also re-highlight the editor yourself.
+ * There is no need to re-highlight the editor yourself, since this function
+ * does this for you.
  * 
- * \bug No way of re-highligting the editor On Qt < 4.2.0
  */
 void QsvSyntaxHighlighter::setHighlight( QsvLangDef *newLang )
 {
+	if (newLang == language)
+		return;
+
 	QString str;
 	language = newLang;
-
+	
 	mappings.clear();
 	
 	if (language == NULL)
 		return;
+		
 
 	//first match keyword lists
 	// TODO: optimizations
@@ -155,7 +159,7 @@ void QsvSyntaxHighlighter::setHighlight( QsvLangDef *newLang )
 			s  = l.startRegex + ".*$";
 		else
 			s  = l.startRegex + ".*" + l.endRegex;
- 		addMappingFromName( s, l.style );
+		addMappingFromName( s, l.style );
 	}
 
 	// later, pattern items
@@ -182,8 +186,10 @@ void QsvSyntaxHighlighter::setHighlight( QsvLangDef *newLang )
 		addMappingFromName( QString("%1.*").arg(l.start), l.style );
 	}
 
-	// now we need to re-highlight, how the hell can we do this?
-	setDocument( document() );
+	// now we need to re-highlight, on qt 4.1, we can use this code:
+	// setDocument( document() );
+	// but since 4.2 we can use this code:
+	rehighlight();
 }
 
 /**
@@ -194,12 +200,17 @@ void QsvSyntaxHighlighter::setHighlight( QsvLangDef *newLang )
  * The old colros are not disposed, you should take care of freeing 
  * the allocated memory yourself.
  * 
- * You should also re-highlight the editor yourself.
+ * There is no need to re-highlight the editor yourself, since this function
+ * does this for you.
  * 
- * \bug No way of re-highligting the editor On Qt < 4.2.0
+ * Old colors are not deleted by this method, and you should take care 
+ * of freeing that memory manualy.
  */
 void QsvSyntaxHighlighter::setColorsDef( QsvColorDefFactory *newColors )
 {
+	if (colors == newColors)
+		return;
+		
 	colors = newColors;
 	LanguageEntity *entity;
 	

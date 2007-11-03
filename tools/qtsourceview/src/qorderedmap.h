@@ -62,19 +62,19 @@ private:
 /**
  * \brief default construstor
  * 
- * Creates and initialized the ordered map object.
+ * Creates and initializes the ordered map object.
  */
 template <class Key, class Value>
 QOrderedMap<Key, Value>::QOrderedMap()
 {
 	// construst the object... yey!!!
-	nodes.clear();
 }
 
 /**
  * \brief default destructor
  * 
- * Destruct the ordered map object.
+ * Destruct the ordered map object. Will clear the internal
+ * QList object.
  */
 template <class Key, class Value>
 QOrderedMap<Key, Value>::~QOrderedMap()
@@ -91,6 +91,7 @@ QOrderedMap<Key, Value>::~QOrderedMap()
  * Inserts a new item with the key key and a value of value.
  * If there is already an item with the key key, that item's value 
  * is replaced with value.
+ *
  * If there are multiple items with the key key, the most recently 
  * inserted item's value is replaced with value.
  */
