@@ -115,7 +115,9 @@ EditorConfigData  EditorConfig::getDefaultConfiguration()
 	defaultConfiguration.showLineNumbers	= true;
 	defaultConfiguration.showWhiteSpaces	= true;
 	defaultConfiguration.matchBrackes	= true;
+	defaultConfiguration.showMargins	= false;
 	defaultConfiguration.tabSize		= 8;
+	defaultConfiguration.marginsWidth	= 80;
 	defaultConfiguration.matchBrackesList	= "()[]{}";
 	defaultConfiguration.currentFont	= QFont( DEFAULT_FONT_NAME, DEFAULT_FONT_SIZE );
 	if (colorSchemes.isEmpty())
@@ -134,12 +136,14 @@ EditorConfigData EditorConfig::getUserConfiguration()
 	userConfig.markCurrentLine	= ui.cbMarkCurrentLine->isChecked();
 	userConfig.showLineNumbers	= ui.cbShowLineNumbers->isChecked();
 	userConfig.showWhiteSpaces	= ui.cbShowWhiteSpaces->isChecked();
+	userConfig.showMargins		= ui.cbShowMargins->isChecked();
 	userConfig.matchBrackes		= ui.cbMatchBrackets->isChecked();
 	userConfig.matchBrackesList	= ui.leMatchCraketsList->text();
 	userConfig.tabSize		= ui.sbTabSize->value();
 	userConfig.currentFont		= ui.labelFontPreview->font();
 	
-	userConfig.tabSize		= 8;
+	userConfig.tabSize		= ui.sbTabSize->value();
+	userConfig.marginsWidth		= ui.sbMarginSize->value();
 	userConfig.matchBrackesList	= ui.leMatchCraketsList->text();
 	userConfig.currentFont		= ui.labelFontPreview->font();
 
@@ -164,8 +168,12 @@ void EditorConfig::applyConfiguration( EditorConfigData c, LinesEditor *editor )
 	editor->setDisplayWhiteSpaces( c.showWhiteSpaces );
 	editor->setDisplatMatchingBrackets( c.matchBrackes );
 	editor->setMatchingString( c.matchBrackesList );
+	if (c.showMargins)
+		editor->setMargin( c.marginsWidth );
+	else
+		editor->setMargin( -1 );
 	
-	//currentConfig.tabSize         = sbTabSize->value();
+	editor->setTabSize( c.tabSize );
 	editor->document()->setDefaultFont( c.currentFont );
 	editor->getPanel()->setFont( c.currentFont );
 	
@@ -179,6 +187,7 @@ void EditorConfig::applyConfiguration( EditorConfigData c, LinesEditor *editor )
 		editor->setTextColor( c.currentColorScheme->getColorDef("dsNormal").getColor() );
 		editor->setItemColor( LinesPanel, c.currentColorScheme->getColorDef("dsWidgetLinesPanel").getBackground() );
 		editor->setItemColor( CurrentLine, c.currentColorScheme->getColorDef("dsWidgetCurLine").getBackground() );
+		editor->setItemColor( WhiteSpaceColor, c.currentColorScheme->getColorDef("dsWhiteSpace").getColor() );
 		
 		QsvSyntaxHighlighter *sh = editor->getSyntaxHighlighter();
 		if (sh)
@@ -278,10 +287,9 @@ void EditorConfig::on_tabWidget_currentChanged(int index)
 
 void EditorConfig::on_colorsCombo_currentIndexChanged( int index )
 {
+	Q_UNUSED( index );
 	EditorConfigData c = getUserConfiguration();
 	
 	applyConfiguration( c , ui.sampleEdit );
-	
-	// remove gcc warnings
-	(void)(index);
 }
+

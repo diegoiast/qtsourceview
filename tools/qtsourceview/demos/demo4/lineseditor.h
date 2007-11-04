@@ -11,7 +11,7 @@ class QsvSyntaxHighlighter;
 class QFileSystemWatcher;
 
 enum ItemColors {
-	 LinesPanel, CurrentLine, MatchBrackets, NoText, TextFound, TextNoFound
+	 LinesPanel, CurrentLine, MatchBrackets, NoText, TextFound, TextNoFound, WhiteSpaceColor
 };
 
 class LinesEditor: public QTextEdit
@@ -22,11 +22,12 @@ public:
 	LinesEditor( QWidget *p=NULL );
 	QColor	getItemColor( ItemColors role );
 	void	setItemColor( ItemColors role, QColor );
+	void	setMargin( int width );
+	void	setTabSize( int size );
 	virtual void findMatching( QChar c1, QChar c2, bool forward, QTextBlock &block );
 	QsvSyntaxHighlighter* getSyntaxHighlighter();
 	void setSyntaxHighlighter( QsvSyntaxHighlighter *newSyntaxHighlighter );
 	
-
 public slots:
 	void	on_searchText_textChanged( const QString & text );
 	void	showFindWidget();
@@ -55,11 +56,13 @@ protected:
 	void	printWhiteSpaces( QPainter &p );
 	void	printCurrentLine( QPainter &p );
 	void	printMatchingBraces( QPainter &p );
+	void	printMargins( QPainter &p );
 	void	widgetToBottom( QWidget *w );
 	void	widgetToTop( QWidget *w );
 
 private:
 	void	setupActions();
+	void	updateMarkIcons();
 
 	QPixmap	tabPixmap;
 	QPixmap spacePixmap;
@@ -68,10 +71,13 @@ private:
 	QColor	searchFoundColor;
 	QColor	searchNotFoundColor;
 	QColor	searchNoText;
+	QColor	whiteSpaceColor;
 	
 	bool	highlightCurrentLine;
 	bool	showWhiteSpaces;
 	bool	showMatchingBraces;
+	bool	showPrintingMargins;
+	int	printMarginWidth;
 	QString matchingString;
 
 	int	matchStart;

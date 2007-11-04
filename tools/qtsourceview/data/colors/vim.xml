@@ -23,4 +23,5 @@
         <itemData defStyleNum="dsWidgetBackground"   name="Widget background"         background="#000000"  />
         <itemData defStyleNum="dsWidgetCurLine"      name="Widget current line"       background="#202020"  />
         <itemData defStyleNum="dsWidgetLinesPanel"   name="Widget lines marker"       background="#808080"  />
+	<itemData defStyleNum="dsWhiteSpace"         name="White spaces color"        color="#181818"  />
 </itemDatas>

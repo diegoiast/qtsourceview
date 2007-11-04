@@ -26,11 +26,12 @@ void NewLineEdit::setIcon(QPixmap i)
 	clearButton->setIcon( i );
 	clearButton->setIconSize(i.size());
 }
+
 void NewLineEdit::resizeEvent(QResizeEvent *e)
 {
 	QLineEdit::resizeEvent( e );
 
-    	QSize sz = clearButton->sizeHint();
+	QSize sz = clearButton->sizeHint();
 	int frameWidth = style()->pixelMetric(QStyle::PM_DefaultFrameWidth);
 	clearButton->move( rect().right() - frameWidth - sz.width(), (rect().bottom() + 1 - sz.height())/2 );	
 }

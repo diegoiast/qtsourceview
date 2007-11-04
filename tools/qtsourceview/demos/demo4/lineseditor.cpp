@@ -68,9 +68,12 @@ LinesEditor::LinesEditor( QWidget *p ) :QTextEdit(p)
 	matchBracesColor	= QColor( "#FF0000" );
 	searchFoundColor	= QColor( "#DDDDFF" ); //QColor::fromRgb( 220, 220, 255)
 	searchNotFoundColor	= QColor( "#FFAAAA" ); //QColor::fromRgb( 255, 102, 102) "#FF6666"
+	whiteSpaceColor		= QColor( "#E0E0E0" );
 	highlightCurrentLine	= true;
 	showWhiteSpaces		= true;
 	showMatchingBraces	= true;
+	showPrintingMargins	= false;
+	printMarginWidth	= 80;
 	matchStart		= -1;
 	matchEnd		= -1;
 	matchingString		= "(){}[]";
@@ -124,6 +127,7 @@ QColor LinesEditor::getItemColor( ItemColors role )
 		case NoText:		return searchNoText;
 		case TextFound:		return searchFoundColor;
 		case TextNoFound:	return searchNotFoundColor;
+		case WhiteSpaceColor:	return whiteSpaceColor;
 	}
 	
 	// just to keep gcc happy, will not get executed
@@ -140,25 +144,37 @@ void LinesEditor::setItemColor( ItemColors role, QColor c )
 			break;
 		case CurrentLine:	
 			currentLineColor = c;
-			update();
 			break;
 		case MatchBrackets:
 			matchBracesColor = c;
-			update();
 			break;
 		case NoText:	
 			searchNoText = c;
-			update();
 			break;
 		case TextFound:
 			searchFoundColor = c;
-			update();
 			break;
 		case TextNoFound:
 			searchNotFoundColor = c;
-			update();
+			break;
+		case WhiteSpaceColor:
+			whiteSpaceColor = c;
+			updateMarkIcons();
 			break;
 	}
+}
+
+void	LinesEditor::setMargin( int width )
+{
+	printMarginWidth = width;
+	showPrintingMargins = (width>0);
+}
+
+void	LinesEditor::setTabSize( int size )
+{
+	const QFontMetrics fm = QFontMetrics( document()->defaultFont() );
+	int j = fm.width( " " ) * size;
+	setTabStopWidth( j );
 }
 
 void LinesEditor::findMatching( QChar c1, QChar c2, bool forward, QTextBlock &block )
@@ -347,7 +363,6 @@ int LinesEditor::loadFile( QString s )
 void LinesEditor::setDisplayCurrentLine( bool b )
 {
 	highlightCurrentLine = b;
-
 }
 
 void LinesEditor::setDisplayWhiteSpaces( bool b )
@@ -366,8 +381,7 @@ void LinesEditor::setMatchingString( QString s )
 	matchingString = s;	
 }
 
-
-void LinesEditor::keyReleaseEvent( QKeyEvent * event )
+void LinesEditor::keyReleaseEvent( QKeyEvent *event )
 {
 	switch (event->key())
 	{		
@@ -400,7 +414,7 @@ void LinesEditor::keyReleaseEvent( QKeyEvent * event )
 
 void LinesEditor::resizeEvent ( QResizeEvent *event )
 {
-	adjustMarginWidgets();
+	//adjustMarginWidgets();
 	QTextEdit::resizeEvent( event );
 	adjustMarginWidgets();
 
@@ -423,18 +437,20 @@ void LinesEditor::paintEvent(QPaintEvent *e)
 	if (highlightCurrentLine || showWhiteSpaces || showMatchingBraces)
 	{		
 		QPainter p( viewport() );
-	
+		
 		if (highlightCurrentLine)
 			printCurrentLine( p );
-				
+		
+		if (showPrintingMargins)
+			printMargins( p );
+		
 		if (showWhiteSpaces)
 			printWhiteSpaces( p );
-
+		
 		QTextEdit::paintEvent(e);
 			
 		if (showMatchingBraces)
 			printMatchingBraces( p );
-			
 	}
 	else
 		QTextEdit::paintEvent(e);
@@ -443,13 +459,14 @@ void LinesEditor::paintEvent(QPaintEvent *e)
 void	LinesEditor::timerEvent( QTimerEvent *event )
 {
 	// TODO
+	Q_UNUSED( event );
 }
 
 void LinesEditor::printWhiteSpaces( QPainter &p )
 {		
 	const int contentsY = verticalScrollBar()->value();
 	const qreal pageBottom = contentsY + viewport()->height();
-	const QFontMetrics fm = QFontMetrics( currentFont() );
+	const QFontMetrics fm = QFontMetrics( document()->defaultFont() );
 	
 	for ( QTextBlock block = document()->begin(); block.isValid(); block = block.next() )
 	{
@@ -552,7 +569,7 @@ void	LinesEditor::on_fileChanged( const QString &fName )
 	QFileInfo f (fileName);
 	
 	if (f.exists())
-		ui_fileMessage.label->setText( tr("File has been modified outside the editor. <a href=':reload'>Click here to reload.</a>") );
+		ui_fileMessage.label->setText( tr("File has been modified outside the editor. <a href=':reload' title='Clicking this links will revert all changes to this editor'>Click here to reload.</a>") );
 	else
 		ui_fileMessage.label->setText( tr("File has been deleted outside the editor.") );
 	
@@ -561,9 +578,12 @@ void	LinesEditor::on_fileChanged( const QString &fName )
 
 void	LinesEditor::on_fileMessage_clicked( QString s )
 {
-	loadFile( fileName );
-	ui_fileMessage.label->setText( "" );
-	fileMessage->hide();
+	if (s == ":reload")
+	{
+		loadFile( fileName );
+		ui_fileMessage.label->setText( "" );
+		fileMessage->hide();
+	}
 }
 
 void LinesEditor::adjustMarginWidgets()
@@ -604,9 +624,19 @@ void LinesEditor::printMatchingBraces( QPainter &p )
 		p.drawText(r.x()-1, r.y(), r.width(), r.height(), Qt::AlignLeft | Qt::AlignVCenter, matchChar );
 }
 
+void	LinesEditor::printMargins( QPainter &p )
+{
+	int lineLocation;
+	
+	p.setFont( document()->defaultFont() );
+	p.setPen( whiteSpaceColor );
+	lineLocation = p.fontMetrics().width( " " ) * printMarginWidth + 0;
+	p.drawLine( lineLocation, 0, lineLocation, height() );
+}
+
 void LinesEditor::widgetToBottom( QWidget *w )
 {
-	QRect r1 = viewport()->geometry();	
+	QRect r1 = viewport()->geometry();
 	QRect r2 = w->geometry();
 
 	int i = r2.height();
@@ -641,4 +671,30 @@ void LinesEditor::setupActions()
 	connect( actionFind, SIGNAL(triggered()), this, SLOT(showFindWidget()) );
 	
 	addAction( actionFind );
+}
+
+void LinesEditor::updateMarkIcons()
+{
+	int x, y;
+	QImage img;
+	
+	img = tabPixmap.toImage();
+	for( x=0; x< tabPixmap.width(); x++ )
+		for( y=0; y< tabPixmap.height(); y++ )
+		{
+			uint rgb = qRgb(  whiteSpaceColor.red(), whiteSpaceColor.green(), whiteSpaceColor.blue() );
+			if (img.pixel(x,y) != 0)
+				img.setPixel( x, y, rgb );
+		}
+	tabPixmap = QPixmap::fromImage( img );
+
+	img = spacePixmap.toImage();
+	for( x=0; x< tabPixmap.width(); x++ )
+		for( y=0; y< tabPixmap.height(); y++ )
+		{
+			uint rgb = qRgb(  whiteSpaceColor.red(), whiteSpaceColor.green(), whiteSpaceColor.blue() );
+			if (img.pixel(x,y) != 0)
+				img.setPixel( x, y, rgb );
+		}
+	spacePixmap = QPixmap::fromImage( img );
 }

@@ -14,8 +14,7 @@ QModelIndex ColorsModel::index( int row, int col, const QModelIndex &parent ) co
 {
 	return createIndex( row, col, 0 );
 	
-	// shut up gcc warnings
-	parent.data();	
+	Q_UNUSED( parent );
 }
 
 QModelIndex ColorsModel::parent( const QModelIndex & ) const
@@ -33,13 +32,13 @@ int ColorsModel::rowCount( const QModelIndex &parent ) const
 	
 	return i;
 
-	// shut up gcc warnings
-	parent.row();
+	Q_UNUSED( parent );
 }
 
 int ColorsModel::columnCount( const QModelIndex &parent ) const
 {
-	return 1;	
+	return 1;
+	Q_UNUSED( parent );
 }
 
 QVariant ColorsModel::data( const QModelIndex &index, int role ) const
@@ -65,5 +64,4 @@ QVariant ColorsModel::data( const QModelIndex &index, int role ) const
 		return c->fileName;
 	else
 		return QVariant();
-
 }

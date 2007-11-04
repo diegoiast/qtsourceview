@@ -20,8 +20,10 @@ struct EditorConfigData
 	bool			markCurrentLine;
 	bool			showLineNumbers;
 	bool			showWhiteSpaces;
+	bool			showMargins;
 	bool			matchBrackes;
 	int			tabSize;
+	int			marginsWidth;
 	QString			matchBrackesList;
 	QFont			currentFont;
 	QsvColorDefFactory	*currentColorScheme;
