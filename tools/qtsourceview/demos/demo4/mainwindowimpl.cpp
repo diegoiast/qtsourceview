@@ -1,7 +1,8 @@
 #include <QString>
 #include <QFileDialog>
 #include <QDir>
-
+#include <QMenu>
+#include <QMenuItem>
 #include <QDebug>
 
 // QtSourceView includes
@@ -34,10 +35,28 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
 	//highlight = new QsvSyntaxHighlighter( textEdit, defColors, langDefinition );
 	
 	textEdit->loadFile( "mainwindowimpl.cpp" );
-	textEdit->setSyntaxHighlighter( new QsvSyntaxHighlighter( textEdit, defColors, langDefinition ) );
-	connect( action_find, SIGNAL(triggered()), textEdit, SLOT(showFindWidget()) );
-	
+	textEdit->setSyntaxHighlighter( new QsvSyntaxHighlighter( textEdit, defColors, langDefinition ) );	
 	connect( EditorConfig::getInstance(), SIGNAL(configurationModified()), this, SLOT(configuration_updated()));
+	
+	textEdit->setupActions();
+	QMenu *tmpMenu = menuBar()->findChildren<QMenu*>( "menu_Edit" )[0];
+	if (tmpMenu)
+	{
+		QMenu *actionsMenu = new QMenu( "Text actions", tmpMenu );
+		actionsMenu->setObjectName("actionsMenu");
+		//actionsMenu->addAction( textEdit->actionFind );
+		tmpMenu->actions().prepend( textEdit->actionFind );
+		actionsMenu->addAction( textEdit->actionCapitalize );
+		actionsMenu->addAction( textEdit->actionLowerCase );
+		actionsMenu->addAction( textEdit->actionChangeCase );
+		tmpMenu->addMenu( actionsMenu );
+	}
+	tmpMenu = menuBar()->findChildren<QMenu*>( "menu_Edit" )[0];
+	if (tmpMenu)
+		tmpMenu->addAction( textEdit->actionFind );	
+	
+	// debug
+	//dumpObjectTree();
 }
 
 void MainWindowImpl::on_action_New_triggered()

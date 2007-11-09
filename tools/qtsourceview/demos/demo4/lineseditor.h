@@ -20,36 +20,47 @@ class LinesEditor: public QTextEdit
 public:
 	
 	LinesEditor( QWidget *p=NULL );
-	QColor	getItemColor( ItemColors role );
-	void	setItemColor( ItemColors role, QColor );
-	void	setMargin( int width );
-	void	setTabSize( int size );
-	virtual void findMatching( QChar c1, QChar c2, bool forward, QTextBlock &block );
+	void		setupActions();
+	virtual void	findMatching( QChar c1, QChar c2, bool forward, QTextBlock &block );
 	QsvSyntaxHighlighter* getSyntaxHighlighter();
-	void setSyntaxHighlighter( QsvSyntaxHighlighter *newSyntaxHighlighter );
 	
 public slots:
-	void	on_searchText_textChanged( const QString & text );
-	void	showFindWidget();
-	int	loadFile( QString );
+	void		on_searchText_textChanged( const QString & text );
+	void		showFindWidget();
+	int		loadFile( QString );
+
+	QColor		getItemColor( ItemColors role );
+	void		setItemColor( ItemColors role, QColor );
+	void		setMargin( int width );
+	//int		getMargin();
+	void		setTabSize( int size );
+	//int		getTabSize();
+	void		setSyntaxHighlighter( QsvSyntaxHighlighter *newSyntaxHighlighter );	
+	QTextCursor	getCurrentTextCursor();	
+	void		setDisplayCurrentLine( bool );
+	//bool		getDisplayCurrentLine();
+	void		setDisplayWhiteSpaces( bool );
+	//bool		getDisplayWhiteSpaces();
+	void		setDisplatMatchingBrackets( bool );
+	//bool		getDisplatMatchingBrackets();
+	void		setMatchingString( QString );
+	//QString		getMatchingString();
 	
-	void	setDisplayCurrentLine( bool );
-	void	setDisplayWhiteSpaces( bool );
-	void	setDisplatMatchingBrackets( bool );
-	void	setMatchingString( QString );
+	void		transformBlockToUpper();
+	void		transformBlockToLower();
+	void		transformBlockCase();
 	
 	QWidget*	getPanel();
-	void	adjustMarginWidgets();
+	void		adjustMarginWidgets();
 		
 protected slots:
 	void	cursorPositionChanged();
 	void	updateCurrentLine();
 	void	on_fileChanged( const QString &fName );
 	void	on_fileMessage_clicked( QString s );
-	//void	showPanel( bool visible );
 	
 protected:
-	void	keyReleaseEvent ( QKeyEvent * event );
+	void	keyPressEvent ( QKeyEvent * event );
 	void	resizeEvent ( QResizeEvent *event );
 	void	paintEvent(QPaintEvent *e);
 	void	timerEvent( QTimerEvent *event );
@@ -59,9 +70,15 @@ protected:
 	void	printMargins( QPainter &p );
 	void	widgetToBottom( QWidget *w );
 	void	widgetToTop( QWidget *w );
+	bool	handleIndentEvent( bool forward );
+
+public:
+	QAction	*actionFind;
+	QAction	*actionCapitalize;
+	QAction	*actionLowerCase;
+	QAction	*actionChangeCase;
 
 private:
-	void	setupActions();
 	void	updateMarkIcons();
 
 	QPixmap	tabPixmap;
@@ -87,8 +104,7 @@ private:
 	QString	fileName;
 	QsvSyntaxHighlighter	*syntaxHighlighter;
 	QFileSystemWatcher	*fileSystemWatcher;
-	
-	QAction			*actionFind;
+		
 	SamplePanel		*panel;
 	TransparentWidget	*findWidget;
 	TransparentWidget	*fileMessage;

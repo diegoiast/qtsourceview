@@ -15,7 +15,8 @@ NewLineEdit::NewLineEdit( QWidget *parent )
 	int frameWidth = style()->pixelMetric(QStyle::PM_DefaultFrameWidth);
 	QSize msz = minimumSizeHint();
 	setStyleSheet(QString("QLineEdit { padding-right: %1px; } ").arg(clearButton->sizeHint().width() + frameWidth + 1));
-	setMinimumSize(qMax(msz.width(), height() + frameWidth * 2 + 2), qMax(msz.height(), height() + frameWidth * 2 + 2));
+	setMinimumWidth( qMax(msz.width(), width() + frameWidth * 2 + 2) );
+	//setMinimumHeight( qMax(msz.height(), height() + frameWidth * 2 + 2) );
 
 	connect(clearButton, SIGNAL(clicked()), this, SLOT(clear()));
 	connect(this, SIGNAL(textChanged(const QString&)), this, SLOT(updateEditLine()));
@@ -24,7 +25,7 @@ NewLineEdit::NewLineEdit( QWidget *parent )
 void NewLineEdit::setIcon(QPixmap i)
 {
 	clearButton->setIcon( i );
-	clearButton->setIconSize(i.size());
+	//clearButton->setIconSize(i.size());
 }
 
 void NewLineEdit::resizeEvent(QResizeEvent *e)

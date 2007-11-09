@@ -13,7 +13,6 @@
 #include <QStyle>
 #include <QFileSystemWatcher>
 #include <QFileInfo>
-
 #include <QDebug>
 
 #include "qsvsyntaxhighlighter.h"
@@ -115,6 +114,32 @@ LinesEditor::LinesEditor( QWidget *p ) :QTextEdit(p)
 	connect( ui_findWidget.closeButton, SIGNAL(clicked()), this, SLOT(showFindWidget()));
 	connect( ui_fileMessage.closeButton, SIGNAL(clicked()), fileMessage, SLOT(hide()));
 	connect( fileSystemWatcher, SIGNAL(fileChanged(const QString&)), this, SLOT(on_fileChanged(const QString&)));
+}
+
+void LinesEditor::setupActions()
+{
+	actionFind = new QAction( "Find (inline)", this );
+	actionFind->setObjectName("actionFind");
+	actionFind->setShortcut( QKeySequence("Ctrl+F") );
+	connect( actionFind, SIGNAL(triggered()), this, SLOT(showFindWidget()) );	
+	//addAction( actionFind );
+
+	actionCapitalize = new QAction( "Change to capital letters", this );
+	actionCapitalize->setObjectName( "actionCapitalize" );
+	actionCapitalize->setShortcut( QKeySequence( Qt::CTRL | Qt::Key_U ) );
+	connect( actionCapitalize, SIGNAL(triggered()), this, SLOT(transformBlockToUpper()) );	
+	//addAction( actionCapitalize );
+
+	actionLowerCase = new QAction( "Change to lower letters", this );
+	actionLowerCase->setObjectName( "actionLowerCase" );
+	actionLowerCase->setShortcut( QKeySequence( Qt::CTRL | Qt::SHIFT | Qt::Key_U  ) );
+	connect( actionLowerCase, SIGNAL(triggered()), this, SLOT(transformBlockToLower()) );	
+	//addAction( actionLowerCase );
+
+	actionChangeCase = new QAction( "Change case", this );
+	actionChangeCase->setObjectName( "actionChangeCase" );
+	connect( actionChangeCase, SIGNAL(triggered()), this, SLOT(transformBlockCase()) );	
+	//addAction( actionChangeCase );
 }
 
 QColor LinesEditor::getItemColor( ItemColors role )
@@ -220,13 +245,21 @@ void LinesEditor::setSyntaxHighlighter( QsvSyntaxHighlighter *newSyntaxHighlight
 	syntaxHighlighter->rehighlight();
 }
 
-#if 1
+QTextCursor	LinesEditor::getCurrentTextCursor()
+{
+	QTextCursor cursor = textCursor();
+	if (!cursor.hasSelection())
+		cursor.select(QTextCursor::WordUnderCursor);
+	return cursor;
+}
+
+#if 0
 void LinesEditor::on_searchText_textChanged( const QString & text )
 {	
 	if (text.isEmpty())
 	{
 		QPalette p = palette();
-		p.setColor( QPalette::Base, QColor("#FFFFFF" )); // white
+		p.setColor( QPalette::Base, QColor("#FFFFFF") ); // white
 		ui_findWidget.searchText->setPalette( p );
 	}
 	else
@@ -242,7 +275,7 @@ void LinesEditor::on_searchText_textChanged( const QString & text )
 		QTextCursor c = oldCursor;
 		c = document()->find( text, c, !QTextDocument::FindCaseSensitively );
 		bool found = ! c.isNull();
-				
+		
 		if (!found)
 		{
 			// lets try again, from the start
@@ -255,6 +288,8 @@ void LinesEditor::on_searchText_textChanged( const QString & text )
 		if (found)
 		{
 			ui_findWidget.searchText->setPalette( ok );
+			int w = c.selectionEnd() - c.selectionStart() ;
+			c.setPosition( c.selectionStart() );
 			//c.setPosition( c.selectionStart(), QTextCursor::KeepAnchor );
 			setTextCursor( c );	
 		}
@@ -381,10 +416,71 @@ void LinesEditor::setMatchingString( QString s )
 	matchingString = s;	
 }
 
-void LinesEditor::keyReleaseEvent( QKeyEvent *event )
+void	LinesEditor::transformBlockToUpper()
+{
+	//QTextCursor cursor = textCursor();
+	//if (!cursor.hasSelection())
+		//cursor.select(QTextCursor::WordUnderCursor);
+	//return cursor;
+
+	QTextCursor cursor = getCurrentTextCursor();
+	QString s_before = cursor.selectedText();
+	QString s_after  = s_before.toUpper();
+	
+	if (s_before != s_after)
+	{
+		cursor.beginEditBlock();
+		cursor.deleteChar();
+		cursor.insertText( s_after );
+		cursor.endEditBlock();
+		setTextCursor( cursor );
+	}
+}
+
+void	LinesEditor::transformBlockToLower()
+{
+	QTextCursor cursor = getCurrentTextCursor();
+	QString s_before = cursor.selectedText();
+	QString s_after  = s_before.toLower();
+	
+	if (s_before != s_after)
+	{
+		cursor.beginEditBlock();
+		cursor.deleteChar();
+		cursor.insertText( s_after );
+		cursor.endEditBlock();
+		setTextCursor( cursor );
+	}
+}
+
+void	LinesEditor::transformBlockCase()
+{
+	QTextCursor cursor = getCurrentTextCursor();
+	QString s_before = cursor.selectedText();
+	QString s_after = s_before;
+	uint s_len = s_before.length();
+	
+	for( uint i=0; i< s_len; i++ )
+		if (s_after[i].isLower())
+			s_after[i] = s_after[i].toUpper();
+		else if (s_after[i].isUpper())
+			s_after[i] = s_after[i].toLower();
+		
+		
+	if (s_before != s_after)
+	{
+		cursor.beginEditBlock();
+		cursor.deleteChar();
+		cursor.insertText( s_after );
+		cursor.endEditBlock();
+		setTextCursor( cursor );
+	}
+}
+
+void LinesEditor::keyPressEvent( QKeyEvent *event )
 {
 	switch (event->key())
-	{		
+	{
 		case Qt::Key_Escape:
 			if (findWidget->isVisible())
 				// hide  it
@@ -407,14 +503,21 @@ void LinesEditor::keyReleaseEvent( QKeyEvent *event )
 			if (findWidget->isVisible())
 				return;
 			break;
+			
+		case Qt::Key_Tab:
+			//if (tabIndents)
+			{
+				if (handleIndentEvent( !(event->modifiers() & Qt::ShiftModifier) ))
+					// do not call original hanlder, if this was handled by that function
+					return; 
+			}
 	} // end case
 	
-	QTextEdit::keyReleaseEvent( event );
+	QTextEdit::keyPressEvent( event );
 }
 
 void LinesEditor::resizeEvent ( QResizeEvent *event )
 {
-	//adjustMarginWidgets();
 	QTextEdit::resizeEvent( event );
 	adjustMarginWidgets();
 
@@ -433,7 +536,7 @@ void LinesEditor::resizeEvent ( QResizeEvent *event )
 
 void LinesEditor::paintEvent(QPaintEvent *e)
 {
-	// if no special paiting, no need to create the QPainter
+	// if no special painting, no need to create the QPainter
 	if (highlightCurrentLine || showWhiteSpaces || showMatchingBraces)
 	{		
 		QPainter p( viewport() );
@@ -462,7 +565,7 @@ void	LinesEditor::timerEvent( QTimerEvent *event )
 	Q_UNUSED( event );
 }
 
-void LinesEditor::printWhiteSpaces( QPainter &p )
+void	LinesEditor::printWhiteSpaces( QPainter &p )
 {		
 	const int contentsY = verticalScrollBar()->value();
 	const qreal pageBottom = contentsY + viewport()->height();
@@ -505,7 +608,7 @@ void LinesEditor::printWhiteSpaces( QPainter &p )
 	}
 }
 
-void LinesEditor::printCurrentLine( QPainter &p )
+void	LinesEditor::printCurrentLine( QPainter &p )
 {
 	QRect r = cursorRect();
 	r.setX( 0 );
@@ -518,7 +621,7 @@ QWidget* LinesEditor::getPanel()
 	return panel;
 }
 
-void LinesEditor::cursorPositionChanged()
+void	LinesEditor::cursorPositionChanged()
 {
 	QTextCursor cursor = textCursor();
 	int pos = cursor.position();
@@ -555,7 +658,7 @@ void LinesEditor::cursorPositionChanged()
 	updateCurrentLine();
 }
 
-void LinesEditor::updateCurrentLine()
+void	LinesEditor::updateCurrentLine()
 {
 	if (highlightCurrentLine)
 		viewport()->update();
@@ -586,7 +689,7 @@ void	LinesEditor::on_fileMessage_clicked( QString s )
 	}
 }
 
-void LinesEditor::adjustMarginWidgets()
+void	LinesEditor::adjustMarginWidgets()
 {
 	if (panel->isVisible())
 	{
@@ -601,7 +704,7 @@ void LinesEditor::adjustMarginWidgets()
 	}
 }
 
-void LinesEditor::printMatchingBraces( QPainter &p )
+void	LinesEditor::printMatchingBraces( QPainter &p )
 {
 	if (matchStart == -1)
 		return;
@@ -664,14 +767,18 @@ void LinesEditor::widgetToTop( QWidget *w )
 	w->show();	
 }
 
-void LinesEditor::setupActions()
+bool	LinesEditor::handleIndentEvent( bool forward )
 {
-	actionFind = new QAction( "Find", this );
-	actionFind->setShortcut( QKeySequence("Ctrl+F") );
-	connect( actionFind, SIGNAL(triggered()), this, SLOT(showFindWidget()) );
+	QTextCursor cursor = textCursor();
+	if (!cursor.hasSelection())
+	{
+		qDebug("no selection, not handeling");
+		return false;
+	}
 	
-	addAction( actionFind );
+	return true;
 }
+
 
 void LinesEditor::updateMarkIcons()
 {
