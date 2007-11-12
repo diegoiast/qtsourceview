@@ -14,7 +14,7 @@ HEADERS += samplepanel.h \
  mainwindowimpl.h \
  editorconfig.h \
  colorsmodel.h
-CONFIG += warn_on debug
+CONFIG += warn_on debug_and_release
 FORMS += findwidget.ui mainwindow.ui configdialog.ui
 RESOURCES += textlines.qrc
 INCLUDEPATH += ../../src src

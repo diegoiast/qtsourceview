@@ -2,5 +2,6 @@
 	<qresource prefix="/images" >
 		<file alias="clear_left.png">images/clear_left.png</file>
 		<file alias="fileclose.png">images/fileclose.png</file>
+		<file alias="bookmark.png">images/bookmark.png</file>
 	</qresource>
 </RCC>

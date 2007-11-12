@@ -10,11 +10,11 @@ class SamplePanel : public QWidget
 	Q_OBJECT
 public:
 	SamplePanel(LinesEditor *a);
-    
 private:
 	void paintEvent(QPaintEvent*);
 	QTextEdit *edit;
 	QColor panelColor;
+	QPixmap bookMarkImage;
 friend class LinesEditor;
 };
 

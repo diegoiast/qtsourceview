@@ -50,6 +50,7 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
 		actionsMenu->addAction( textEdit->actionLowerCase );
 		actionsMenu->addAction( textEdit->actionChangeCase );
 		tmpMenu->addMenu( actionsMenu );
+		tmpMenu->addAction( textEdit->actionToggleBookmark );
 	}
 	tmpMenu = menuBar()->findChildren<QMenu*>( "menu_Edit" )[0];
 	if (tmpMenu)

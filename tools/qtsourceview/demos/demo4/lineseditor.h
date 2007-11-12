@@ -7,6 +7,7 @@
 
 class SamplePanel;
 class TransparentWidget;
+class PrivateBlockData;
 class QsvSyntaxHighlighter;
 class QFileSystemWatcher;
 
@@ -22,7 +23,8 @@ public:
 	LinesEditor( QWidget *p=NULL );
 	void		setupActions();
 	virtual void	findMatching( QChar c1, QChar c2, bool forward, QTextBlock &block );
-	QsvSyntaxHighlighter* getSyntaxHighlighter();
+	PrivateBlockData*	getPrivateBlockData( QTextBlock block );
+	QsvSyntaxHighlighter*	getSyntaxHighlighter();
 	
 public slots:
 	void		on_searchText_textChanged( const QString & text );
@@ -45,6 +47,7 @@ public slots:
 	//bool		getDisplatMatchingBrackets();
 	void		setMatchingString( QString );
 	//QString		getMatchingString();
+	void		toggleBookmark();
 	
 	void		transformBlockToUpper();
 	void		transformBlockToLower();
@@ -56,6 +59,7 @@ public slots:
 protected slots:
 	void	cursorPositionChanged();
 	void	updateCurrentLine();
+	void	on_textDocument_contentsChanged();
 	void	on_fileChanged( const QString &fName );
 	void	on_fileMessage_clicked( QString s );
 	
@@ -64,8 +68,9 @@ protected:
 	void	resizeEvent ( QResizeEvent *event );
 	void	paintEvent(QPaintEvent *e);
 	void	timerEvent( QTimerEvent *event );
-	void	printWhiteSpaces( QPainter &p );
-	void	printCurrentLine( QPainter &p );
+	void	printBackgrounds( QPainter &p );
+	void	printWhiteSpaces( QPainter &p, QTextBlock &block );
+	void	printCurrentLines( QPainter &p, QTextBlock &block );
 	void	printMatchingBraces( QPainter &p );
 	void	printMargins( QPainter &p );
 	void	widgetToBottom( QWidget *w );
@@ -77,6 +82,7 @@ public:
 	QAction	*actionCapitalize;
 	QAction	*actionLowerCase;
 	QAction	*actionChangeCase;
+	QAction	*actionToggleBookmark;
 
 private:
 	void	updateMarkIcons();

@@ -5,6 +5,7 @@
 #include <QTextLayout>
 #include <QScrollBar>
 
+#include "privateblockdata.h"
 #include "samplepanel.h"
 #include "lineseditor.h"
 
@@ -13,9 +14,10 @@ SamplePanel::SamplePanel(LinesEditor *a): QWidget(a)//, m_area(a)
 	edit = a;
 	setFixedWidth(50);
 
+	bookMarkImage = QPixmap(":/images/bookmark.png");
 	connect(edit->verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(update()));
 }
-	
+
 void SamplePanel::paintEvent(QPaintEvent*)
 {
 	QPainter p( this );
@@ -34,6 +36,8 @@ void SamplePanel::paintEvent(QPaintEvent*)
 		QTextLayout* layout = block.layout();
 		const QRectF boundingRect = layout->boundingRect();
 		QPointF position = layout->position();
+		PrivateBlockData *data = dynamic_cast<PrivateBlockData*>( block.userData() );
+
 		if ( position.y() +boundingRect.height() < contentsY )
 			continue;
 		if ( position.y() > pageBottom )
@@ -41,6 +45,15 @@ void SamplePanel::paintEvent(QPaintEvent*)
 		
 		const QString txt = QString::number( m_lineNumber );
 		
-		p.drawText( width() -fm.width( txt ) - 2, qRound( position.y() ) -contentsY +ascent, txt ); // -fm.width( "0" ) is an ampty place/indent 
+		p.drawText( width() -fm.width( txt ) - 7, qRound( position.y() ) -contentsY +ascent, txt ); // -fm.width( "0" ) is an ampty place/indent 
+		
+		if (data)
+		{
+			if (data->m_isBookmark)
+				p.drawPixmap( 2, qRound(position.y() -contentsY +ascent - bookMarkImage.height()), bookMarkImage ); 
+				
+			if (data->m_isModified)
+				p.fillRect( width()- 3, qRound(position.y()-contentsY), 2, qRound(boundingRect.height()), Qt::green );
+		}
 	}
 }

@@ -15,6 +15,7 @@
 #include <QFileInfo>
 #include <QDebug>
 
+#include "privateblockdata.h"
 #include "qsvsyntaxhighlighter.h"
 #include "lineseditor.h"
 #include "samplepanel.h"
@@ -110,6 +111,7 @@ LinesEditor::LinesEditor( QWidget *p ) :QTextEdit(p)
 	//connect( horizontalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(adjustMarginWidgets()));
 	//connect( verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(adjustMarginWidgets()));
 	connect( this, SIGNAL(cursorPositionChanged()), this, SLOT(cursorPositionChanged()));
+	connect( document(), SIGNAL(contentsChanged()), this, SLOT(on_textDocument_contentsChanged()));
 	connect( ui_findWidget.searchText, SIGNAL(textChanged(const QString)), this, SLOT(on_searchText_textChanged(const QString)) );
 	connect( ui_findWidget.closeButton, SIGNAL(clicked()), this, SLOT(showFindWidget()));
 	connect( ui_fileMessage.closeButton, SIGNAL(clicked()), fileMessage, SLOT(hide()));
@@ -140,6 +142,11 @@ void LinesEditor::setupActions()
 	actionChangeCase->setObjectName( "actionChangeCase" );
 	connect( actionChangeCase, SIGNAL(triggered()), this, SLOT(transformBlockCase()) );	
 	//addAction( actionChangeCase );
+
+	actionToggleBookmark = new QAction( "Toggle line bookmark", this );
+	actionToggleBookmark->setObjectName( "actionToggleBookmark" );
+	actionToggleBookmark->setShortcut( QKeySequence("F9") );
+	connect( actionToggleBookmark, SIGNAL(triggered()), this, SLOT(toggleBookmark()) );	
 }
 
 QColor LinesEditor::getItemColor( ItemColors role )
@@ -232,6 +239,23 @@ void LinesEditor::findMatching( QChar c1, QChar c2, bool forward, QTextBlock &bl
 	
 	if (n == 0)
 		matchEnd = i;
+}
+
+PrivateBlockData* LinesEditor::getPrivateBlockData( QTextBlock block )
+{
+	QTextBlockUserData *d1 = block.userData();
+	PrivateBlockData *data = dynamic_cast<PrivateBlockData*>( d1 );
+	
+	if (d1 && !data)
+		// a user data has been defined, nd it's not our structure
+		return NULL;
+	
+	if (!data)
+	{
+		data = new PrivateBlockData;
+		block.setUserData( data );
+	}
+	return data;
 }
 
 QsvSyntaxHighlighter* LinesEditor::getSyntaxHighlighter()
@@ -416,6 +440,17 @@ void LinesEditor::setMatchingString( QString s )
 	matchingString = s;	
 }
 
+void	LinesEditor::toggleBookmark()
+{
+	PrivateBlockData *data = getPrivateBlockData( textCursor().block() );
+	if (!data)
+		return;
+		
+	data->m_isBookmark = ! data->m_isBookmark;
+	updateCurrentLine();
+	panel->update();
+}
+
 void	LinesEditor::transformBlockToUpper()
 {
 	//QTextCursor cursor = textCursor();
@@ -538,20 +573,12 @@ void LinesEditor::paintEvent(QPaintEvent *e)
 {
 	// if no special painting, no need to create the QPainter
 	if (highlightCurrentLine || showWhiteSpaces || showMatchingBraces)
-	{		
+	{
 		QPainter p( viewport() );
 		
-		if (highlightCurrentLine)
-			printCurrentLine( p );
-		
-		if (showPrintingMargins)
-			printMargins( p );
-		
-		if (showWhiteSpaces)
-			printWhiteSpaces( p );
-		
+		printBackgrounds(p);
 		QTextEdit::paintEvent(e);
-			
+		
 		if (showMatchingBraces)
 			printMatchingBraces( p );
 	}
@@ -559,17 +586,10 @@ void LinesEditor::paintEvent(QPaintEvent *e)
 		QTextEdit::paintEvent(e);
 }
 
-void	LinesEditor::timerEvent( QTimerEvent *event )
+void	LinesEditor::printBackgrounds( QPainter &p )
 {
-	// TODO
-	Q_UNUSED( event );
-}
-
-void	LinesEditor::printWhiteSpaces( QPainter &p )
-{		
 	const int contentsY = verticalScrollBar()->value();
 	const qreal pageBottom = contentsY + viewport()->height();
-	const QFontMetrics fm = QFontMetrics( document()->defaultFont() );
 	
 	for ( QTextBlock block = document()->begin(); block.isValid(); block = block.next() )
 	{
@@ -581,39 +601,81 @@ void	LinesEditor::printWhiteSpaces( QPainter &p )
 			continue;
 		if ( position.y() > pageBottom )
 			break;
+			
+		if (highlightCurrentLine)
+			printCurrentLines( p, block );
+		if (showWhiteSpaces)
+			printWhiteSpaces( p, block );
+	}
+
+	if (showPrintingMargins)
+		printMargins( p );
+}
+
+void	LinesEditor::printWhiteSpaces( QPainter &p, QTextBlock &block )
+{
+	const QFontMetrics fm = QFontMetrics( document()->defaultFont() );
+	const QString txt = block.text();
+	const int len = txt.length();
+	
+	for ( int i=0; i<len; i++ )
+	{
+		QPixmap *p1 = 0;
 		
-		const QString txt = block.text();
-		const int len = txt.length();
+		if (txt[i] == ' ' )
+			p1 = &spacePixmap;
+		else if (txt[i] == '\t' )
+			p1 = &tabPixmap;
+		else 
+			continue;
 		
-		for ( int i=0; i<len; i++)
-		{
-			QPixmap *p1 = 0;
-			
-			if (txt[i] == ' ' )
-				p1 = &spacePixmap;
-			else if (txt[i] == '\t' )
-				p1 = &tabPixmap;
-			else 
-				continue;
-			
-			// pixmaps are of size 8x8 pixels
-			QTextCursor cursor = textCursor();
-			cursor.setPosition( block.position() + i, QTextCursor::MoveAnchor);
-			
-			QRect r = cursorRect( cursor );
-			int x = r.x() + 4;
-			int y = r.y() + fm.height() / 2 - 5;
-			p.drawPixmap( x, y, *p1 );
-		}
+		// pixmaps are of size 8x8 pixels
+		QTextCursor cursor = textCursor();
+		cursor.setPosition( block.position() + i, QTextCursor::MoveAnchor);
+		
+		QRect r = cursorRect( cursor );
+		int x = r.x() + 4;
+		int y = r.y() + fm.height() / 2 - 5;
+		p.drawPixmap( x, y, *p1 );
 	}
 }
 
-void	LinesEditor::printCurrentLine( QPainter &p )
+void	LinesEditor::printCurrentLines( QPainter &p, QTextBlock &block )
 {
-	QRect r = cursorRect();
+	QRect r;
+	QColor color = Qt::transparent;
+	PrivateBlockData *data = dynamic_cast<PrivateBlockData*>( block.userData() );
+
+	if (data)
+	{
+		if (data->m_isBookmark)
+			color = Qt::blue;
+	}
+	
+	if (color != Qt::transparent)
+	{
+		QTextLayout* layout = block.layout();
+		QRectF boundingRect = layout->boundingRect();
+		QPointF position = layout->position();
+		QTextCursor cursor = textCursor();
+		
+		cursor.setPosition( block.position(), QTextCursor::MoveAnchor);
+		r = cursorRect( cursor );
+		r.setX( 0 );
+		r.setWidth( viewport()->width() );
+		p.fillRect( r, color );
+	}
+
+	r = cursorRect();
 	r.setX( 0 );
 	r.setWidth( viewport()->width() );
 	p.fillRect( r, currentLineColor );
+}
+
+void	LinesEditor::timerEvent( QTimerEvent *event )
+{
+	// TODO
+	Q_UNUSED( event );
 }
 
 QWidget* LinesEditor::getPanel()
@@ -662,6 +724,16 @@ void	LinesEditor::updateCurrentLine()
 {
 	if (highlightCurrentLine)
 		viewport()->update();
+}
+
+void	LinesEditor::on_textDocument_contentsChanged()
+{
+	PrivateBlockData* data = getPrivateBlockData( textCursor().block() );
+	if (!data)
+		return;
+	
+	data->m_isModified = true;
+	panel->update();
 }
 
 void	LinesEditor::on_fileChanged( const QString &fName )
