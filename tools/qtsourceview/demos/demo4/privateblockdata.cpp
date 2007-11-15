@@ -6,4 +6,5 @@ PrivateBlockData::PrivateBlockData(  )
 	// TODO
 	m_isCurrentDebugLine = false;
 	m_isBookmark = false;
+	m_isBreakpoint = false;
 }

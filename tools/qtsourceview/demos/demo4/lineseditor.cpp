@@ -64,7 +64,9 @@ LinesEditor::LinesEditor( QWidget *p ) :QTextEdit(p)
 {
 	tabPixmap		= QPixmap( tabPixmap_img ); 
 	spacePixmap		= QPixmap( spacePixmap_img ); 
-	currentLineColor	= QColor( "#EEF6FF" );
+	currentLineColor	= QColor( "#DCE4F9" );
+	bookmarkLineColor	= QColor( "#0000FF" );
+	breakpointLineColor	= QColor( "#FF0000" );
 	matchBracesColor	= QColor( "#FF0000" );
 	searchFoundColor	= QColor( "#DDDDFF" ); //QColor::fromRgb( 220, 220, 255)
 	searchNotFoundColor	= QColor( "#FFAAAA" ); //QColor::fromRgb( 255, 102, 102) "#FF6666"
@@ -76,7 +78,7 @@ LinesEditor::LinesEditor( QWidget *p ) :QTextEdit(p)
 	printMarginWidth	= 80;
 	matchStart		= -1;
 	matchEnd		= -1;
-	matchingString		= "(){}[]";
+	matchingString		= "(){}[]\"\"''``";
 		
 	panel = new SamplePanel( this );
 	panel->panelColor = QColor( "#FFFFD0" );
@@ -145,8 +147,13 @@ void LinesEditor::setupActions()
 
 	actionToggleBookmark = new QAction( "Toggle line bookmark", this );
 	actionToggleBookmark->setObjectName( "actionToggleBookmark" );
-	actionToggleBookmark->setShortcut( QKeySequence("F9") );
+	actionToggleBookmark->setShortcut( QKeySequence( Qt::CTRL | Qt::Key_B  ) );
 	connect( actionToggleBookmark, SIGNAL(triggered()), this, SLOT(toggleBookmark()) );	
+
+	actionTogglebreakpoint = new QAction( "Toggle breakpoint", this );
+	actionTogglebreakpoint->setObjectName( "actionTogglebreakpoint" );
+	actionTogglebreakpoint->setShortcut( QKeySequence("F9") );
+	connect( actionTogglebreakpoint, SIGNAL(triggered()), this, SLOT(toggleBreakpoint()) );	
 }
 
 QColor LinesEditor::getItemColor( ItemColors role )
@@ -160,6 +167,8 @@ QColor LinesEditor::getItemColor( ItemColors role )
 		case TextFound:		return searchFoundColor;
 		case TextNoFound:	return searchNotFoundColor;
 		case WhiteSpaceColor:	return whiteSpaceColor;
+		case BookmarkLineColor:	return bookmarkLineColor;
+		case BreakpointLineColor: return breakpointLineColor;
 	}
 	
 	// just to keep gcc happy, will not get executed
@@ -193,6 +202,10 @@ void LinesEditor::setItemColor( ItemColors role, QColor c )
 			whiteSpaceColor = c;
 			updateMarkIcons();
 			break;
+		case BookmarkLineColor:
+			bookmarkLineColor = c;
+		case BreakpointLineColor: 
+			breakpointLineColor = c;
 	}
 }
 
@@ -214,22 +227,29 @@ void LinesEditor::findMatching( QChar c1, QChar c2, bool forward, QTextBlock &bl
 	int i = matchStart;
 	int n = 1;
 	QChar c;
+	QString blockString = block.text();
 	
-	do	
+	do
 	{
 		if (forward)
 		{
 			i ++;
 			if ((i - block.position()) == block.length())
-				block = block.next();	
+			{
+				block = block.next();
+				blockString = block.text();
+			}
 		}
 		else
 		{
 			i --;
 			if ((i - block.position()) == -1)
+			{
 				block = block.previous();
+				blockString = block.text();
+			}
 		}
-		c = block.text()[i - block.position() ];
+		c = blockString[i - block.position()];
 
 		if (c == c1)
 			n++;
@@ -239,6 +259,25 @@ void LinesEditor::findMatching( QChar c1, QChar c2, bool forward, QTextBlock &bl
 	
 	if (n == 0)
 		matchEnd = i;
+}
+
+void	LinesEditor::findMatching( QChar c, QTextBlock &block )
+{
+	int n = 0;
+	QString blockString = block.text();
+	int blockLen = block.length();
+	
+	// try forward
+	while (n < blockLen) 
+	{
+		if (n != matchStart - block.position())
+			if (blockString[n] == c)
+			{
+				matchEnd = block.position() + n;
+				return;
+			}
+		n++;
+	}
 }
 
 PrivateBlockData* LinesEditor::getPrivateBlockData( QTextBlock block )
@@ -440,15 +479,60 @@ void LinesEditor::setMatchingString( QString s )
 	matchingString = s;	
 }
 
-void	LinesEditor::toggleBookmark()
+void	LinesEditor::setBookmark( BookmarkAction action, QTextBlock block  )
 {
-	PrivateBlockData *data = getPrivateBlockData( textCursor().block() );
+	PrivateBlockData *data = getPrivateBlockData( block );
 	if (!data)
 		return;
-		
-	data->m_isBookmark = ! data->m_isBookmark;
+
+	switch (action)
+	{
+		case Toggle:
+			data->m_isBookmark = ! data->m_isBookmark;
+			break;
+		case Enable: 
+			data->m_isBookmark = true;
+			break;
+		case Disable:
+			data->m_isBookmark = false;
+			break;
+	}
+
 	updateCurrentLine();
 	panel->update();
+}
+
+void	LinesEditor::toggleBookmark()
+{
+	setBookmark( Toggle, textCursor().block() );
+}
+
+void	LinesEditor::setBreakpoint( BookmarkAction action, QTextBlock block )
+{
+	PrivateBlockData *data = getPrivateBlockData( block );
+	if (!data)
+		return;
+
+	switch (action)
+	{
+		case Toggle:
+			data->m_isBreakpoint = ! data->m_isBreakpoint;
+			break;
+		case Enable: 
+			data->m_isBreakpoint = true;
+			break;
+		case Disable:
+			data->m_isBreakpoint = false;
+			break;
+	}
+
+	updateCurrentLine();
+	panel->update();
+}
+
+void	LinesEditor::toggleBreakpoint()
+{
+	setBreakpoint( Toggle, textCursor().block() );
 }
 
 void	LinesEditor::transformBlockToUpper()
@@ -642,34 +726,30 @@ void	LinesEditor::printWhiteSpaces( QPainter &p, QTextBlock &block )
 
 void	LinesEditor::printCurrentLines( QPainter &p, QTextBlock &block )
 {
-	QRect r;
-	QColor color = Qt::transparent;
 	PrivateBlockData *data = dynamic_cast<PrivateBlockData*>( block.userData() );
+	QTextCursor cursor = textCursor();
+	cursor.setPosition( block.position(), QTextCursor::MoveAnchor);
+	QRect r = cursorRect( cursor );
+	r.setX( 0 );
+	r.setWidth( viewport()->width() );
+	p.setOpacity( 0.3 );
 
+	p.save();
 	if (data)
 	{
 		if (data->m_isBookmark)
-			color = Qt::blue;
-	}
-	
-	if (color != Qt::transparent)
-	{
-		QTextLayout* layout = block.layout();
-		QRectF boundingRect = layout->boundingRect();
-		QPointF position = layout->position();
-		QTextCursor cursor = textCursor();
-		
-		cursor.setPosition( block.position(), QTextCursor::MoveAnchor);
-		r = cursorRect( cursor );
-		r.setX( 0 );
-		r.setWidth( viewport()->width() );
-		p.fillRect( r, color );
+			p.fillRect( r, bookmarkLineColor );
+			
+		if (data->m_isBreakpoint)
+			p.fillRect( r, breakpointLineColor );
+			
+		// print all other states
 	}
 
-	r = cursorRect();
-	r.setX( 0 );
-	r.setWidth( viewport()->width() );
-	p.fillRect( r, currentLineColor );
+	if (r.top() == cursorRect().top() )
+		p.fillRect( r, currentLineColor );
+	p.restore();
+	p.setOpacity( 1.0 );
 }
 
 void	LinesEditor::timerEvent( QTimerEvent *event )
@@ -711,12 +791,15 @@ void	LinesEditor::cursorPositionChanged()
 			updateCurrentLine();
 		return;
 	}
-	
-	if (j %2 == 0)
-		findMatching( matchingString[j], matchChar = matchingString[j+1], true, block );
-	else
-		findMatching( matchingString[j], matchChar = matchingString[j-1], false, block );
 
+	if ( matchingString[j] != matchingString[j+1] )
+		if (j %2 == 0)
+			findMatching( matchingString[j], matchChar = matchingString[j+1], true, block );
+		else
+			findMatching( matchingString[j], matchChar = matchingString[j-1], false, block );
+	else
+		findMatching( matchChar = matchingString[j], block );
+		
 	updateCurrentLine();
 }
 

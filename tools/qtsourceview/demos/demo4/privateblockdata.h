@@ -10,6 +10,7 @@ public:
 //private:
 	bool m_isCurrentDebugLine;
 	bool m_isBookmark;
+	bool m_isBreakpoint;
 	bool m_isModified;
 };
 

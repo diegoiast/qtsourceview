@@ -34,8 +34,8 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
 	langDefinition = QsvLangDefFactory::getInstanse()->getHighlight("1.cpp");
 	//highlight = new QsvSyntaxHighlighter( textEdit, defColors, langDefinition );
 	
-	textEdit->loadFile( "mainwindowimpl.cpp" );
 	textEdit->setSyntaxHighlighter( new QsvSyntaxHighlighter( textEdit, defColors, langDefinition ) );	
+	textEdit->loadFile( "mainwindowimpl.cpp" );
 	connect( EditorConfig::getInstance(), SIGNAL(configurationModified()), this, SLOT(configuration_updated()));
 	
 	textEdit->setupActions();
@@ -51,6 +51,7 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
 		actionsMenu->addAction( textEdit->actionChangeCase );
 		tmpMenu->addMenu( actionsMenu );
 		tmpMenu->addAction( textEdit->actionToggleBookmark );
+		tmpMenu->addAction( textEdit->actionTogglebreakpoint );
 	}
 	tmpMenu = menuBar()->findChildren<QMenu*>( "menu_Edit" )[0];
 	if (tmpMenu)

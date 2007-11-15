@@ -12,8 +12,13 @@ class QsvSyntaxHighlighter;
 class QFileSystemWatcher;
 
 enum ItemColors {
-	 LinesPanel, CurrentLine, MatchBrackets, NoText, TextFound, TextNoFound, WhiteSpaceColor
+	 LinesPanel, CurrentLine, MatchBrackets, NoText, TextFound, TextNoFound, WhiteSpaceColor, 
+	 BookmarkLineColor, BreakpointLineColor
 };
+
+enum BookmarkAction {
+	Toggle, Enable, Disable
+} ;
 
 class LinesEditor: public QTextEdit
 {
@@ -23,6 +28,7 @@ public:
 	LinesEditor( QWidget *p=NULL );
 	void		setupActions();
 	virtual void	findMatching( QChar c1, QChar c2, bool forward, QTextBlock &block );
+	virtual void	findMatching( QChar c, QTextBlock &block );
 	PrivateBlockData*	getPrivateBlockData( QTextBlock block );
 	QsvSyntaxHighlighter*	getSyntaxHighlighter();
 	
@@ -47,7 +53,10 @@ public slots:
 	//bool		getDisplatMatchingBrackets();
 	void		setMatchingString( QString );
 	//QString		getMatchingString();
+	void		setBookmark( BookmarkAction action, QTextBlock block );
 	void		toggleBookmark();
+	void		setBreakpoint( BookmarkAction action, QTextBlock block );
+	void		toggleBreakpoint();
 	
 	void		transformBlockToUpper();
 	void		transformBlockToLower();
@@ -83,6 +92,7 @@ public:
 	QAction	*actionLowerCase;
 	QAction	*actionChangeCase;
 	QAction	*actionToggleBookmark;
+	QAction	*actionTogglebreakpoint;
 
 private:
 	void	updateMarkIcons();
@@ -90,6 +100,8 @@ private:
 	QPixmap	tabPixmap;
 	QPixmap spacePixmap;
 	QColor	currentLineColor;
+	QColor	bookmarkLineColor;
+	QColor	breakpointLineColor;
 	QColor	matchBracesColor;
 	QColor	searchFoundColor;
 	QColor	searchNotFoundColor;

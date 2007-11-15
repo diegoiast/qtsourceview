@@ -118,7 +118,7 @@ EditorConfigData  EditorConfig::getDefaultConfiguration()
 	defaultConfiguration.showMargins	= false;
 	defaultConfiguration.tabSize		= 8;
 	defaultConfiguration.marginsWidth	= 80;
-	defaultConfiguration.matchBrackesList	= "()[]{}";
+	defaultConfiguration.matchBrackesList	= "()[]{}\"\"''``";
 	defaultConfiguration.currentFont	= QFont( DEFAULT_FONT_NAME, DEFAULT_FONT_SIZE );
 	if (colorSchemes.isEmpty())
 		defaultConfiguration.currentColorScheme = NULL;
@@ -188,6 +188,8 @@ void EditorConfig::applyConfiguration( EditorConfigData c, LinesEditor *editor )
 		editor->setItemColor( LinesPanel, c.currentColorScheme->getColorDef("dsWidgetLinesPanel").getBackground() );
 		editor->setItemColor( CurrentLine, c.currentColorScheme->getColorDef("dsWidgetCurLine").getBackground() );
 		editor->setItemColor( WhiteSpaceColor, c.currentColorScheme->getColorDef("dsWhiteSpace").getColor() );
+		editor->setItemColor( BookmarkLineColor, c.currentColorScheme->getColorDef("dsWidgetBookmark").getBackground() );
+		editor->setItemColor( BreakpointLineColor, c.currentColorScheme->getColorDef("dsWidgetActiveBreakpoint").getBackground() );
 		
 		QsvSyntaxHighlighter *sh = editor->getSyntaxHighlighter();
 		if (sh)
