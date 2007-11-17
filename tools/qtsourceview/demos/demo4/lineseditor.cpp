@@ -1,5 +1,6 @@
 #include <QPainter>
 #include <QTextEdit>
+#include <QTextDocument>
 #include <QTextBlock>
 #include <QTextLayout>
 #include <QScrollBar>
@@ -79,7 +80,16 @@ LinesEditor::LinesEditor( QWidget *p ) :QTextEdit(p)
 	matchStart		= -1;
 	matchEnd		= -1;
 	matchingString		= "(){}[]\"\"''``";
-		
+
+	actionFind		= NULL;
+	actionFindNext		= NULL;
+	actionFindPrev		= NULL;
+	actionCapitalize	= NULL;
+	actionLowerCase		= NULL;
+	actionChangeCase	= NULL;
+	actionToggleBookmark	= NULL;
+	actionTogglebreakpoint	= NULL;
+	
 	panel = new SamplePanel( this );
 	panel->panelColor = QColor( "#FFFFD0" );
 	panel->setVisible( true );
@@ -112,7 +122,7 @@ LinesEditor::LinesEditor( QWidget *p ) :QTextEdit(p)
 
 	//connect( horizontalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(adjustMarginWidgets()));
 	//connect( verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(adjustMarginWidgets()));
-	connect( this, SIGNAL(cursorPositionChanged()), this, SLOT(cursorPositionChanged()));
+	connect( this, SIGNAL(cursorPositionChanged()), this, SLOT(on_cursorPositionChanged()));
 	connect( document(), SIGNAL(contentsChanged()), this, SLOT(on_textDocument_contentsChanged()));
 	connect( ui_findWidget.searchText, SIGNAL(textChanged(const QString)), this, SLOT(on_searchText_textChanged(const QString)) );
 	connect( ui_findWidget.closeButton, SIGNAL(clicked()), this, SLOT(showFindWidget()));
@@ -125,35 +135,41 @@ void LinesEditor::setupActions()
 	actionFind = new QAction( "Find (inline)", this );
 	actionFind->setObjectName("actionFind");
 	actionFind->setShortcut( QKeySequence("Ctrl+F") );
-	connect( actionFind, SIGNAL(triggered()), this, SLOT(showFindWidget()) );	
-	//addAction( actionFind );
+	connect( actionFind, SIGNAL(triggered()), this, SLOT(showFindWidget()) );
 
+	actionFindNext = new QAction( "Find next", this );
+	actionFindNext->setObjectName("actionFindNext");
+	actionFindNext->setShortcut( QKeySequence("F3") );
+	connect( actionFindNext, SIGNAL(triggered()), this, SLOT(findNext()) );
+	
+	actionFindPrev = new QAction( "Find previous", this );
+	actionFindPrev->setObjectName("actionFindPrev");
+	actionFindPrev->setShortcut( QKeySequence("Shift+F3") );
+	connect( actionFindPrev, SIGNAL(triggered()), this, SLOT(findPrev()) );
+	
 	actionCapitalize = new QAction( "Change to capital letters", this );
 	actionCapitalize->setObjectName( "actionCapitalize" );
 	actionCapitalize->setShortcut( QKeySequence( Qt::CTRL | Qt::Key_U ) );
-	connect( actionCapitalize, SIGNAL(triggered()), this, SLOT(transformBlockToUpper()) );	
-	//addAction( actionCapitalize );
+	connect( actionCapitalize, SIGNAL(triggered()), this, SLOT(transformBlockToUpper()) );
 
 	actionLowerCase = new QAction( "Change to lower letters", this );
 	actionLowerCase->setObjectName( "actionLowerCase" );
 	actionLowerCase->setShortcut( QKeySequence( Qt::CTRL | Qt::SHIFT | Qt::Key_U  ) );
-	connect( actionLowerCase, SIGNAL(triggered()), this, SLOT(transformBlockToLower()) );	
-	//addAction( actionLowerCase );
+	connect( actionLowerCase, SIGNAL(triggered()), this, SLOT(transformBlockToLower()) );
 
 	actionChangeCase = new QAction( "Change case", this );
 	actionChangeCase->setObjectName( "actionChangeCase" );
-	connect( actionChangeCase, SIGNAL(triggered()), this, SLOT(transformBlockCase()) );	
-	//addAction( actionChangeCase );
+	connect( actionChangeCase, SIGNAL(triggered()), this, SLOT(transformBlockCase()) );
 
 	actionToggleBookmark = new QAction( "Toggle line bookmark", this );
 	actionToggleBookmark->setObjectName( "actionToggleBookmark" );
 	actionToggleBookmark->setShortcut( QKeySequence( Qt::CTRL | Qt::Key_B  ) );
-	connect( actionToggleBookmark, SIGNAL(triggered()), this, SLOT(toggleBookmark()) );	
+	connect( actionToggleBookmark, SIGNAL(triggered()), this, SLOT(toggleBookmark()) );
 
 	actionTogglebreakpoint = new QAction( "Toggle breakpoint", this );
 	actionTogglebreakpoint->setObjectName( "actionTogglebreakpoint" );
 	actionTogglebreakpoint->setShortcut( QKeySequence("F9") );
-	connect( actionTogglebreakpoint, SIGNAL(triggered()), this, SLOT(toggleBreakpoint()) );	
+	connect( actionTogglebreakpoint, SIGNAL(triggered()), this, SLOT(toggleBreakpoint()) );
 }
 
 QColor LinesEditor::getItemColor( ItemColors role )
@@ -249,16 +265,21 @@ void LinesEditor::findMatching( QChar c1, QChar c2, bool forward, QTextBlock &bl
 				blockString = block.text();
 			}
 		}
-		c = blockString[i - block.position()];
+		if (block.isValid())
+			c = blockString[i - block.position()];
+		else
+			break;
 
 		if (c == c1)
 			n++;
 		else if (c == c2)
 			n--;
-	} while (block.isValid() && (n!=0) );
+	} while (n!=0);
 	
 	if (n == 0)
 		matchEnd = i;
+	else
+		matchEnd = -1;
 }
 
 void	LinesEditor::findMatching( QChar c, QTextBlock &block )
@@ -285,8 +306,8 @@ PrivateBlockData* LinesEditor::getPrivateBlockData( QTextBlock block )
 	QTextBlockUserData *d1 = block.userData();
 	PrivateBlockData *data = dynamic_cast<PrivateBlockData*>( d1 );
 	
+	// a user data has been defined, and it's not our structure
 	if (d1 && !data)
-		// a user data has been defined, nd it's not our structure
 		return NULL;
 	
 	if (!data)
@@ -316,124 +337,60 @@ QTextCursor	LinesEditor::getCurrentTextCursor()
 	return cursor;
 }
 
-#if 0
-void LinesEditor::on_searchText_textChanged( const QString & text )
-{	
-	if (text.isEmpty())
-	{
-		QPalette p = palette();
-		p.setColor( QPalette::Base, QColor("#FFFFFF") ); // white
-		ui_findWidget.searchText->setPalette( p );
-	}
-	else
-	{
-		QPalette ok, bad;
-		
-		ok = this->palette();
-		bad = this->palette();
-		ok.setColor( QPalette::Base, searchFoundColor );
-		bad.setColor( QPalette::Base, searchNotFoundColor );
-		
-		QTextCursor oldCursor = textCursor();
-		QTextCursor c = oldCursor;
-		c = document()->find( text, c, !QTextDocument::FindCaseSensitively );
-		bool found = ! c.isNull();
-		
-		if (!found)
-		{
-			// lets try again, from the start
-			c = QTextCursor(document());
-			c.movePosition(QTextCursor::Start);
-			c = document()->find( text, c, !QTextDocument::FindCaseSensitively );
-			found = ! c.isNull();
-		}
-		
-		if (found)
-		{
-			ui_findWidget.searchText->setPalette( ok );
-			int w = c.selectionEnd() - c.selectionStart() ;
-			c.setPosition( c.selectionStart() );
-			//c.setPosition( c.selectionStart(), QTextCursor::KeepAnchor );
-			setTextCursor( c );	
-		}
-		else
-		{
-			ui_findWidget.searchText->setPalette( bad );	
-			setTextCursor( oldCursor );	
-		}
-	}
-}
-#else
-void LinesEditor::on_searchText_textChanged( const QString & text )
-{
-	QTextDocument *doc = document();
-	QString oldText = ui_findWidget.searchText->text();
-	QTextCursor c = textCursor();
-	QTextDocument::FindFlags options;
-	QPalette p = palette();
-	p.setColor(QPalette::Active, QPalette::Base, Qt::white);
-
-	if (c.hasSelection())
-		//c.setPosition(forward ? c.position() : c.anchor(), QTextCursor::MoveAnchor);
-		c.setPosition(c.position(), QTextCursor::MoveAnchor);
-
-	QTextCursor newCursor = c;
-
-	if (!text.isEmpty()) {
-		/*if (backward)
-			options |= QTextDocument::FindBackward;
-
-		if (ui.checkCase->isChecked())
-			options |= QTextDocument::FindCaseSensitively;
-
-		if (ui.checkWholeWords->isChecked())
-			options |= QTextDocument::FindWholeWords;
-*/
-		newCursor = doc->find(text, c, options);
-		//ui.labelWrapped->hide();
-
-		if (newCursor.isNull()) {
-			QTextCursor ac(doc);
-			//ac.movePosition(options & QTextDocument::FindBackward ? QTextCursor::End : QTextCursor::Start);
-			ac.movePosition(QTextCursor::Start);
-			newCursor = doc->find(text, ac, options);
-			if (newCursor.isNull()) {
-				//p.setColor(QPalette::Active, QPalette::Base, QColor(255, 102, 102));
-				p.setColor(QPalette::Active, QPalette::Base, searchNotFoundColor);
-				newCursor = c;
-			} else
-			{
-				p.setColor(QPalette::Active, QPalette::Base, searchFoundColor);
-				//ui.labelWrapped->show();
-				;
-			}
-		}
-		else
-			p.setColor(QPalette::Active, QPalette::Base, searchFoundColor);
-
-	}
-
-	//if (!findWidget->isVisible())
-		//findWidget->show();
-	setTextCursor(newCursor);
-	ui_findWidget.searchText->setPalette(p);
-	/*if (!ui.editFind->hasFocus())
-		autoHideTimer->start();*/
-}
-#endif
-
-void LinesEditor::showFindWidget()
+void	LinesEditor::showFindWidget()
 {	
 	if (findWidget->isVisible())
 	{
 		findWidget->hide();
 		this->setFocus();
-		return;		
+		return;
+	}
+
+	searchCursor = textCursor();
+	widgetToBottom( findWidget );
+	ui_findWidget.searchText->clear();
+	ui_findWidget.searchText->setFocus();
+}
+
+void	LinesEditor::findNext()
+{
+	issue_search( ui_findWidget.searchText->text(), textCursor(), 0 );
+}
+
+void LinesEditor::findPrev()
+{
+	issue_search( ui_findWidget.searchText->text(), textCursor(), QTextDocument::FindBackward );
+}
+
+bool LinesEditor::issue_search( const QString &text, QTextCursor newCursor, QFlags<QTextDocument::FindFlag> findOptions  )
+{
+	QTextCursor c = document()->find( text, newCursor, findOptions );
+	bool found = ! c.isNull();
+	
+	if (!found)
+	{
+		//lets try again, from the start
+		c.movePosition(findOptions.testFlag(QTextDocument::FindBackward)? QTextCursor::End : QTextCursor::Start);
+		c = document()->find( ui_findWidget.searchText->text(), c, findOptions );
+		found = ! c.isNull();
 	}
 	
-	widgetToBottom( findWidget );
-	//widgetToTop( findWidget );
-	ui_findWidget.searchText->setFocus();
+	if (found)
+	{
+		QPalette ok = this->palette();
+		ok.setColor( QPalette::Base, searchFoundColor );
+		ui_findWidget.searchText->setPalette( ok );
+		setTextCursor( c );
+	}
+	else
+	{
+		QPalette bad = this->palette();
+		bad.setColor( QPalette::Base, searchNotFoundColor );
+		ui_findWidget.searchText->setPalette( bad );	
+		setTextCursor( searchCursor );
+	}
+	
+	return found;
 }
 
 int LinesEditor::loadFile( QString s )
@@ -630,6 +587,9 @@ void LinesEditor::keyPressEvent( QKeyEvent *event )
 					// do not call original hanlder, if this was handled by that function
 					return; 
 			}
+		default:
+			if (handleKeyPressEvent(event))
+				return;
 	} // end case
 	
 	QTextEdit::keyPressEvent( event );
@@ -732,9 +692,13 @@ void	LinesEditor::printCurrentLines( QPainter &p, QTextBlock &block )
 	QRect r = cursorRect( cursor );
 	r.setX( 0 );
 	r.setWidth( viewport()->width() );
-	p.setOpacity( 0.3 );
 
 	p.save();
+	p.setOpacity( 0.8 );
+	if (r.top() == cursorRect().top() )
+		p.fillRect( r, currentLineColor );
+
+	p.setOpacity( 0.2 );
 	if (data)
 	{
 		if (data->m_isBookmark)
@@ -746,10 +710,7 @@ void	LinesEditor::printCurrentLines( QPainter &p, QTextBlock &block )
 		// print all other states
 	}
 
-	if (r.top() == cursorRect().top() )
-		p.fillRect( r, currentLineColor );
 	p.restore();
-	p.setOpacity( 1.0 );
 }
 
 void	LinesEditor::timerEvent( QTimerEvent *event )
@@ -763,7 +724,26 @@ QWidget* LinesEditor::getPanel()
 	return panel;
 }
 
-void	LinesEditor::cursorPositionChanged()
+void	LinesEditor::updateCurrentLine()
+{
+	if (highlightCurrentLine)
+		viewport()->update();
+}
+
+void LinesEditor::on_searchText_textChanged( const QString & text )
+{
+	if (text.isEmpty())
+	{
+		QPalette p = palette();
+		p.setColor( QPalette::Base, QColor("#FFFFFF") ); // white
+		ui_findWidget.searchText->setPalette( p );
+		return;
+	}
+	
+	issue_search( text, searchCursor, !QTextDocument::FindCaseSensitively | !QTextDocument::FindBackward ); 
+}
+
+void	LinesEditor::on_cursorPositionChanged()
 {
 	QTextCursor cursor = textCursor();
 	int pos = cursor.position();
@@ -801,12 +781,6 @@ void	LinesEditor::cursorPositionChanged()
 		findMatching( matchChar = matchingString[j], block );
 		
 	updateCurrentLine();
-}
-
-void	LinesEditor::updateCurrentLine()
-{
-	if (highlightCurrentLine)
-		viewport()->update();
 }
 
 void	LinesEditor::on_textDocument_contentsChanged()
@@ -909,7 +883,7 @@ void LinesEditor::widgetToBottom( QWidget *w )
 
 void LinesEditor::widgetToTop( QWidget *w )
 {
-	QRect r1 = viewport()->geometry();	
+	QRect r1 = viewport()->geometry();
 	QRect r2 = w->geometry();
 
 	int i = r2.height();
@@ -920,6 +894,79 @@ void LinesEditor::widgetToTop( QWidget *w )
 	
 	w->setGeometry(r2);
 	w->show();	
+}
+
+bool	LinesEditor::handleKeyPressEvent( QKeyEvent *event )
+{
+	QTextCursor cursor = textCursor();
+	int i,j;
+	QString s;
+	
+	if (event->key() == Qt::Key_Delete)
+	{
+		if (cursor.hasSelection())
+			return false;
+		
+		i = cursor.position() - cursor.block().position();
+		QChar c1 = cursor.block().text()[ i ];
+		j = matchingString.indexOf( c1 );
+		if (j == -1)
+			return false;
+		
+		if (j%2 == 0)
+		{
+			qDebug("Deleting forward");
+			QChar c2 = cursor.block().text()[ i+1 ];
+			if (c2 != matchingString[j+1])
+				return false;
+			cursor.deletePreviousChar();
+			cursor.deleteChar();
+		}
+		else
+		{
+			qDebug("Deleting backward");
+			QChar c2 = cursor.block().text()[ i-1 ];
+			if (c2 != matchingString[j-1])
+				return false;
+			cursor.deletePreviousChar();
+			cursor.deleteChar();
+		}
+		
+		goto FUNCTION_END;
+	}
+	
+	s = event->text();
+	// handle only normal key presses
+	if (s.isEmpty())
+		return false;
+	
+	// don't handle if not in the matching list
+	j = matchingString.indexOf( s[0] );
+	if ((j == -1) || (j%2 == 1))
+		return false;
+	
+	i = cursor.position();
+	
+	if (!cursor.hasSelection())
+	{
+		cursor.insertText( QString(matchingString[j]) );
+		cursor.insertText( QString(matchingString[j+1]) );
+	}
+	else
+	{
+		QString s = cursor.selectedText();
+		cursor.beginEditBlock();
+		cursor.deleteChar();
+		s = matchingString[j] + s + matchingString[j+1];
+		cursor.insertText(s);
+		cursor.endEditBlock();
+	}
+	cursor.setPosition( i + 1 );
+	setTextCursor(cursor);
+	
+FUNCTION_END:
+	event->accept();
+	return true;
 }
 
 bool	LinesEditor::handleIndentEvent( bool forward )

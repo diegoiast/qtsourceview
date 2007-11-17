@@ -2,6 +2,7 @@
 #define __LINESEDITOR_H__
 
 #include <QTextEdit>
+//#include 
 #include "ui_findwidget.h"
 #include "ui_filemessage.h"
 
@@ -10,6 +11,8 @@ class TransparentWidget;
 class PrivateBlockData;
 class QsvSyntaxHighlighter;
 class QFileSystemWatcher;
+class QTextCursor;
+enum QTextDocument::FindFlag;
 
 enum ItemColors {
 	 LinesPanel, CurrentLine, MatchBrackets, NoText, TextFound, TextNoFound, WhiteSpaceColor, 
@@ -33,8 +36,10 @@ public:
 	QsvSyntaxHighlighter*	getSyntaxHighlighter();
 	
 public slots:
-	void		on_searchText_textChanged( const QString & text );
 	void		showFindWidget();
+	void		findNext();
+	void		findPrev();
+	bool		issue_search( const QString &text, QTextCursor newCursor, QFlags<QTextDocument::FindFlag> findOptions );
 	int		loadFile( QString );
 
 	QColor		getItemColor( ItemColors role );
@@ -66,14 +71,15 @@ public slots:
 	void		adjustMarginWidgets();
 		
 protected slots:
-	void	cursorPositionChanged();
 	void	updateCurrentLine();
+	void	on_searchText_textChanged( const QString & text );
+	void	on_cursorPositionChanged();
 	void	on_textDocument_contentsChanged();
 	void	on_fileChanged( const QString &fName );
 	void	on_fileMessage_clicked( QString s );
 	
 protected:
-	void	keyPressEvent ( QKeyEvent * event );
+	void	keyPressEvent ( QKeyEvent *event );
 	void	resizeEvent ( QResizeEvent *event );
 	void	paintEvent(QPaintEvent *e);
 	void	timerEvent( QTimerEvent *event );
@@ -84,10 +90,13 @@ protected:
 	void	printMargins( QPainter &p );
 	void	widgetToBottom( QWidget *w );
 	void	widgetToTop( QWidget *w );
+	bool	handleKeyPressEvent( QKeyEvent *event );
 	bool	handleIndentEvent( bool forward );
 
 public:
 	QAction	*actionFind;
+	QAction	*actionFindNext;
+	QAction	*actionFindPrev;
 	QAction	*actionCapitalize;
 	QAction	*actionLowerCase;
 	QAction	*actionChangeCase;
@@ -122,7 +131,8 @@ private:
 	QString	fileName;
 	QsvSyntaxHighlighter	*syntaxHighlighter;
 	QFileSystemWatcher	*fileSystemWatcher;
-		
+	
+	QTextCursor		searchCursor;
 	SamplePanel		*panel;
 	TransparentWidget	*findWidget;
 	TransparentWidget	*fileMessage;
