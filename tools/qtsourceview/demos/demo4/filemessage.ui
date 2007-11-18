@@ -94,11 +94,6 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="font" >
-         <font>
-          <family>Arial</family>
-         </font>
-        </property>
         <property name="text" >
          <string>TextLabel</string>
         </property>

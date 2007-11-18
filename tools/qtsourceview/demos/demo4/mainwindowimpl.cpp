@@ -53,6 +53,8 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
 		tmpMenu->addAction( textEdit->actionFindPrev );
 		tmpMenu->addMenu( actionsMenu );
 		tmpMenu->addAction( textEdit->actionToggleBookmark );
+		tmpMenu->addAction( textEdit->actionNextBookmark );
+		tmpMenu->addAction( textEdit->actionPrevBookmark );
 		tmpMenu->addAction( textEdit->actionTogglebreakpoint );
 	}
 }

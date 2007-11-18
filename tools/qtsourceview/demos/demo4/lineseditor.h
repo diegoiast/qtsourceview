@@ -32,7 +32,7 @@ public:
 	void		setupActions();
 	virtual void	findMatching( QChar c1, QChar c2, bool forward, QTextBlock &block );
 	virtual void	findMatching( QChar c, QTextBlock &block );
-	PrivateBlockData*	getPrivateBlockData( QTextBlock block );
+	PrivateBlockData*	getPrivateBlockData( QTextBlock block, bool createIfNotExisting=false );
 	QsvSyntaxHighlighter*	getSyntaxHighlighter();
 	
 public slots:
@@ -49,7 +49,7 @@ public slots:
 	void		setTabSize( int size );
 	//int		getTabSize();
 	void		setSyntaxHighlighter( QsvSyntaxHighlighter *newSyntaxHighlighter );	
-	QTextCursor	getCurrentTextCursor();	
+	QTextCursor	getCurrentTextCursor();
 	void		setDisplayCurrentLine( bool );
 	//bool		getDisplayCurrentLine();
 	void		setDisplayWhiteSpaces( bool );
@@ -60,6 +60,8 @@ public slots:
 	//QString		getMatchingString();
 	void		setBookmark( BookmarkAction action, QTextBlock block );
 	void		toggleBookmark();
+	void		gotoNextBookmark();
+	void		gotoPrevBookmark();
 	void		setBreakpoint( BookmarkAction action, QTextBlock block );
 	void		toggleBreakpoint();
 	
@@ -97,6 +99,8 @@ public:
 	QAction	*actionFind;
 	QAction	*actionFindNext;
 	QAction	*actionFindPrev;
+	QAction	*actionNextBookmark;
+	QAction	*actionPrevBookmark;
 	QAction	*actionCapitalize;
 	QAction	*actionLowerCase;
 	QAction	*actionChangeCase;

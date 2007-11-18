@@ -18,7 +18,7 @@
 #	define DEFAULT_FONT_SIZE 10
 #else
 #	define DEFAULT_FONT_NAME "Monospace"
-#	define DEFAULT_FONT_SIZE 10
+#	define DEFAULT_FONT_SIZE 9
 #endif
 
 EditorConfig * EditorConfig::instance = NULL;
@@ -56,6 +56,17 @@ void EditorConfig::showConfigDialog()
 	{
 		QsvLangDef *langDefinition = QsvLangDefFactory::getInstanse()->getHighlight("1.cpp");
 		currentConfig = this->getDefaultConfiguration();
+		ui.sampleEdit->setText(
+"#include <stdio.h>\n\
+\n\
+// main application entry\n\
+int main( int argc, char *argv[])\n\
+{\n\
+	printf(\"hello world!\\n\");\n\
+	return 0;\n\
+}\n"
+		);
+
 		ui.sampleEdit->setSyntaxHighlighter(
 			new QsvSyntaxHighlighter( ui.sampleEdit, currentConfig.currentColorScheme, langDefinition ) 
 		);
@@ -173,8 +184,8 @@ void EditorConfig::applyConfiguration( EditorConfigData c, LinesEditor *editor )
 	else
 		editor->setMargin( -1 );
 	
-	editor->setTabSize( c.tabSize );
 	editor->document()->setDefaultFont( c.currentFont );
+	editor->setTabSize( c.tabSize );
 	editor->getPanel()->setFont( c.currentFont );
 	
 	if (c.currentColorScheme == NULL )

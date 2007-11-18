@@ -30,6 +30,7 @@ void SamplePanel::paintEvent(QPaintEvent*)
 	int m_lineNumber = 1;
 	const QFontMetrics fm = fontMetrics();
 	const int ascent = fontMetrics().ascent() +1;
+	QTextBlock currentBlock= edit->textCursor().block();
 	
 	for ( QTextBlock block = edit->document()->begin(); block.isValid(); block = block.next(), m_lineNumber++ )
 	{
@@ -45,7 +46,19 @@ void SamplePanel::paintEvent(QPaintEvent*)
 		
 		const QString txt = QString::number( m_lineNumber );
 		
+		if (block == currentBlock)
+		{
+			QFont f = p.font();
+			f.setBold( true );
+			p.setFont( f );
+		}
 		p.drawText( width() -fm.width( txt ) - 7, qRound( position.y() ) -contentsY +ascent, txt ); // -fm.width( "0" ) is an ampty place/indent 
+		if (block == currentBlock)
+		{
+			QFont f = p.font();
+			f.setBold( false );
+			p.setFont( f );
+		}
 		
 		if (data)
 		{

@@ -105,8 +105,9 @@ LinesEditor::LinesEditor( QWidget *p ) :QTextEdit(p)
 #else
 	QFont f("Monospace", 9);
 #endif
-	setFont( f );
+	document()->setDefaultFont( f );
 	panel->setFont( f );
+	setTabSize( 8 );
 	
 	findWidget = new TransparentWidget( this, 0.8 );
 	ui_findWidget.setupUi( findWidget );
@@ -160,6 +161,21 @@ void LinesEditor::setupActions()
 	actionChangeCase = new QAction( "Change case", this );
 	actionChangeCase->setObjectName( "actionChangeCase" );
 	connect( actionChangeCase, SIGNAL(triggered()), this, SLOT(transformBlockCase()) );
+
+	actionToggleBookmark = new QAction( "Toggle line bookmark", this );
+	actionToggleBookmark->setObjectName( "actionToggleBookmark" );
+	actionToggleBookmark->setShortcut( QKeySequence( Qt::CTRL | Qt::Key_B  ) );
+	connect( actionToggleBookmark, SIGNAL(triggered()), this, SLOT(toggleBookmark()) );
+
+	actionPrevBookmark = new QAction( "Previous bookmark", this );
+	actionPrevBookmark->setObjectName( "actionPrevBookmark" );
+	actionPrevBookmark->setShortcut( QKeySequence( Qt::CTRL | Qt::Key_PageUp ) );
+	connect( actionPrevBookmark, SIGNAL(triggered()), this, SLOT(gotoPrevBookmark()) );
+
+	actionNextBookmark = new QAction( "Next bookmark", this );
+	actionNextBookmark->setObjectName( "actionNextBookmark" );
+	actionNextBookmark->setShortcut( QKeySequence( Qt::CTRL | Qt::Key_PageDown ) );
+	connect( actionNextBookmark, SIGNAL(triggered()), this, SLOT(gotoNextBookmark()) );
 
 	actionToggleBookmark = new QAction( "Toggle line bookmark", this );
 	actionToggleBookmark->setObjectName( "actionToggleBookmark" );
@@ -301,7 +317,7 @@ void	LinesEditor::findMatching( QChar c, QTextBlock &block )
 	}
 }
 
-PrivateBlockData* LinesEditor::getPrivateBlockData( QTextBlock block )
+PrivateBlockData* LinesEditor::getPrivateBlockData( QTextBlock block, bool createIfNotExisting )
 {
 	QTextBlockUserData *d1 = block.userData();
 	PrivateBlockData *data = dynamic_cast<PrivateBlockData*>( d1 );
@@ -310,7 +326,7 @@ PrivateBlockData* LinesEditor::getPrivateBlockData( QTextBlock block )
 	if (d1 && !data)
 		return NULL;
 	
-	if (!data)
+	if (!data && createIfNotExisting)
 	{
 		data = new PrivateBlockData;
 		block.setUserData( data );
@@ -438,7 +454,7 @@ void LinesEditor::setMatchingString( QString s )
 
 void	LinesEditor::setBookmark( BookmarkAction action, QTextBlock block  )
 {
-	PrivateBlockData *data = getPrivateBlockData( block );
+	PrivateBlockData *data = getPrivateBlockData( block, true );
 	if (!data)
 		return;
 
@@ -456,7 +472,6 @@ void	LinesEditor::setBookmark( BookmarkAction action, QTextBlock block  )
 	}
 
 	updateCurrentLine();
-	panel->update();
 }
 
 void	LinesEditor::toggleBookmark()
@@ -464,9 +479,55 @@ void	LinesEditor::toggleBookmark()
 	setBookmark( Toggle, textCursor().block() );
 }
 
+void	LinesEditor::gotoNextBookmark()
+{
+	QTextCursor cursor = textCursor();
+	QTextBlock block = cursor.block();
+	PrivateBlockData *data = getPrivateBlockData( block, false );
+	
+	while (block.isValid())
+	{
+		block = block.next();
+		data = getPrivateBlockData( block, false );
+		if (data)
+		{
+			if (data->m_isBookmark)
+			{
+				cursor.setPosition( block.position() );
+				setTextCursor(cursor);
+				return;
+			}
+		}
+		
+	}
+}
+
+void	LinesEditor::gotoPrevBookmark()
+{
+	QTextCursor cursor = textCursor();
+	QTextBlock block = cursor.block();
+	PrivateBlockData *data = getPrivateBlockData( block, false );
+	
+	while (block.isValid())
+	{
+		block = block.previous();
+		data = getPrivateBlockData( block, false );
+
+		if (data)
+		{
+			if (data->m_isBookmark)
+			{
+				cursor.setPosition( block.position() );
+				setTextCursor(cursor);
+				return;
+			}
+		}
+	}
+}
+
 void	LinesEditor::setBreakpoint( BookmarkAction action, QTextBlock block )
 {
-	PrivateBlockData *data = getPrivateBlockData( block );
+	PrivateBlockData *data = getPrivateBlockData( block, true );
 	if (!data)
 		return;
 
@@ -484,7 +545,6 @@ void	LinesEditor::setBreakpoint( BookmarkAction action, QTextBlock block )
 	}
 
 	updateCurrentLine();
-	panel->update();
 }
 
 void	LinesEditor::toggleBreakpoint()
@@ -728,6 +788,8 @@ void	LinesEditor::updateCurrentLine()
 {
 	if (highlightCurrentLine)
 		viewport()->update();
+		
+	panel->update();
 }
 
 void LinesEditor::on_searchText_textChanged( const QString & text )
@@ -785,8 +847,11 @@ void	LinesEditor::on_cursorPositionChanged()
 
 void	LinesEditor::on_textDocument_contentsChanged()
 {
-	PrivateBlockData* data = getPrivateBlockData( textCursor().block() );
+	PrivateBlockData* data = getPrivateBlockData( textCursor().block(), true );
 	if (!data)
+		return;
+	
+	if (data->m_isModified)
 		return;
 	
 	data->m_isModified = true;
