@@ -29,7 +29,12 @@ HEADERS += samplepanel.h \
  ../../src/qsvsyntaxhighlighter.h \
  privateblockdata.h
 CONFIG += warn_on debug_and_release
-FORMS += findwidget.ui mainwindow.ui configdialog.ui filemessage.ui
+FORMS += findwidget.ui \
+ mainwindow.ui \
+ configdialog.ui \
+ filemessage.ui \
+ replacewidget.ui \
+ gotolinewidget.ui
 RESOURCES += textlines.qrc
 INCLUDEPATH += ../../src src
 LIBS +=

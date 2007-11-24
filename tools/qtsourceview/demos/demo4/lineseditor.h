@@ -2,17 +2,19 @@
 #define __LINESEDITOR_H__
 
 #include <QTextEdit>
-//#include 
 #include "ui_findwidget.h"
+#include "ui_replacewidget.h"
+#include "ui_gotolinewidget.h"
 #include "ui_filemessage.h"
 
-class SamplePanel;
-class TransparentWidget;
-class PrivateBlockData;
 class QsvSyntaxHighlighter;
 class QFileSystemWatcher;
 class QTextCursor;
 enum QTextDocument::FindFlag;
+
+class SamplePanel;
+class TransparentWidget;
+class PrivateBlockData;
 
 enum ItemColors {
 	 LinesPanel, CurrentLine, MatchBrackets, NoText, TextFound, TextNoFound, WhiteSpaceColor, 
@@ -21,7 +23,7 @@ enum ItemColors {
 
 enum BookmarkAction {
 	Toggle, Enable, Disable
-} ;
+};
 
 class LinesEditor: public QTextEdit
 {
@@ -37,6 +39,8 @@ public:
 	
 public slots:
 	void		showFindWidget();
+	void		showReplaceWidget();
+	void		showGotoLineWidget();
 	void		findNext();
 	void		findPrev();
 	bool		issue_search( const QString &text, QTextCursor newCursor, QFlags<QTextDocument::FindFlag> findOptions );
@@ -75,6 +79,10 @@ public slots:
 protected slots:
 	void	updateCurrentLine();
 	void	on_searchText_textChanged( const QString & text );
+	void	on_replaceWidget_expand( bool checked );
+	void	on_replaceOldText_textChanged( const QString & text );
+	void	on_replaceOldText_valueChanged(int i);
+	void	on_replaceOldText_editingFinished();
 	void	on_cursorPositionChanged();
 	void	on_textDocument_contentsChanged();
 	void	on_fileChanged( const QString &fName );
@@ -99,6 +107,9 @@ public:
 	QAction	*actionFind;
 	QAction	*actionFindNext;
 	QAction	*actionFindPrev;
+	QAction	*actionReplace;
+	QAction	*actionGotoLine;
+	
 	QAction	*actionNextBookmark;
 	QAction	*actionPrevBookmark;
 	QAction	*actionCapitalize;
@@ -138,9 +149,13 @@ private:
 	
 	QTextCursor		searchCursor;
 	SamplePanel		*panel;
-	TransparentWidget	*findWidget;
-	TransparentWidget	*fileMessage;
+	QWidget			*findWidget;
+	QWidget			*replaceWidget;
+	QWidget			*gotoLineWidget;
+	QWidget			*fileMessage;
 	Ui::FindWidget		ui_findWidget;
+	Ui::ReplaceWidget	ui_replaceWidget;
+	Ui::GotoLineWidget	ui_gotoLineWidget;
 	Ui::FileMessage		ui_fileMessage;
 };
 

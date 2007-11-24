@@ -52,6 +52,8 @@
     <addaction name="action_Open" />
     <addaction name="action_Save" />
     <addaction name="separator" />
+    <addaction name="action_setup" />
+    <addaction name="separator" />
     <addaction name="actionE_xit" />
    </widget>
    <widget class="QMenu" name="menu_Edit" >
@@ -59,7 +61,6 @@
      <string>&amp;Edit</string>
     </property>
     <addaction name="separator" />
-    <addaction name="action_setup" />
    </widget>
    <addaction name="menu_File" />
    <addaction name="menu_Edit" />
@@ -99,7 +100,7 @@
   </action>
   <action name="action_setup" >
    <property name="text" >
-    <string>&amp;Setup</string>
+    <string>&amp;Preferences</string>
    </property>
    <property name="shortcut" >
     <string>F7</string>

@@ -14,6 +14,8 @@
 #include <QStyle>
 #include <QFileSystemWatcher>
 #include <QFileInfo>
+#include <QApplication>
+
 #include <QDebug>
 
 #include "privateblockdata.h"
@@ -21,7 +23,8 @@
 #include "lineseditor.h"
 #include "samplepanel.h"
 #include "transparentwidget.h"
-#include "ui_findwidget.h"
+
+const int floatingWidgetTimeout = 0;
 
 static const char * tabPixmap_img[] = 
 {
@@ -75,7 +78,7 @@ LinesEditor::LinesEditor( QWidget *p ) :QTextEdit(p)
 	highlightCurrentLine	= true;
 	showWhiteSpaces		= true;
 	showMatchingBraces	= true;
-	showPrintingMargins	= false;
+	showPrintingMargins	= true;
 	printMarginWidth	= 80;
 	matchStart		= -1;
 	matchEnd		= -1;
@@ -111,9 +114,19 @@ LinesEditor::LinesEditor( QWidget *p ) :QTextEdit(p)
 	
 	findWidget = new TransparentWidget( this, 0.8 );
 	ui_findWidget.setupUi( findWidget );
-	ui_findWidget.searchText->setIcon( QPixmap(":/images/clear_left.png") );
+	ui_findWidget.searchText->setIcon( QPixmap(":/images/edit-undo.png") );
 	findWidget->hide();
+
+	replaceWidget = new TransparentWidget( this, 0.8 );
+	ui_replaceWidget.setupUi( replaceWidget );
+	ui_replaceWidget.optionsFrame->hide();
+	replaceWidget->adjustSize();
+	replaceWidget->hide();
 	
+	gotoLineWidget = new TransparentWidget( this, 0.8 );
+	ui_gotoLineWidget.setupUi( gotoLineWidget );
+	gotoLineWidget->hide();
+
 	fileMessage = new TransparentWidget( this, 0.8 );
 	ui_fileMessage.setupUi( fileMessage );
 	connect( ui_fileMessage.label, SIGNAL(linkActivated(const QString&)), this, SLOT(on_fileMessage_clicked(QString)));
@@ -125,18 +138,37 @@ LinesEditor::LinesEditor( QWidget *p ) :QTextEdit(p)
 	//connect( verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(adjustMarginWidgets()));
 	connect( this, SIGNAL(cursorPositionChanged()), this, SLOT(on_cursorPositionChanged()));
 	connect( document(), SIGNAL(contentsChanged()), this, SLOT(on_textDocument_contentsChanged()));
-	connect( ui_findWidget.searchText, SIGNAL(textChanged(const QString)), this, SLOT(on_searchText_textChanged(const QString)) );
+	connect( ui_findWidget.searchText, SIGNAL(textChanged(const QString)), this, SLOT(on_searchText_textChanged(const QString)));
 	connect( ui_findWidget.closeButton, SIGNAL(clicked()), this, SLOT(showFindWidget()));
+
+	connect( ui_replaceWidget.moreButton, SIGNAL(clicked(bool)), this, SLOT(on_replaceWidget_expand(bool)));
+	connect( ui_replaceWidget.replaceOldText, SIGNAL(textChanged(const QString)), this, SLOT(on_replaceOldText_textChanged(const QString)));
+	connect( ui_replaceWidget.closeButton, SIGNAL(clicked()), this, SLOT(showReplaceWidget()));
+
+	connect( ui_gotoLineWidget.lineNumber, SIGNAL(editingFinished()), this, SLOT(on_replaceOldText_editingFinished()));
+	connect( ui_gotoLineWidget.lineNumber, SIGNAL(valueChanged(int)), this, SLOT(on_replaceOldText_valueChanged(int)));
+	connect( ui_gotoLineWidget.closeButton, SIGNAL(clicked()), this, SLOT(showGotoLineWidget()));
+
 	connect( ui_fileMessage.closeButton, SIGNAL(clicked()), fileMessage, SLOT(hide()));
 	connect( fileSystemWatcher, SIGNAL(fileChanged(const QString&)), this, SLOT(on_fileChanged(const QString&)));
 }
 
 void LinesEditor::setupActions()
 {
-	actionFind = new QAction( "Find (inline)", this );
+	actionFind = new QAction( "Find...", this );
 	actionFind->setObjectName("actionFind");
 	actionFind->setShortcut( QKeySequence("Ctrl+F") );
 	connect( actionFind, SIGNAL(triggered()), this, SLOT(showFindWidget()) );
+
+	actionReplace = new QAction( "Replace...", this );
+	actionReplace->setObjectName("actionReplace");
+	actionReplace->setShortcut( QKeySequence("Ctrl+R") );
+	connect( actionReplace, SIGNAL(triggered()), this, SLOT(showReplaceWidget()) );
+
+	actionGotoLine = new QAction( "Goto line...", this );
+	actionGotoLine->setObjectName("actionGotoLine");
+	actionGotoLine->setShortcut( QKeySequence("Ctrl+G") );
+	connect( actionGotoLine, SIGNAL(triggered()), this, SLOT(showGotoLineWidget()) );
 
 	actionFindNext = new QAction( "Find next", this );
 	actionFindNext->setObjectName("actionFindNext");
@@ -354,10 +386,17 @@ QTextCursor	LinesEditor::getCurrentTextCursor()
 }
 
 void	LinesEditor::showFindWidget()
-{	
+{
+	if (replaceWidget->isVisible())
+		replaceWidget->hide();
+	
+	if (gotoLineWidget->isVisible())
+		gotoLineWidget->hide();
+	
 	if (findWidget->isVisible())
 	{
-		findWidget->hide();
+		//findWidget->hide();
+		QTimer::singleShot( floatingWidgetTimeout, findWidget, SLOT(hide()) );
 		this->setFocus();
 		return;
 	}
@@ -366,6 +405,77 @@ void	LinesEditor::showFindWidget()
 	widgetToBottom( findWidget );
 	ui_findWidget.searchText->clear();
 	ui_findWidget.searchText->setFocus();
+}
+
+void	LinesEditor::showReplaceWidget()
+{
+	if (findWidget->isVisible())
+		findWidget->hide();
+	
+	if (gotoLineWidget->isVisible())
+		gotoLineWidget->hide();
+	
+	if (replaceWidget->isVisible())
+	{
+		//replaceWidget->hide();
+		QTimer::singleShot( floatingWidgetTimeout, replaceWidget, SLOT(hide()) );
+		this->setFocus();
+		return;
+	}
+
+	searchCursor = textCursor();
+	ui_replaceWidget.replaceOldText->clear();
+	ui_replaceWidget.replaceOldText->setFocus();
+	widgetToBottom( replaceWidget );
+}
+
+void	LinesEditor::showGotoLineWidget()
+{
+	if (findWidget->isVisible())
+		findWidget->hide();
+	
+	if (replaceWidget->isVisible())
+		replaceWidget->hide();
+
+	if (gotoLineWidget->isVisible())
+	{
+		//gotoLineWidget->hide();
+		QTimer::singleShot( floatingWidgetTimeout, gotoLineWidget, SLOT(hide()) );
+		this->setFocus();
+		return;
+	}
+	
+	QTextCursor c = textCursor();
+	ui_gotoLineWidget.lineNumber->setValue( c.blockNumber()+1 );
+	
+	c.movePosition(QTextCursor::End);
+	ui_gotoLineWidget.lineNumber->setMaximum( c.blockNumber()+1 );
+	ui_gotoLineWidget.lineNumber->setMinimum( 1 );
+	ui_gotoLineWidget.lineNumber->setFocus();
+	QLineEdit *lineEdit = ui_gotoLineWidget.lineNumber->findChild<QLineEdit*>();
+	if (lineEdit)
+		lineEdit->selectAll();
+	widgetToBottom( gotoLineWidget );
+}
+
+void	LinesEditor::on_replaceOldText_valueChanged(int i)
+{
+	int requestedBlockNum = i - 1;
+	QTextCursor c = textCursor();
+	for( c.movePosition(QTextCursor::Start); requestedBlockNum && (!c.isNull()); --requestedBlockNum )
+		c.movePosition( QTextCursor::NextBlock );
+	
+	if (c.isNull())
+		return;
+	
+	setTextCursor( c );
+}
+
+void	LinesEditor::on_replaceOldText_editingFinished()
+{
+	// toggle the widget visibility only if visible
+	if (gotoLineWidget->isVisible())
+		showGotoLineWidget();
 }
 
 void	LinesEditor::findNext()
@@ -405,7 +515,7 @@ bool LinesEditor::issue_search( const QString &text, QTextCursor newCursor, QFla
 		ui_findWidget.searchText->setPalette( bad );	
 		setTextCursor( searchCursor );
 	}
-	
+
 	return found;
 }
 
@@ -498,7 +608,6 @@ void	LinesEditor::gotoNextBookmark()
 				return;
 			}
 		}
-		
 	}
 }
 
@@ -554,11 +663,6 @@ void	LinesEditor::toggleBreakpoint()
 
 void	LinesEditor::transformBlockToUpper()
 {
-	//QTextCursor cursor = textCursor();
-	//if (!cursor.hasSelection())
-		//cursor.select(QTextCursor::WordUnderCursor);
-	//return cursor;
-
 	QTextCursor cursor = getCurrentTextCursor();
 	QString s_before = cursor.selectedText();
 	QString s_after  = s_before.toUpper();
@@ -619,8 +723,11 @@ void LinesEditor::keyPressEvent( QKeyEvent *event )
 	{
 		case Qt::Key_Escape:
 			if (findWidget->isVisible())
-				// hide  it
 				showFindWidget();
+			else if (replaceWidget->isVisible())
+				showReplaceWidget();
+			else if (gotoLineWidget->isVisible())
+				showGotoLineWidget();
 			else
 			{
 				// clear selection
@@ -636,11 +743,16 @@ void LinesEditor::keyPressEvent( QKeyEvent *event )
 		case Qt::Key_Enter:
 		case Qt::Key_Return:
 			// TODO, BUG: ignore "enter" keypresses, if looking for text
-			if (findWidget->isVisible())
+			if (findWidget->isVisible() || replaceWidget->isVisible() || gotoLineWidget->isVisible())
 				return;
 			break;
 			
 		case Qt::Key_Tab:
+			if (replaceWidget->isVisible())
+			{
+				QApplication::sendEvent(replaceWidget, event);
+				return;
+			}
 			//if (tabIndents)
 			{
 				if (handleIndentEvent( !(event->modifiers() & Qt::ShiftModifier) ))
@@ -664,6 +776,17 @@ void LinesEditor::resizeEvent ( QResizeEvent *event )
 	{
 		findWidget->hide();
 		showFindWidget();
+	}
+	if (replaceWidget->isVisible())
+	{
+		replaceWidget->hide();
+		showReplaceWidget();
+	}
+
+	if (gotoLineWidget->isVisible())
+	{
+		gotoLineWidget->hide();
+		showGotoLineWidget();
 	}
 
 	if (fileMessage->isVisible())
@@ -805,6 +928,35 @@ void LinesEditor::on_searchText_textChanged( const QString & text )
 	issue_search( text, searchCursor, !QTextDocument::FindCaseSensitively | !QTextDocument::FindBackward ); 
 }
 
+void	LinesEditor::on_replaceOldText_textChanged( const QString & text )
+{
+	QPalette palette = this->palette();
+	if (text.isEmpty())
+	{
+		palette.setColor( QPalette::Base, QColor("#FFFFFF") ); // white
+		ui_replaceWidget.replaceOldText->setPalette( palette );
+		return;
+	}
+
+	QTextCursor c = textCursor();
+	c.movePosition(QTextCursor::Start);
+	c = document()->find( text, c );
+	
+	if (!c.isNull())
+		palette.setColor( QPalette::Base, searchFoundColor );
+	else
+		palette.setColor( QPalette::Base, searchNotFoundColor );
+	ui_replaceWidget.replaceOldText->setPalette( palette );
+}
+
+void	LinesEditor::on_replaceWidget_expand( bool checked )
+{
+	ui_replaceWidget.optionsFrame->setVisible( checked );
+	ui_replaceWidget.frame->adjustSize();
+	replaceWidget->adjustSize();
+	widgetToBottom( replaceWidget );
+}
+
 void	LinesEditor::on_cursorPositionChanged()
 {
 	QTextCursor cursor = textCursor();
@@ -893,7 +1045,8 @@ void	LinesEditor::adjustMarginWidgets()
 		lrect.adjust( -panel->width(), 0, 0, 0 );
 		panel->setGeometry(lrect);		
 	}
-	else{
+	else
+	{
 		setViewportMargins( 0, 0, 0, 0);
 	}
 }
@@ -943,7 +1096,8 @@ void LinesEditor::widgetToBottom( QWidget *w )
 	r2.setHeight( i );
 	
 	w->setGeometry(r2);
-	w->show();	
+	w->show();
+	//QTimer::singleShot( 100, w, SLOT(show()) );
 }
 
 void LinesEditor::widgetToTop( QWidget *w )

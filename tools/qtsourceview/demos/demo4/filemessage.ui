@@ -105,7 +105,7 @@
          <string>x</string>
         </property>
         <property name="icon" >
-         <iconset resource="textlines.qrc" >:/images/fileclose.png</iconset>
+         <iconset resource="textlines.qrc" >:/images/process-stop.png</iconset>
         </property>
         <property name="autoRaise" >
          <bool>true</bool>

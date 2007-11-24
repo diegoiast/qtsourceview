@@ -16,6 +16,12 @@
 #include "mainwindowimpl.h"
 #include "editorconfig.h"
 
+/*     -                       -                                               | 80 chars
+12345678901234567890123456789012345678901234567890123456789012345678901234567890
+         10        20        30        40        50        60        70        80
+	8 CHARS			32 chars					80 chars
+*/
+
 MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f) 
 	: QMainWindow(parent, f)
 {
@@ -42,19 +48,27 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
 	QMenu *tmpMenu = menuBar()->findChildren<QMenu*>( "menu_Edit" )[0];
 	if (tmpMenu)
 	{
-		QMenu *actionsMenu = new QMenu( "Text actions", tmpMenu );
-		actionsMenu->setObjectName("actionsMenu");
-		actionsMenu->addAction( textEdit->actionCapitalize );
-		actionsMenu->addAction( textEdit->actionLowerCase );
-		actionsMenu->addAction( textEdit->actionChangeCase );
-
 		tmpMenu->addAction( textEdit->actionFind );
+		tmpMenu->addAction( textEdit->actionReplace );
+		tmpMenu->addAction( textEdit->actionGotoLine );
 		tmpMenu->addAction( textEdit->actionFindNext );
 		tmpMenu->addAction( textEdit->actionFindPrev );
-		tmpMenu->addMenu( actionsMenu );
-		tmpMenu->addAction( textEdit->actionToggleBookmark );
-		tmpMenu->addAction( textEdit->actionNextBookmark );
-		tmpMenu->addAction( textEdit->actionPrevBookmark );
+		tmpMenu->addSeparator();
+
+		QMenu *new_menu = new QMenu( tr("Text actions"), tmpMenu );
+		new_menu->setObjectName("actionsMenu");
+		new_menu->addAction( textEdit->actionCapitalize );
+		new_menu->addAction( textEdit->actionLowerCase );
+		new_menu->addAction( textEdit->actionChangeCase );
+		tmpMenu->addMenu( new_menu );
+
+		new_menu = new QMenu( tr("Bookmarks"), tmpMenu );
+		new_menu->addAction( textEdit->actionToggleBookmark );
+		new_menu->addSeparator();
+		new_menu->addAction( textEdit->actionNextBookmark );
+		new_menu->addAction( textEdit->actionPrevBookmark );
+		tmpMenu->addMenu( new_menu );
+
 		tmpMenu->addAction( textEdit->actionTogglebreakpoint );
 	}
 }

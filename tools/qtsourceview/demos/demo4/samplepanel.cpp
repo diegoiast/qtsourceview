@@ -14,7 +14,7 @@ SamplePanel::SamplePanel(LinesEditor *a): QWidget(a)//, m_area(a)
 	edit = a;
 	setFixedWidth(50);
 
-	bookMarkImage = QPixmap(":/images/bookmark.png");
+	bookMarkImage = QPixmap(":/images/emblem-important.png");
 	connect(edit->verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(update()));
 }
 

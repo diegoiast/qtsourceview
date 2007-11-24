@@ -1,7 +1,10 @@
 <RCC>
-	<qresource prefix="/images" >
-		<file alias="clear_left.png">images/clear_left.png</file>
-		<file alias="fileclose.png">images/fileclose.png</file>
-		<file alias="bookmark.png">images/bookmark.png</file>
-	</qresource>
+    <qresource prefix="/" >
+        <file>images/edit-undo.png</file>
+        <file>images/emblem-important.png</file>
+        <file>images/go-next.png</file>
+        <file>images/go-previous.png</file>
+        <file>images/process-stop.png</file>
+        <file>images/view-refresh.png</file>
+    </qresource>
 </RCC>
