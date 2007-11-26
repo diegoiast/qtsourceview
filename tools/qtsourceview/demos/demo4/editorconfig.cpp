@@ -177,7 +177,7 @@ void EditorConfig::applyConfiguration( EditorConfigData c, LinesEditor *editor )
 	editor->setDisplayCurrentLine( c.markCurrentLine );
 	editor->getPanel()->setVisible( c.showLineNumbers );
 	editor->setDisplayWhiteSpaces( c.showWhiteSpaces );
-	editor->setDisplatMatchingBrackets( c.matchBrackes );
+	editor->setDisplayMatchingBrackets( c.matchBrackes );
 	editor->setMatchingString( c.matchBrackesList );
 	if (c.showMargins)
 		editor->setMargin( c.marginsWidth );
