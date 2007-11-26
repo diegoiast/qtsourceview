@@ -97,6 +97,29 @@
           <property name="orientation" >
            <enum>Qt::Horizontal</enum>
           </property>
+          <property name="sizeType" >
+           <enum>QSizePolicy::Maximum</enum>
+          </property>
+          <property name="sizeHint" >
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QLabel" name="linesCountLabel" >
+          <property name="text" >
+           <string>%1 lines available</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer>
+          <property name="orientation" >
+           <enum>Qt::Horizontal</enum>
+          </property>
           <property name="sizeHint" >
            <size>
             <width>40</width>

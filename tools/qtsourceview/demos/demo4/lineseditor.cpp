@@ -452,6 +452,7 @@ void	LinesEditor::showGotoLineWidget()
 	
 	c.movePosition(QTextCursor::End);
 	ui_gotoLineWidget.lineNumber->setMaximum( c.blockNumber()+1 );
+	ui_gotoLineWidget.linesCountLabel->setText( tr("%1 lines available").arg(c.blockNumber()+1) );
 	ui_gotoLineWidget.lineNumber->setMinimum( 1 );
 	ui_gotoLineWidget.lineNumber->setFocus();
 	QLineEdit *lineEdit = ui_gotoLineWidget.lineNumber->findChild<QLineEdit*>();
