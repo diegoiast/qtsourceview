@@ -2,6 +2,7 @@
 #define __LINESEDITOR_H__
 
 #include <QTextEdit>
+#include <QTextBlock>
 #include "ui_findwidget.h"
 #include "ui_replacewidget.h"
 #include "ui_gotolinewidget.h"

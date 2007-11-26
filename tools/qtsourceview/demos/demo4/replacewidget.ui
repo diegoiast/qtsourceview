@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>685</width>
-    <height>156</height>
+    <width>561</width>
+    <height>127</height>
    </rect>
   </property>
   <property name="sizePolicy" >
@@ -41,7 +41,7 @@
       <enum>QFrame::StyledPanel</enum>
      </property>
      <property name="frameShadow" >
-      <enum>QFrame::Raised</enum>
+      <enum>QFrame::Sunken</enum>
      </property>
      <layout class="QGridLayout" >
       <property name="leftMargin" >
@@ -147,7 +147,19 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="moreButton" >
+         <widget class="QToolButton" name="moreButton" >
+          <property name="sizePolicy" >
+           <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="cursor" >
+           <cursorShape>PointingHandCursor</cursorShape>
+          </property>
+          <property name="focusPolicy" >
+           <enum>Qt::StrongFocus</enum>
+          </property>
           <property name="toolTip" >
            <string>Opens the options panel</string>
           </property>
@@ -155,6 +167,9 @@
            <string>&amp;More...</string>
           </property>
           <property name="checkable" >
+           <bool>true</bool>
+          </property>
+          <property name="autoRaise" >
            <bool>true</bool>
           </property>
          </widget>
@@ -200,6 +215,13 @@
            </property>
           </widget>
          </item>
+         <item row="0" column="2" >
+          <widget class="QCheckBox" name="checkBox" >
+           <property name="text" >
+            <string>&amp;Selected text only</string>
+           </property>
+          </widget>
+         </item>
          <item rowspan="2" row="0" column="4" >
           <widget class="QPushButton" name="replaceAllButton" >
            <property name="text" >
@@ -233,13 +255,6 @@
             </size>
            </property>
           </spacer>
-         </item>
-         <item row="0" column="2" >
-          <widget class="QCheckBox" name="checkBox" >
-           <property name="text" >
-            <string>&amp;Selected text only</string>
-           </property>
-          </widget>
          </item>
         </layout>
        </widget>
@@ -286,7 +301,6 @@
   <tabstop>replaceNewText</tabstop>
   <tabstop>replaceButton</tabstop>
   <tabstop>closeButton</tabstop>
-  <tabstop>moreButton</tabstop>
   <tabstop>cbCaseSensitive</tabstop>
   <tabstop>cbWholeWords</tabstop>
   <tabstop>cbFindBackwards</tabstop>
