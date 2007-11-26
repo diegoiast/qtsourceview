@@ -139,6 +139,8 @@ LinesEditor::LinesEditor( QWidget *p ) :QTextEdit(p)
 	connect( this, SIGNAL(cursorPositionChanged()), this, SLOT(on_cursorPositionChanged()));
 	connect( document(), SIGNAL(contentsChanged()), this, SLOT(on_textDocument_contentsChanged()));
 	connect( ui_findWidget.searchText, SIGNAL(textChanged(const QString)), this, SLOT(on_searchText_textChanged(const QString)));
+	connect( ui_findWidget.prevButton, SIGNAL(clicked()), this, SLOT(findPrev()));
+	connect( ui_findWidget.nextButton, SIGNAL(clicked()), this, SLOT(findNext()));
 	connect( ui_findWidget.closeButton, SIGNAL(clicked()), this, SLOT(showFindWidget()));
 
 	connect( ui_replaceWidget.moreButton, SIGNAL(clicked(bool)), this, SLOT(on_replaceWidget_expand(bool)));
@@ -480,14 +482,26 @@ void	LinesEditor::on_replaceOldText_editingFinished()
 
 void	LinesEditor::findNext()
 {
-	issue_search( ui_findWidget.searchText->text(), textCursor(), 0 );
+	issue_search( ui_findWidget.searchText->text(), textCursor(), getSearchFlags() );
 }
 
 void LinesEditor::findPrev()
 {
-	issue_search( ui_findWidget.searchText->text(), textCursor(), QTextDocument::FindBackward );
+	issue_search( ui_findWidget.searchText->text(), textCursor(), getSearchFlags() | QTextDocument::FindBackward );
 }
 
+QFlags<QTextDocument::FindFlag> LinesEditor::getSearchFlags()
+{
+	QFlags<QTextDocument::FindFlag> f;
+	
+	if (ui_findWidget.caseSensitive->isChecked())
+		f = f | QTextDocument::FindCaseSensitively;
+
+	if (ui_findWidget.wholeWords->isChecked())
+		f = f | QTextDocument::FindWholeWords;
+		
+	return f;
+}
 bool LinesEditor::issue_search( const QString &text, QTextCursor newCursor, QFlags<QTextDocument::FindFlag> findOptions  )
 {
 	QTextCursor c = document()->find( text, newCursor, findOptions );
@@ -925,7 +939,7 @@ void LinesEditor::on_searchText_textChanged( const QString & text )
 		return;
 	}
 	
-	issue_search( text, searchCursor, !QTextDocument::FindCaseSensitively | !QTextDocument::FindBackward ); 
+	issue_search( text, searchCursor, getSearchFlags() ); 
 }
 
 void	LinesEditor::on_replaceOldText_textChanged( const QString & text )

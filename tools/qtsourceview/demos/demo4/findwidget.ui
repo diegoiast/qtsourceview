@@ -149,14 +149,20 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton" >
+       <widget class="QToolButton" name="prevButton" >
+        <property name="toolTip" >
+         <string>Find previous</string>
+        </property>
         <property name="text" >
-         <string>Previous</string>
+         <string/>
         </property>
         <property name="icon" >
          <iconset resource="textlines.qrc" >:/images/go-previous.png</iconset>
         </property>
-        <property name="flat" >
+        <property name="autoRepeat" >
+         <bool>true</bool>
+        </property>
+        <property name="autoRaise" >
          <bool>true</bool>
         </property>
        </widget>
@@ -178,14 +184,20 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton_2" >
+       <widget class="QToolButton" name="nextButton" >
+        <property name="toolTip" >
+         <string>Find  next</string>
+        </property>
         <property name="text" >
-         <string>&amp;Next</string>
+         <string/>
         </property>
         <property name="icon" >
          <iconset resource="textlines.qrc" >:/images/go-next.png</iconset>
         </property>
-        <property name="flat" >
+        <property name="autoRepeat" >
+         <bool>true</bool>
+        </property>
+        <property name="autoRaise" >
          <bool>true</bool>
         </property>
        </widget>
@@ -207,7 +219,7 @@
        </spacer>
       </item>
       <item>
-       <widget class="QCheckBox" name="checkBox" >
+       <widget class="QCheckBox" name="caseSensitive" >
         <property name="text" >
          <string>Case sensitive</string>
         </property>
@@ -230,7 +242,7 @@
        </spacer>
       </item>
       <item>
-       <widget class="QCheckBox" name="checkBox_2" >
+       <widget class="QCheckBox" name="wholeWords" >
         <property name="text" >
          <string>Whole words</string>
         </property>
@@ -285,7 +297,7 @@
         </property>
         <property name="sizeHint" >
          <size>
-          <width>21</width>
+          <width>20</width>
           <height>42</height>
          </size>
         </property>

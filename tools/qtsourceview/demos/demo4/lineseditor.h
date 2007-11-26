@@ -43,6 +43,7 @@ public slots:
 	void		showGotoLineWidget();
 	void		findNext();
 	void		findPrev();
+	QFlags<QTextDocument::FindFlag> getSearchFlags();
 	bool		issue_search( const QString &text, QTextCursor newCursor, QFlags<QTextDocument::FindFlag> findOptions );
 	int		loadFile( QString );
 
