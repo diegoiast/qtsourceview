@@ -19,7 +19,7 @@ class PrivateBlockData;
 
 enum ItemColors {
 	 LinesPanel, CurrentLine, MatchBrackets, NoText, TextFound, TextNoFound, WhiteSpaceColor, 
-	 BookmarkLineColor, BreakpointLineColor
+	 BookmarkLineColor, BreakpointLineColor, ModifiedColor
 };
 
 enum BookmarkAction {

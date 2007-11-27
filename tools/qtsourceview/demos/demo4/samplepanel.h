@@ -12,9 +12,10 @@ public:
 	SamplePanel(LinesEditor *a);
 private:
 	void paintEvent(QPaintEvent*);
-	QTextEdit *edit;
-	QColor panelColor;
-	QPixmap bookMarkImage;
+	QTextEdit *m_edit;
+	QColor m_panelColor;
+	QColor m_modifiedColor;
+	QPixmap m_bookMarkImage;
 friend class LinesEditor;
 };
 

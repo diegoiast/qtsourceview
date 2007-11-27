@@ -94,7 +94,8 @@ LinesEditor::LinesEditor( QWidget *p ) :QTextEdit(p)
 	actionTogglebreakpoint	= NULL;
 	
 	panel = new SamplePanel( this );
-	panel->panelColor = QColor( "#FFFFD0" );
+	panel->m_panelColor	= QColor( "#FFFFD0" );
+	panel->m_modifiedColor	= QColor( "#00FF00" );
 	panel->setVisible( true );
 
 	setFrameStyle( QFrame::NoFrame );
@@ -228,7 +229,8 @@ QColor LinesEditor::getItemColor( ItemColors role )
 {
 	switch (role)
 	{
-		case LinesPanel:	return panel->panelColor; 
+		case LinesPanel:	return panel->m_panelColor; 
+		case ModifiedColor:	return panel->m_modifiedColor;
 		case CurrentLine:	return currentLineColor;
 		case MatchBrackets:	return matchBracesColor;
 		case NoText:		return searchNoText;
@@ -247,17 +249,21 @@ void LinesEditor::setItemColor( ItemColors role, QColor c )
 {
 	switch (role)
 	{
-		case LinesPanel:	
-			panel->panelColor = c;
+		case LinesPanel:
+			panel->m_panelColor = c;
 			panel->update();
 			break;
-		case CurrentLine:	
+		case ModifiedColor:
+			panel->m_modifiedColor = c;
+			panel->update();
+			break;
+		case CurrentLine:
 			currentLineColor = c;
 			break;
 		case MatchBrackets:
 			matchBracesColor = c;
 			break;
-		case NoText:	
+		case NoText:
 			searchNoText = c;
 			break;
 		case TextFound:

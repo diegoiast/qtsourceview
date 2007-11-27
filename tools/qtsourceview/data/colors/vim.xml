@@ -31,5 +31,6 @@
 	<itemData defStyleNum="dsWidgetError"              name="Widget error line"                background="#FF0000"  />
 
 	<itemData defStyleNum="dsWidgetLinesPanel"   name="Widget lines marker"       background="#808080"  />
+	<itemData defStyleNum="dsWidgetModifiedLine" name="Line modification marker"  background="#ff0000"  />
 	<itemData defStyleNum="dsWhiteSpace"         name="White spaces color"        color="#181818"  />
 </itemDatas>

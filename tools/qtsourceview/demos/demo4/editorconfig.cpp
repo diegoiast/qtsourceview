@@ -197,6 +197,7 @@ void EditorConfig::applyConfiguration( EditorConfigData c, LinesEditor *editor )
 		editor->setPalette( p );
 		editor->setTextColor( c.currentColorScheme->getColorDef("dsNormal").getColor() );
 		editor->setItemColor( LinesPanel, c.currentColorScheme->getColorDef("dsWidgetLinesPanel").getBackground() );
+		editor->setItemColor( ModifiedColor, c.currentColorScheme->getColorDef("dsWidgetModifiedLine").getBackground() );
 		editor->setItemColor( CurrentLine, c.currentColorScheme->getColorDef("dsWidgetCurLine").getBackground() );
 		editor->setItemColor( WhiteSpaceColor, c.currentColorScheme->getColorDef("dsWhiteSpace").getColor() );
 		editor->setItemColor( BookmarkLineColor, c.currentColorScheme->getColorDef("dsWidgetBookmark").getBackground() );
