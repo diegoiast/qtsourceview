@@ -112,18 +112,18 @@ LinesEditor::LinesEditor( QWidget *p ) :QTextEdit(p)
 	panel->setFont( f );
 	setTabSize( 8 );
 	
-	findWidget = new TransparentWidget( this, 0.8 );
+	findWidget = new TransparentWidget( this, 0.80 );
 	ui_findWidget.setupUi( findWidget );
 	ui_findWidget.searchText->setIcon( QPixmap(":/images/edit-undo.png") );
 	findWidget->hide();
 
-	replaceWidget = new TransparentWidget( this, 0.8 );
+	replaceWidget = new TransparentWidget( this, 0.80 );
 	ui_replaceWidget.setupUi( replaceWidget );
 	ui_replaceWidget.optionsFrame->hide();
 	replaceWidget->adjustSize();
 	replaceWidget->hide();
 	
-	gotoLineWidget = new TransparentWidget( this, 0.8 );
+	gotoLineWidget = new TransparentWidget( this, 0.80 );
 	ui_gotoLineWidget.setupUi( gotoLineWidget );
 	gotoLineWidget->hide();
 
@@ -140,6 +140,7 @@ LinesEditor::LinesEditor( QWidget *p ) :QTextEdit(p)
 	connect( document(), SIGNAL(contentsChanged()), this, SLOT(on_textDocument_contentsChanged()));
 	connect( ui_findWidget.searchText, SIGNAL(textChanged(const QString)), this, SLOT(on_searchText_textChanged(const QString)));
 	connect( ui_findWidget.searchText, SIGNAL(editingFinished()), this, SLOT(on_searchText_editingFinished()));
+	connect( ui_findWidget.searchText, SIGNAL(returnPressed()), this, SLOT(showFindWidget()));
 	connect( ui_findWidget.prevButton, SIGNAL(clicked()), this, SLOT(findPrev()));
 	connect( ui_findWidget.nextButton, SIGNAL(clicked()), this, SLOT(findNext()));
 	connect( ui_findWidget.closeButton, SIGNAL(clicked()), this, SLOT(showFindWidget()));
@@ -438,8 +439,6 @@ int LinesEditor::loadFile( QString s )
 	return 0;
 }
 
-
-// slots
 void LinesEditor::updateMarkIcons()
 {
 	int x, y;
@@ -476,7 +475,6 @@ void	LinesEditor::showFindWidget()
 	
 	if (findWidget->isVisible())
 	{
-		//findWidget->hide();
 		QTimer::singleShot( floatingWidgetTimeout, findWidget, SLOT(hide()) );
 		this->setFocus();
 		return;
@@ -498,7 +496,6 @@ void	LinesEditor::showReplaceWidget()
 	
 	if (replaceWidget->isVisible())
 	{
-		//replaceWidget->hide();
 		QTimer::singleShot( floatingWidgetTimeout, replaceWidget, SLOT(hide()) );
 		this->setFocus();
 		return;
@@ -520,7 +517,6 @@ void	LinesEditor::showGotoLineWidget()
 
 	if (gotoLineWidget->isVisible())
 	{
-		//gotoLineWidget->hide();
 		QTimer::singleShot( floatingWidgetTimeout, gotoLineWidget, SLOT(hide()) );
 		this->setFocus();
 		return;
@@ -661,7 +657,6 @@ void	LinesEditor::transformBlockCase()
 	}
 }
 
-// protected slots
 void	LinesEditor::updateCurrentLine()
 {
 	if (highlightCurrentLine)
@@ -685,8 +680,9 @@ void LinesEditor::on_searchText_textChanged( const QString & text )
 
 void	LinesEditor::on_searchText_editingFinished()
 {
-	showFindWidget();
+	//showFindWidget();
 	searchString = ui_findWidget.searchText->text();
+	viewport()->update();
 }
 
 void	LinesEditor::on_replaceWidget_expand( bool checked )
@@ -816,7 +812,6 @@ void	LinesEditor::on_fileMessage_clicked( QString s )
 	}
 }
 
-// protected
 void LinesEditor::keyPressEvent( QKeyEvent *event )
 {
 	switch (event->key())
@@ -829,8 +824,7 @@ void LinesEditor::keyPressEvent( QKeyEvent *event )
 			else if (gotoLineWidget->isVisible())
 				showGotoLineWidget();
 			else
-			{
-				// clear selection
+			{	// clear selection
 				QTextCursor c = textCursor();
 				if (c.hasSelection())
 				{
@@ -842,7 +836,6 @@ void LinesEditor::keyPressEvent( QKeyEvent *event )
 			
 		case Qt::Key_Enter:
 		case Qt::Key_Return:
-			// TODO, BUG: ignore "enter" keypresses, if looking for text
 			if (findWidget->isVisible() || replaceWidget->isVisible() || gotoLineWidget->isVisible())
 				return;
 			break;
@@ -914,9 +907,6 @@ void LinesEditor::paintEvent(QPaintEvent *e)
 		
 		if (showMatchingBraces)
 			printMatchingBraces( p );
-			
-		if (!searchString.isEmpty())
-			printSearchString( p );
 	}
 	else
 		QTextEdit::paintEvent(e);
@@ -926,6 +916,7 @@ void	LinesEditor::printBackgrounds( QPainter &p )
 {
 	const int contentsY = verticalScrollBar()->value();
 	const qreal pageBottom = contentsY + viewport()->height();
+	const QFontMetrics fm = QFontMetrics( document()->defaultFont() );
 	
 	for ( QTextBlock block = document()->begin(); block.isValid(); block = block.next() )
 	{
@@ -941,16 +932,17 @@ void	LinesEditor::printBackgrounds( QPainter &p )
 		if (highlightCurrentLine)
 			printCurrentLines( p, block );
 		if (showWhiteSpaces)
-			printWhiteSpaces( p, block );
+			printWhiteSpaces( p, block, fm );
+		if (!searchString.isEmpty())
+			printSearchString( p, block, fm );
 	}
 
 	if (showPrintingMargins)
 		printMargins( p );
 }
 
-void	LinesEditor::printWhiteSpaces( QPainter &p, QTextBlock &block )
+void	LinesEditor::printWhiteSpaces( QPainter &p, const QTextBlock &block, const QFontMetrics &fm )
 {
-	const QFontMetrics fm = QFontMetrics( document()->defaultFont() );
 	const QString txt = block.text();
 	const int len = txt.length();
 	
@@ -976,7 +968,7 @@ void	LinesEditor::printWhiteSpaces( QPainter &p, QTextBlock &block )
 	}
 }
 
-void	LinesEditor::printCurrentLines( QPainter &p, QTextBlock &block )
+void	LinesEditor::printCurrentLines( QPainter &p, const QTextBlock &block )
 {
 	PrivateBlockData *data = dynamic_cast<PrivateBlockData*>( block.userData() );
 	QTextCursor cursor = textCursor();
@@ -989,7 +981,6 @@ void	LinesEditor::printCurrentLines( QPainter &p, QTextBlock &block )
 	p.setOpacity( 0.8 );
 	if (r.top() == cursorRect().top() )
 		p.fillRect( r, currentLineColor );
-
 	p.setOpacity( 0.2 );
 	if (data)
 	{
@@ -999,9 +990,8 @@ void	LinesEditor::printCurrentLines( QPainter &p, QTextBlock &block )
 		if (data->m_isBreakpoint)
 			p.fillRect( r, breakpointLineColor );
 			
-		// print all other states
+		// TODO: print all other states in a generic way
 	}
-
 	p.restore();
 }
 
@@ -1028,8 +1018,30 @@ void	LinesEditor::printMatchingBraces( QPainter &p )
 		p.drawText(r.x()-1, r.y(), r.width(), r.height(), Qt::AlignLeft | Qt::AlignVCenter, matchChar );
 }
 
-void	LinesEditor::printSearchString( QPainter &p )
+void	LinesEditor::printSearchString( QPainter &p, const QTextBlock &block, const QFontMetrics &fm )
 {
+	int searchStringLen = fm.width( searchString );
+	const QString t = block.text();
+	QTextCursor cursor = textCursor();
+	Qt::CaseSensitivity caseSensitive = getSearchFlags().testFlag(QTextDocument::FindCaseSensitively)?
+		Qt::CaseSensitive:Qt::CaseInsensitive;
+	QRect r;
+	
+	int k=0;
+	int t_len = t.length();
+	do
+	{
+		k = t.indexOf( searchString, k, caseSensitive );
+		if (k == -1)
+			break;
+
+		cursor.setPosition( block.position()+k+1, QTextCursor::MoveAnchor);
+		r = cursorRect( cursor );
+		p.setOpacity( 0.3 );
+		p.fillRect(r.x()-1, r.y(), searchStringLen, r.height(), Qt::yellow );
+		p.setOpacity( 1 );
+		k = k + searchString.length();
+	} while(k< t_len);
 }
 
 void	LinesEditor::printMargins( QPainter &p )
@@ -1055,7 +1067,6 @@ void LinesEditor::widgetToBottom( QWidget *w )
 	
 	w->setGeometry(r2);
 	w->show();
-	//QTimer::singleShot( 100, w, SLOT(show()) );
 }
 
 void LinesEditor::widgetToTop( QWidget *w )
@@ -1112,8 +1123,8 @@ bool	LinesEditor::handleKeyPressEvent( QKeyEvent *event )
 		goto FUNCTION_END;
 	}
 	
-	s = event->text();
 	// handle only normal key presses
+	s = event->text();
 	if (s.isEmpty())
 		return false;
 	
@@ -1150,8 +1161,8 @@ bool	LinesEditor::handleIndentEvent( bool forward )
 {
 	QTextCursor cursor = textCursor();
 	if (!cursor.hasSelection())
-	{
-		qDebug("no selection, not handeling");
+	{	// TODO
+		qDebug("no selection, not handling");
 		return false;
 	}
 	

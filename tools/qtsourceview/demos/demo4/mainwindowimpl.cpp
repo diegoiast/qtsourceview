@@ -49,10 +49,11 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
 	if (tmpMenu)
 	{
 		tmpMenu->addAction( textEdit->actionFind );
-		tmpMenu->addAction( textEdit->actionReplace );
-		tmpMenu->addAction( textEdit->actionGotoLine );
 		tmpMenu->addAction( textEdit->actionFindNext );
 		tmpMenu->addAction( textEdit->actionFindPrev );
+		tmpMenu->addAction( textEdit->actionReplace );
+		tmpMenu->addSeparator();
+		tmpMenu->addAction( textEdit->actionGotoLine );
 		tmpMenu->addSeparator();
 
 		QMenu *new_menu = new QMenu( tr("Text actions"), tmpMenu );

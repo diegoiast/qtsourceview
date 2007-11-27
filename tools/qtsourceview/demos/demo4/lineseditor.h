@@ -91,10 +91,10 @@ protected:
 
 	void		paintEvent(QPaintEvent *e);
 	void		printBackgrounds( QPainter &p );
-	void		printWhiteSpaces( QPainter &p, QTextBlock &block );
-	void		printCurrentLines( QPainter &p, QTextBlock &block );
+	void		printWhiteSpaces( QPainter &p, const QTextBlock &block, const QFontMetrics &fm );
+	void		printCurrentLines( QPainter &p, const QTextBlock &block );
 	void		printMatchingBraces( QPainter &p );
-	void		printSearchString( QPainter &p );	
+	void		printSearchString( QPainter &p, const QTextBlock &block, const QFontMetrics &fm );
 	void		printMargins( QPainter &p );
 	
 	void		updateMarkIcons();
