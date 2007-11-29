@@ -146,8 +146,9 @@ void QsvSyntaxHighlighter::setHighlight( QsvLangDef *newLang )
 // 			if (l.matchEmptyStringAtBeginning)
 // 			if (l.matchEmptyStringAtEnd)
 
+			// no whole words
 			s = l.startRegex + s + l.endRegex;
-			addMappingFromName( s, l.style );
+			addMappingFromName( s, l.style, false, l.caseSensitive? Qt::CaseSensitive : Qt::CaseInsensitive );
 		}
 	}
 
@@ -159,14 +160,14 @@ void QsvSyntaxHighlighter::setHighlight( QsvLangDef *newLang )
 			s  = l.startRegex + ".*$";
 		else
 			s  = l.startRegex + ".*" + l.endRegex;
-		addMappingFromName( s, l.style );
+		addMappingFromName( s, l.style, false, Qt::CaseSensitive );
 	}
 
 	// later, pattern items
 	// TODO: optimizations
 	foreach( QsvEntityPatternItem l, language->patternItems )
 	{
-		addMappingFromName( l.regex, l.style, !true );
+		addMappingFromName( l.regex, l.style, !true, Qt::CaseSensitive );
 	}
 
 	// strings...
@@ -176,14 +177,14 @@ void QsvSyntaxHighlighter::setHighlight( QsvLangDef *newLang )
 			continue;
 
 		QString s = l.startRegex + QString("[^%1]*").arg(l.startRegex) + l.endRegex;
-		addMappingFromName( s, l.style );
+		addMappingFromName( s, l.style, false, Qt::CaseSensitive );
 	}
 
 	// and finally... line comments...
 	// block comments are handeled in the drawing function	
 	foreach( QsvEntityLineComment l, language->lineCommentsDefs )
 	{
-		addMappingFromName( QString("%1.*").arg(l.start), l.style );
+		addMappingFromName( QString("%1.*").arg(l.start), l.style, false, Qt::CaseSensitive );
 	}
 
 	// now we need to re-highlight, on qt 4.1, we can use this code:
@@ -274,7 +275,7 @@ void QsvSyntaxHighlighter::highlightBlock(const QString &text)
 
 	// this code draws each line
 	foreach ( pattern, mappings.keys() )
-		drawText( text, pattern.key, pattern.value.charFormat );
+		drawText( text, pattern.key, pattern.value.charFormat, pattern.value.cs );
 
 	setCurrentBlockState(0);
 
@@ -311,7 +312,7 @@ HANDLE_BLOCK_COMMENTS:
 }
 
 
-void QsvSyntaxHighlighter::addMapping( const QString mappingName, const QString &pattern, const QTextCharFormat &format, bool fullWord )
+void QsvSyntaxHighlighter::addMapping( const QString mappingName, const QString &pattern, const QTextCharFormat &format, bool fullWord, Qt::CaseSensitivity cs )
 {	
 	QString p = pattern;
 	LanguageEntity newEntity;
@@ -320,18 +321,20 @@ void QsvSyntaxHighlighter::addMapping( const QString mappingName, const QString 
 		p = "\\b" + p + "\\b";
 		
 #ifdef __DEBUG_ADD_MAPPING__
-	qDebug( "%s %d new mapping - [%s] %s - ", __FILE__, __LINE__, 
+	qDebug( "%s %d new mapping (sensitive)- [%s] %s  (%d)", __FILE__, __LINE__, 
 		qPrintable(pattern), 
-		qPrintable(format.foreground().color().name()) 		
+		qPrintable(format.foreground().color().name()),
+		cs==Qt::CaseSensitive?1:0
 	);
 #endif
 	newEntity.charFormat = format;
 	newEntity.name = mappingName;
+	newEntity.cs = cs;
 
 	mappings.add( p, newEntity );
 }
 
-void QsvSyntaxHighlighter::addMappingFromName( const QString &pattern, const QString formatName, bool fullWord )
+void QsvSyntaxHighlighter::addMappingFromName( const QString &pattern, const QString formatName, bool fullWord, Qt::CaseSensitivity cs )
 {
 	QString s = formatName;
 	if (!colors)
@@ -362,27 +365,28 @@ void QsvSyntaxHighlighter::addMappingFromName( const QString &pattern, const QSt
 		s = "dsOthers3";
 
 	// at this stage, s is always a Kate color format
-	addMapping( s, pattern, colors->getColorDef(s).toCharFormat(), fullWord );
+	addMapping( s, pattern, colors->getColorDef(s).toCharFormat(), fullWord, cs );
 }
 
-void QsvSyntaxHighlighter::drawText( QString text, QString s, QTextCharFormat &format )
+void QsvSyntaxHighlighter::drawText( QString text, QString s, QTextCharFormat &format, Qt::CaseSensitivity caseSensitive )
 {
 //	using regex is a smart idea, but slow
-//	if (s.contains( QRegExp("[^\\\\*+()?]") )){
+//	if (s.contains( QRegExp("[^\\\\*+()?]") ))
 	if	(
 			s.contains('^') || s.contains('+') || s.contains('*') || s.contains('?') || 
 			s.contains('(') || s.contains(')') || s.contains('[') || s.contains(']') ||
 			s.contains('\\') 
 		)
-		drawRegExp( text, s, format );
+		drawRegExp( text, s, format, caseSensitive );
 	else
-		drawKeywords( text, s, format );
+		drawKeywords( text, s, format, caseSensitive );
 }
 
-void QsvSyntaxHighlighter::drawRegExp( QString text, QString s, QTextCharFormat &format )
+void QsvSyntaxHighlighter::drawRegExp( QString text, QString s, QTextCharFormat &format, Qt::CaseSensitivity caseSensitive )
 {	
 	QRegExp expression(s);
-	int index = text.indexOf(expression);
+	expression.setCaseSensitivity(caseSensitive);
+	int index = text.indexOf(expression, 0);
 
 #ifdef __DEBUG_HIGHLIGHT__
 	qDebug( "%s %d (drawing regex)	-  %s )", __FILE__, __LINE__, qPrintable(s) );
@@ -392,17 +396,17 @@ void QsvSyntaxHighlighter::drawRegExp( QString text, QString s, QTextCharFormat 
 	{
 		int length = expression.matchedLength();
 		setFormat(index, length, format );
-		index = text.indexOf(expression, index + length);
+		index = text.indexOf(expression, index + length );
 	}
 }
 
-void QsvSyntaxHighlighter::drawKeywords( QString text, QString s, QTextCharFormat &format )
+void QsvSyntaxHighlighter::drawKeywords( QString text, QString s, QTextCharFormat &format, Qt::CaseSensitivity caseSensitive  )
 {
 #ifdef __DEBUG_HIGHLIGHT__
-	qDebug( "%s %d (drawing keyword)	- %s", __FILE__, __LINE__, qPrintable(s) );
+	qDebug( "%s %d (drawing keyword=sensitive)	- %s (%d)", __FILE__, __LINE__, qPrintable(s), caseSensitive);
 #endif
 
-	int index = text.indexOf(s);
+	int index = text.indexOf(s, 0, caseSensitive);
 	int length = s.length();
 	int txtLen = text.length();
 	
@@ -423,7 +427,7 @@ void QsvSyntaxHighlighter::drawKeywords( QString text, QString s, QTextCharForma
 			)
 		)
 			setFormat(index, length, format );
-		index = text.indexOf(s, index + length);
+		index = text.indexOf(s, index + length, caseSensitive);
 	}
 }
 

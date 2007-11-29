@@ -123,8 +123,8 @@ QsvLangDef* QsvLangDefFactory::getHighlight( QString fileName )
 
 			if ( !mimeTypes.contains(langMimeType) )
 			{
-				qDebug( "%s %d - Unknown mimetype [%s] at highlight file %s",
-					__FILE__, __LINE__, qPrintable(langMimeType), qPrintable(langDef->getName()) );
+				// TODO
+				//qDebug( "%s %d - Unknown mimetype [%s] at highlight file %s", __FILE__, __LINE__, qPrintable(langMimeType), qPrintable(langDef->getName()) );
 				continue;
 			}
 			

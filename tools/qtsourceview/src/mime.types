@@ -205,6 +205,9 @@ text/x-c++hdr			h hh hpp
 text/x-csharpsrc		cs
 text/x-csharp			cs
 
+# pascal
+text/x-pascal			pas pp
+
 # ini files
 text/x-ini-file			ini
 application/x-ini-file		ini

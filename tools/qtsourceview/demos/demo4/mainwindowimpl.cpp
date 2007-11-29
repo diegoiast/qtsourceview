@@ -37,11 +37,15 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
 	EditorConfig::getInstance()->loadColorsDirectory( dataPath + "/data/colors/" );
 	
 	defColors = new QsvColorDefFactory( dataPath + "/data/colors/kate.xml" );
-	langDefinition = QsvLangDefFactory::getInstanse()->getHighlight("1.cpp");
+	
+	QString loadedFile;
+	//loadedFile = "mainwindowimpl.cpp";
+	//loadedFile = "../../tests/highlight.pas";
+	textEdit->loadFile( loadedFile );
+	langDefinition = QsvLangDefFactory::getInstanse()->getHighlight(loadedFile);
 	//highlight = new QsvSyntaxHighlighter( textEdit, defColors, langDefinition );
 	
 	textEdit->setSyntaxHighlighter( new QsvSyntaxHighlighter( textEdit, defColors, langDefinition ) );	
-	textEdit->loadFile( "mainwindowimpl.cpp" );
 	connect( EditorConfig::getInstance(), SIGNAL(configurationModified()), this, SLOT(configuration_updated()));
 	
 	textEdit->setupActions();
