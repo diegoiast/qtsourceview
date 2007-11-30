@@ -1,7 +1,6 @@
 #include <QPainter>
 #include "transparentwidget.h"
 
-
 TransparentWidget::TransparentWidget( QWidget *parent, qreal t )
 :QWidget(parent)
 {

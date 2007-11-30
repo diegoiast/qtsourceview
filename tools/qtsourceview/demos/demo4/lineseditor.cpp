@@ -120,6 +120,8 @@ LinesEditor::LinesEditor( QWidget *p ) :QTextEdit(p)
 
 	replaceWidget = new TransparentWidget( this, 0.80 );
 	ui_replaceWidget.setupUi( replaceWidget );
+	ui_replaceWidget.replaceOldText->setIcon( QPixmap(":/images/edit-undo.png") );
+	ui_replaceWidget.replaceNewText->setIcon( QPixmap(":/images/edit-undo.png") );
 	ui_replaceWidget.optionsFrame->hide();
 	replaceWidget->adjustSize();
 	replaceWidget->hide();
@@ -148,9 +150,12 @@ LinesEditor::LinesEditor( QWidget *p ) :QTextEdit(p)
 
 	connect( ui_replaceWidget.moreButton, SIGNAL(clicked(bool)), this, SLOT(on_replaceWidget_expand(bool)));
 	connect( ui_replaceWidget.replaceOldText, SIGNAL(textChanged(const QString)), this, SLOT(on_replaceOldText_textChanged(const QString)));
+	connect( ui_replaceWidget.replaceOldText, SIGNAL(returnPressed()), this, SLOT(on_replaceOldText_returnPressed()));
+	connect( ui_replaceWidget.replaceNewText, SIGNAL(returnPressed()), this, SLOT(on_replaceOldText_returnPressed()));
+	connect( ui_replaceWidget.replaceButton, SIGNAL(clicked()), this, SLOT(on_replaceOldText_returnPressed()));
 	connect( ui_replaceWidget.closeButton, SIGNAL(clicked()), this, SLOT(showReplaceWidget()));
 
-	connect( ui_gotoLineWidget.lineNumber, SIGNAL(editingFinished()), this, SLOT(on_replaceOldText_editingFinished()));
+	connect( ui_gotoLineWidget.lineNumber, SIGNAL(editingFinished()), this, SLOT(on_lineNumber_editingFinished()));
 	connect( ui_gotoLineWidget.lineNumber, SIGNAL(valueChanged(int)), this, SLOT(on_lineNumber_valueChanged(int)));
 	connect( ui_gotoLineWidget.closeButton, SIGNAL(clicked()), this, SLOT(showGotoLineWidget()));
 
@@ -160,66 +165,71 @@ LinesEditor::LinesEditor( QWidget *p ) :QTextEdit(p)
 
 void LinesEditor::setupActions()
 {
-	actionFind = new QAction( "Find...", this );
+	actionFind = new QAction( "&Find...", this );
 	actionFind->setObjectName("actionFind");
 	actionFind->setShortcut( QKeySequence("Ctrl+F") );
 	connect( actionFind, SIGNAL(triggered()), this, SLOT(showFindWidget()) );
 
-	actionReplace = new QAction( "Replace...", this );
+	actionReplace = new QAction( "&Replace...", this );
 	actionReplace->setObjectName("actionReplace");
 	actionReplace->setShortcut( QKeySequence("Ctrl+R") );
 	connect( actionReplace, SIGNAL(triggered()), this, SLOT(showReplaceWidget()) );
 
-	actionGotoLine = new QAction( "Goto line...", this );
+	actionGotoLine = new QAction( "&Goto line...", this );
 	actionGotoLine->setObjectName("actionGotoLine");
 	actionGotoLine->setShortcut( QKeySequence("Ctrl+G") );
 	connect( actionGotoLine, SIGNAL(triggered()), this, SLOT(showGotoLineWidget()) );
 
-	actionFindNext = new QAction( "Find next", this );
+	actionFindNext = new QAction( "Find &next", this );
 	actionFindNext->setObjectName("actionFindNext");
 	actionFindNext->setShortcut( QKeySequence("F3") );
 	connect( actionFindNext, SIGNAL(triggered()), this, SLOT(findNext()) );
 	
-	actionFindPrev = new QAction( "Find previous", this );
+	actionFindPrev = new QAction( "Find &previous", this );
 	actionFindPrev->setObjectName("actionFindPrev");
 	actionFindPrev->setShortcut( QKeySequence("Shift+F3") );
 	connect( actionFindPrev, SIGNAL(triggered()), this, SLOT(findPrev()) );
 	
-	actionCapitalize = new QAction( "Change to capital letters", this );
+	actionClearSearchHighlight = new QAction( "Clear search &highlight", this );
+	actionClearSearchHighlight->setObjectName("actionClearSearchHighlight");
+	//actionClearSearchHighlight->setShortcut( QKeySequence("Shift+F3") );
+	connect( actionClearSearchHighlight, SIGNAL(triggered()), this, SLOT(clearSearchHighlight()) );
+	
+	actionCapitalize = new QAction( "Change to &capital letters", this );
 	actionCapitalize->setObjectName( "actionCapitalize" );
 	actionCapitalize->setShortcut( QKeySequence( Qt::CTRL | Qt::Key_U ) );
 	connect( actionCapitalize, SIGNAL(triggered()), this, SLOT(transformBlockToUpper()) );
 
-	actionLowerCase = new QAction( "Change to lower letters", this );
+	actionLowerCase = new QAction( "Change to &lower letters", this );
 	actionLowerCase->setObjectName( "actionLowerCase" );
 	actionLowerCase->setShortcut( QKeySequence( Qt::CTRL | Qt::SHIFT | Qt::Key_U  ) );
 	connect( actionLowerCase, SIGNAL(triggered()), this, SLOT(transformBlockToLower()) );
 
-	actionChangeCase = new QAction( "Change case", this );
+	actionChangeCase = new QAction( "Change ca&se", this );
 	actionChangeCase->setObjectName( "actionChangeCase" );
 	connect( actionChangeCase, SIGNAL(triggered()), this, SLOT(transformBlockCase()) );
 
-	actionToggleBookmark = new QAction( "Toggle line bookmark", this );
+	actionToggleBookmark = new QAction( "&Toggle line bookmark", this );
 	actionToggleBookmark->setObjectName( "actionToggleBookmark" );
 	actionToggleBookmark->setShortcut( QKeySequence( Qt::CTRL | Qt::Key_B  ) );
 	connect( actionToggleBookmark, SIGNAL(triggered()), this, SLOT(toggleBookmark()) );
 
-	actionPrevBookmark = new QAction( "Previous bookmark", this );
+	actionPrevBookmark = new QAction( "&Previous bookmark", this );
 	actionPrevBookmark->setObjectName( "actionPrevBookmark" );
 	actionPrevBookmark->setShortcut( QKeySequence( Qt::CTRL | Qt::Key_PageUp ) );
 	connect( actionPrevBookmark, SIGNAL(triggered()), this, SLOT(gotoPrevBookmark()) );
 
-	actionNextBookmark = new QAction( "Next bookmark", this );
+	actionNextBookmark = new QAction( "&Next bookmark", this );
 	actionNextBookmark->setObjectName( "actionNextBookmark" );
 	actionNextBookmark->setShortcut( QKeySequence( Qt::CTRL | Qt::Key_PageDown ) );
 	connect( actionNextBookmark, SIGNAL(triggered()), this, SLOT(gotoNextBookmark()) );
 
-	actionToggleBookmark = new QAction( "Toggle line bookmark", this );
+	actionToggleBookmark = new QAction( "Toggle line &bookmark", this );
 	actionToggleBookmark->setObjectName( "actionToggleBookmark" );
 	actionToggleBookmark->setShortcut( QKeySequence( Qt::CTRL | Qt::Key_B  ) );
 	connect( actionToggleBookmark, SIGNAL(triggered()), this, SLOT(toggleBookmark()) );
 
-	actionTogglebreakpoint = new QAction( "Toggle breakpoint", this );
+	actionTogglebreakpoint = new QAction( "Toggle b&reakpoint", this );
 	actionTogglebreakpoint->setObjectName( "actionTogglebreakpoint" );
 	actionTogglebreakpoint->setShortcut( QKeySequence("F9") );
 	connect( actionTogglebreakpoint, SIGNAL(triggered()), this, SLOT(toggleBreakpoint()) );
@@ -542,6 +552,12 @@ void	LinesEditor::showGotoLineWidget()
 	widgetToBottom( gotoLineWidget );
 }
 
+void	LinesEditor::clearSearchHighlight()
+{
+	highlightString.clear();
+	viewport()->update();
+}
+
 void	LinesEditor::findNext()
 {
 	issue_search( ui_findWidget.searchText->text(), textCursor(), getSearchFlags() );
@@ -687,7 +703,7 @@ void LinesEditor::on_searchText_textChanged( const QString & text )
 void	LinesEditor::on_searchText_editingFinished()
 {
 	//showFindWidget();
-	searchString = ui_findWidget.searchText->text();
+	highlightString = ui_findWidget.searchText->text();
 	viewport()->update();
 }
 
@@ -710,8 +726,8 @@ void	LinesEditor::on_replaceOldText_textChanged( const QString & text )
 	}
 
 	QTextCursor c = textCursor();
-	c.movePosition(QTextCursor::Start);
-	c = document()->find( text, c );
+	//c.movePosition(QTextCursor::Start);
+	c = document()->find( text, c, getReplaceFlags() );
 	
 	if (!c.isNull())
 		palette.setColor( QPalette::Base, searchFoundColor );
@@ -720,7 +736,32 @@ void	LinesEditor::on_replaceOldText_textChanged( const QString & text )
 	ui_replaceWidget.replaceOldText->setPalette( palette );
 }
 
-void	LinesEditor::on_replaceOldText_editingFinished()
+void	LinesEditor::on_replaceOldText_returnPressed()
+{
+	qDebug("starting replace");
+	QFlags<QTextDocument::FindFlag> f;
+
+	if (ui_replaceWidget.caseSensitive->isChecked())
+		f = f | QTextDocument::FindCaseSensitively;
+
+	if (ui_replaceWidget.wholeWords->isChecked())
+		f = f | QTextDocument::FindWholeWords;
+
+	if (ui_replaceWidget.findBackwards->isChecked())
+		f = f | QTextDocument::FindBackward;
+
+	QTextCursor c = textCursor();
+	//c.movePosition(QTextCursor::Start);
+	c = document()->find( ui_replaceWidget.replaceOldText->text(), c, f );
+	if (c.isNull())
+		return;
+	
+	c.deleteChar();
+	c.insertText( ui_replaceWidget.replaceNewText->text() );
+	setTextCursor( c );
+}
+
+void	LinesEditor::on_lineNumber_editingFinished()
 {
 	// toggle the widget visibility only if visible
 	if (gotoLineWidget->isVisible())
@@ -848,8 +889,9 @@ void LinesEditor::keyPressEvent( QKeyEvent *event )
 			
 		case Qt::Key_Tab:
 			if (replaceWidget->isVisible())
-			{
-				QApplication::sendEvent(replaceWidget, event);
+			{	// since the replace widget has many subwidgets
+				// tab should cycle between them
+				event->ignore();
 				return;
 			}
 			//if (tabIndents)
@@ -939,8 +981,8 @@ void	LinesEditor::printBackgrounds( QPainter &p )
 			printCurrentLines( p, block );
 		if (showWhiteSpaces)
 			printWhiteSpaces( p, block, fm );
-		if (!searchString.isEmpty())
-			printSearchString( p, block, fm );
+		if (!highlightString.isEmpty())
+			printHighlightString( p, block, fm );
 	}
 
 	if (showPrintingMargins)
@@ -1024,29 +1066,29 @@ void	LinesEditor::printMatchingBraces( QPainter &p )
 		p.drawText(r.x()-1, r.y(), r.width(), r.height(), Qt::AlignLeft | Qt::AlignVCenter, matchChar );
 }
 
-void	LinesEditor::printSearchString( QPainter &p, const QTextBlock &block, const QFontMetrics &fm )
+void	LinesEditor::printHighlightString( QPainter &p, const QTextBlock &block, const QFontMetrics &fm )
 {
-	int searchStringLen = fm.width( searchString );
+	int highlightStringLen = fm.width( highlightString );
 	const QString t = block.text();
 	QTextCursor cursor = textCursor();
 	Qt::CaseSensitivity caseSensitive = getSearchFlags().testFlag(QTextDocument::FindCaseSensitively)?
-		Qt::CaseSensitive:Qt::CaseInsensitive;
+		Qt::CaseSensitive : Qt::CaseInsensitive;
 	QRect r;
 	
 	int k=0;
 	int t_len = t.length();
 	do
 	{
-		k = t.indexOf( searchString, k, caseSensitive );
+		k = t.indexOf( highlightString, k, caseSensitive );
 		if (k == -1)
 			break;
 
 		cursor.setPosition( block.position()+k+1, QTextCursor::MoveAnchor);
 		r = cursorRect( cursor );
-		p.setOpacity( 0.3 );
-		p.fillRect(r.x()-1, r.y(), searchStringLen, r.height(), Qt::yellow );
+		p.setOpacity( 0.7 );
+		p.fillRect(r.x()-1, r.y(), highlightStringLen, r.height(), Qt::yellow );
 		p.setOpacity( 1 );
-		k = k + searchString.length();
+		k = k + highlightString.length();
 	} while(k< t_len);
 }
 
@@ -1301,9 +1343,25 @@ QFlags<QTextDocument::FindFlag> LinesEditor::getSearchFlags()
 	
 	if (ui_findWidget.caseSensitive->isChecked())
 		f = f | QTextDocument::FindCaseSensitively;
-
+	
 	if (ui_findWidget.wholeWords->isChecked())
 		f = f | QTextDocument::FindWholeWords;
 		
+	return f;
+}
+
+QFlags<QTextDocument::FindFlag> LinesEditor::getReplaceFlags()
+{
+	QFlags<QTextDocument::FindFlag> f;
+	
+	if (ui_replaceWidget.caseSensitive->isChecked())
+		f = f | QTextDocument::FindCaseSensitively;
+	
+	if (ui_replaceWidget.wholeWords->isChecked())
+		f = f | QTextDocument::FindWholeWords;
+
+	if (ui_replaceWidget.findBackwards->isChecked())
+		f = f | QTextDocument::FindBackward;
+	
 	return f;
 }

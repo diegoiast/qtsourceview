@@ -62,30 +62,37 @@
           <number>6</number>
          </property>
          <item row="0" column="0" >
-          <widget class="QCheckBox" name="cbAutoBrackets" >
+          <widget class="QCheckBox" name="autoBrackets" >
            <property name="text" >
             <string>Auto brakets</string>
            </property>
           </widget>
          </item>
          <item row="1" column="0" >
-          <widget class="QCheckBox" name="cbShowLineNumbers" >
+          <widget class="QCheckBox" name="showLineNumbers" >
            <property name="text" >
             <string>Show line numbers</string>
            </property>
           </widget>
          </item>
          <item row="1" column="1" >
-          <widget class="QCheckBox" name="cbShowWhiteSpaces" >
+          <widget class="QCheckBox" name="showWhiteSpaces" >
            <property name="text" >
             <string>Show white spaces</string>
            </property>
           </widget>
          </item>
          <item row="0" column="1" >
-          <widget class="QCheckBox" name="cbMarkCurrentLine" >
+          <widget class="QCheckBox" name="markCurrentLine" >
            <property name="text" >
             <string>Mark current line</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0" >
+          <widget class="QCheckBox" name="wrapLines" >
+           <property name="text" >
+            <string>Wrap long lines</string>
            </property>
           </widget>
          </item>
@@ -98,8 +105,8 @@
          </property>
          <property name="sizeHint" >
           <size>
-           <width>20</width>
-           <height>40</height>
+           <width>412</width>
+           <height>16</height>
           </size>
          </property>
         </spacer>
@@ -107,14 +114,14 @@
        <item>
         <layout class="QGridLayout" >
          <item row="0" column="0" >
-          <widget class="QCheckBox" name="cbMatchBrackets" >
+          <widget class="QCheckBox" name="matchBrackets" >
            <property name="text" >
             <string>Match brackets</string>
            </property>
           </widget>
          </item>
          <item row="0" column="1" >
-          <widget class="QLineEdit" name="leMatchCraketsList" >
+          <widget class="QLineEdit" name="matchCraketsList" >
            <property name="enabled" >
             <bool>false</bool>
            </property>
@@ -124,14 +131,14 @@
           </widget>
          </item>
          <item row="1" column="0" >
-          <widget class="QCheckBox" name="cbShowMargins" >
+          <widget class="QCheckBox" name="showMargins" >
            <property name="text" >
             <string>Show margins</string>
            </property>
           </widget>
          </item>
          <item row="1" column="1" >
-          <widget class="QSpinBox" name="sbMarginSize" >
+          <widget class="QSpinBox" name="marginSize" >
            <property name="enabled" >
             <bool>false</bool>
            </property>
@@ -157,7 +164,7 @@
           </widget>
          </item>
          <item row="2" column="1" >
-          <widget class="QSpinBox" name="sbTabSize" >
+          <widget class="QSpinBox" name="tabSize" >
            <property name="value" >
             <number>8</number>
            </property>
@@ -321,13 +328,13 @@
  </customwidgets>
  <tabstops>
   <tabstop>buttonBox</tabstop>
-  <tabstop>cbAutoBrackets</tabstop>
-  <tabstop>cbMarkCurrentLine</tabstop>
-  <tabstop>cbShowLineNumbers</tabstop>
-  <tabstop>cbShowWhiteSpaces</tabstop>
-  <tabstop>cbMatchBrackets</tabstop>
-  <tabstop>leMatchCraketsList</tabstop>
-  <tabstop>sbTabSize</tabstop>
+  <tabstop>autoBrackets</tabstop>
+  <tabstop>markCurrentLine</tabstop>
+  <tabstop>showLineNumbers</tabstop>
+  <tabstop>showWhiteSpaces</tabstop>
+  <tabstop>matchBrackets</tabstop>
+  <tabstop>matchCraketsList</tabstop>
+  <tabstop>tabSize</tabstop>
   <tabstop>btnChooseFont</tabstop>
   <tabstop>tabWidget</tabstop>
   <tabstop>colorsCombo</tabstop>
@@ -336,9 +343,9 @@
  <resources/>
  <connections>
   <connection>
-   <sender>cbMatchBrackets</sender>
+   <sender>matchBrackets</sender>
    <signal>toggled(bool)</signal>
-   <receiver>leMatchCraketsList</receiver>
+   <receiver>matchCraketsList</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel" >
@@ -352,9 +359,9 @@
    </hints>
   </connection>
   <connection>
-   <sender>cbShowMargins</sender>
+   <sender>showMargins</sender>
    <signal>toggled(bool)</signal>
-   <receiver>sbMarginSize</receiver>
+   <receiver>marginSize</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel" >

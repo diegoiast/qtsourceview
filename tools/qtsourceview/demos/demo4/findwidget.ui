@@ -47,7 +47,7 @@
       <enum>QFrame::StyledPanel</enum>
      </property>
      <property name="frameShadow" >
-      <enum>QFrame::Sunken</enum>
+      <enum>QFrame::Plain</enum>
      </property>
      <layout class="QHBoxLayout" >
       <property name="spacing" >
@@ -157,7 +157,7 @@
          <string/>
         </property>
         <property name="icon" >
-         <iconset resource="textlines.qrc" >:/images/go-previous.png</iconset>
+         <iconset resource="textlines.qrc" >:/images/go-up.png</iconset>
         </property>
         <property name="autoRepeat" >
          <bool>true</bool>
@@ -192,7 +192,7 @@
          <string/>
         </property>
         <property name="icon" >
-         <iconset resource="textlines.qrc" >:/images/go-next.png</iconset>
+         <iconset resource="textlines.qrc" >:/images/go-down.png</iconset>
         </property>
         <property name="autoRepeat" >
          <bool>true</bool>

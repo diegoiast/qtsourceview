@@ -39,27 +39,20 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
 	defColors = new QsvColorDefFactory( dataPath + "/data/colors/kate.xml" );
 	
 	QString loadedFile;
-	//loadedFile = "mainwindowimpl.cpp";
+	loadedFile = "mainwindowimpl.cpp";
 	//loadedFile = "../../tests/highlight.pas";
 	textEdit->loadFile( loadedFile );
 	langDefinition = QsvLangDefFactory::getInstanse()->getHighlight(loadedFile);
 	//highlight = new QsvSyntaxHighlighter( textEdit, defColors, langDefinition );
 	
-	textEdit->setSyntaxHighlighter( new QsvSyntaxHighlighter( textEdit, defColors, langDefinition ) );	
+	textEdit->setSyntaxHighlighter( new QsvSyntaxHighlighter( textEdit, defColors, langDefinition ) );
+	setWindowTitle( tr("QtSourceView demo4 - %1").arg("mainwindowimpl.cpp"));
 	connect( EditorConfig::getInstance(), SIGNAL(configurationModified()), this, SLOT(configuration_updated()));
 	
 	textEdit->setupActions();
 	QMenu *tmpMenu = menuBar()->findChildren<QMenu*>( "menu_Edit" )[0];
 	if (tmpMenu)
 	{
-		tmpMenu->addAction( textEdit->actionFind );
-		tmpMenu->addAction( textEdit->actionFindNext );
-		tmpMenu->addAction( textEdit->actionFindPrev );
-		tmpMenu->addAction( textEdit->actionReplace );
-		tmpMenu->addSeparator();
-		tmpMenu->addAction( textEdit->actionGotoLine );
-		tmpMenu->addSeparator();
-
 		QMenu *new_menu = new QMenu( tr("Text actions"), tmpMenu );
 		new_menu->setObjectName("actionsMenu");
 		new_menu->addAction( textEdit->actionCapitalize );
@@ -76,6 +69,26 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
 
 		tmpMenu->addAction( textEdit->actionTogglebreakpoint );
 	}
+	
+	tmpMenu = menuBar()->findChildren<QMenu*>( "menu_Search" )[0];
+	if (tmpMenu)
+	{
+		tmpMenu->addAction( textEdit->actionFind );
+		tmpMenu->addAction( textEdit->actionFindNext );
+		tmpMenu->addAction( textEdit->actionFindPrev );
+		tmpMenu->addAction( textEdit->actionClearSearchHighlight );
+		tmpMenu->addSeparator();
+		tmpMenu->addAction( textEdit->actionReplace );
+		tmpMenu->addSeparator();
+		tmpMenu->addAction( textEdit->actionGotoLine );
+	}
+	
+	connect( actionUndo, SIGNAL(triggered()), textEdit, SLOT(undo()));
+	connect( actionRedo, SIGNAL(triggered()), textEdit, SLOT(redo()));
+
+	connect( actionCopy, SIGNAL(triggered()), textEdit, SLOT(copy()));
+	connect( actionCut, SIGNAL(triggered()), textEdit, SLOT(cut()));
+	connect( actionPaste, SIGNAL(triggered()), textEdit, SLOT(paste()));
 }
 
 void MainWindowImpl::on_action_New_triggered()
@@ -105,6 +118,7 @@ void MainWindowImpl::on_action_Open_triggered()
 	else
 		lastDir.clear();
 	
+	setWindowTitle( tr("QtSourceView demo4 - %1").arg(s));
 	textEdit->loadFile(s);
 	langDefinition = QsvLangDefFactory::getInstanse()->getHighlight( s );
 	textEdit->getSyntaxHighlighter()->setHighlight( langDefinition );

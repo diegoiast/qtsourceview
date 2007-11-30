@@ -22,6 +22,7 @@ struct EditorConfigData
 	bool			showWhiteSpaces;
 	bool			showMargins;
 	bool			matchBrackes;
+	bool			lineWrapping;
 	int			tabSize;
 	int			marginsWidth;
 	QString			matchBrackesList;

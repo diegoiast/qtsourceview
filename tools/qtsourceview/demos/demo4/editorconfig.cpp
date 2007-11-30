@@ -126,7 +126,8 @@ EditorConfigData  EditorConfig::getDefaultConfiguration()
 	defaultConfiguration.showLineNumbers	= true;
 	defaultConfiguration.showWhiteSpaces	= true;
 	defaultConfiguration.matchBrackes	= true;
-	defaultConfiguration.showMargins	= false;
+	defaultConfiguration.showMargins	= true;
+	defaultConfiguration.lineWrapping	= false;
 	defaultConfiguration.tabSize		= 8;
 	defaultConfiguration.marginsWidth	= 80;
 	defaultConfiguration.matchBrackesList	= "()[]{}\"\"''``";
@@ -143,19 +144,20 @@ EditorConfigData EditorConfig::getUserConfiguration()
 {
 	EditorConfigData userConfig;
 
-	userConfig.autoBrackets		= ui.cbAutoBrackets->isChecked();
-	userConfig.markCurrentLine	= ui.cbMarkCurrentLine->isChecked();
-	userConfig.showLineNumbers	= ui.cbShowLineNumbers->isChecked();
-	userConfig.showWhiteSpaces	= ui.cbShowWhiteSpaces->isChecked();
-	userConfig.showMargins		= ui.cbShowMargins->isChecked();
-	userConfig.matchBrackes		= ui.cbMatchBrackets->isChecked();
-	userConfig.matchBrackesList	= ui.leMatchCraketsList->text();
-	userConfig.tabSize		= ui.sbTabSize->value();
+	userConfig.autoBrackets		= ui.autoBrackets->isChecked();
+	userConfig.markCurrentLine	= ui.markCurrentLine->isChecked();
+	userConfig.showLineNumbers	= ui.showLineNumbers->isChecked();
+	userConfig.showWhiteSpaces	= ui.showWhiteSpaces->isChecked();
+	userConfig.showMargins		= ui.showMargins->isChecked();
+	userConfig.matchBrackes		= ui.matchBrackets->isChecked();
+	userConfig.matchBrackesList	= ui.matchCraketsList->text();
+	userConfig.lineWrapping		= ui.wrapLines->isChecked();
+	userConfig.tabSize		= ui.tabSize->value();
 	userConfig.currentFont		= ui.labelFontPreview->font();
 	
-	userConfig.tabSize		= ui.sbTabSize->value();
-	userConfig.marginsWidth		= ui.sbMarginSize->value();
-	userConfig.matchBrackesList	= ui.leMatchCraketsList->text();
+	userConfig.tabSize		= ui.tabSize->value();
+	userConfig.marginsWidth		= ui.marginSize->value();
+	userConfig.matchBrackesList	= ui.matchCraketsList->text();
 	userConfig.currentFont		= ui.labelFontPreview->font();
 
 	if (colorSchemes.isEmpty())
@@ -187,6 +189,25 @@ void EditorConfig::applyConfiguration( EditorConfigData c, LinesEditor *editor )
 	editor->document()->setDefaultFont( c.currentFont );
 	editor->setTabSize( c.tabSize );
 	editor->getPanel()->setFont( c.currentFont );
+	
+	if (	c.lineWrapping)
+	{
+		if (c.showMargins)
+		{
+			const QFontMetrics fm = QFontMetrics( editor->document()->defaultFont() );
+			const int newWrapWidth = fm.width( " " ) * c.marginsWidth;
+			editor->setLineWrapMode( QTextEdit::FixedPixelWidth );
+			editor->setLineWrapColumnOrWidth( newWrapWidth );
+		}
+		else
+		{
+			editor->setLineWrapMode( QTextEdit::WidgetWidth );
+		}
+	}
+	else
+	{
+		editor->setLineWrapMode( QTextEdit::NoWrap );
+	}
 	
 	if (c.currentColorScheme == NULL )
 		qDebug("%s %d - Warning - no color scheme found!", __FILE__, __LINE__ );
@@ -221,15 +242,15 @@ void EditorConfig::applyConfiguration( EditorConfigData c, LinesEditor *editor )
 void EditorConfig::updateConfiguration()
 {
 	// set the values on the first tab
-	ui.cbAutoBrackets->setChecked( currentConfig.autoBrackets );
-	ui.cbMarkCurrentLine->setChecked( currentConfig.markCurrentLine );
-	ui.cbShowLineNumbers->setChecked( currentConfig.showLineNumbers );
-	ui.cbShowWhiteSpaces->setChecked( currentConfig.showWhiteSpaces );
-	ui.cbMatchBrackets->setChecked( currentConfig.matchBrackes );
-	ui.cbMatchBrackets->setChecked ( currentConfig.tabSize	 );
+	ui.autoBrackets->setChecked( currentConfig.autoBrackets );
+	ui.markCurrentLine->setChecked( currentConfig.markCurrentLine );
+	ui.showLineNumbers->setChecked( currentConfig.showLineNumbers );
+	ui.showWhiteSpaces->setChecked( currentConfig.showWhiteSpaces );
+	ui.matchBrackets->setChecked( currentConfig.matchBrackes );
+	ui.matchBrackets->setChecked ( currentConfig.tabSize	 );
 
-	ui.leMatchCraketsList->setText( currentConfig.matchBrackesList );
-	ui.sbTabSize->setValue( currentConfig.tabSize );
+	ui.matchCraketsList->setText( currentConfig.matchBrackesList );
+	ui.tabSize->setValue( currentConfig.tabSize );
 	ui.labelFontPreview->setText( currentConfig.currentFont.toString() );
 	ui.labelFontPreview->setFont( currentConfig.currentFont );
 	

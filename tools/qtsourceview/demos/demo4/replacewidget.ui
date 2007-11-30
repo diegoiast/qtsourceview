@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>561</width>
-    <height>127</height>
+    <width>574</width>
+    <height>162</height>
    </rect>
   </property>
   <property name="sizePolicy" >
@@ -41,7 +41,7 @@
       <enum>QFrame::StyledPanel</enum>
      </property>
      <property name="frameShadow" >
-      <enum>QFrame::Sunken</enum>
+      <enum>QFrame::Plain</enum>
      </property>
      <layout class="QGridLayout" >
       <property name="leftMargin" >
@@ -111,10 +111,10 @@
          <number>0</number>
         </property>
         <item>
-         <widget class="QLineEdit" name="replaceOldText" />
+         <widget class="NewLineEdit" name="replaceOldText" />
         </item>
         <item>
-         <widget class="QLineEdit" name="replaceNewText" />
+         <widget class="NewLineEdit" name="replaceNewText" />
         </item>
        </layout>
       </item>
@@ -189,7 +189,7 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="0" colspan="6" >
+      <item row="2" column="0" colspan="7" >
        <widget class="QFrame" name="optionsFrame" >
         <property name="frameShape" >
          <enum>QFrame::NoFrame</enum>
@@ -202,21 +202,21 @@
         </property>
         <layout class="QGridLayout" >
          <item row="0" column="0" >
-          <widget class="QCheckBox" name="cbCaseSensitive" >
+          <widget class="QCheckBox" name="caseSensitive" >
            <property name="text" >
             <string>&amp;Case sensitive</string>
            </property>
           </widget>
          </item>
          <item row="0" column="1" >
-          <widget class="QCheckBox" name="cbFindBackwards" >
+          <widget class="QCheckBox" name="findBackwards" >
            <property name="text" >
             <string>Find &amp;backwards</string>
            </property>
           </widget>
          </item>
          <item row="0" column="2" >
-          <widget class="QCheckBox" name="checkBox" >
+          <widget class="QCheckBox" name="selectedText" >
            <property name="text" >
             <string>&amp;Selected text only</string>
            </property>
@@ -230,14 +230,14 @@
           </widget>
          </item>
          <item row="1" column="0" >
-          <widget class="QCheckBox" name="cbWholeWords" >
+          <widget class="QCheckBox" name="wholeWords" >
            <property name="text" >
             <string>&amp;Whole words</string>
            </property>
           </widget>
          </item>
          <item row="1" column="1" >
-          <widget class="QCheckBox" name="cbPromptOnReplace" >
+          <widget class="QCheckBox" name="promptOnReplace" >
            <property name="text" >
             <string>&amp;Prompt on replace</string>
            </property>
@@ -296,15 +296,24 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>NewLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>newlineedit.h</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>replaceOldText</tabstop>
   <tabstop>replaceNewText</tabstop>
   <tabstop>replaceButton</tabstop>
   <tabstop>closeButton</tabstop>
-  <tabstop>cbCaseSensitive</tabstop>
-  <tabstop>cbWholeWords</tabstop>
-  <tabstop>cbFindBackwards</tabstop>
-  <tabstop>cbPromptOnReplace</tabstop>
+  <tabstop>moreButton</tabstop>
+  <tabstop>caseSensitive</tabstop>
+  <tabstop>wholeWords</tabstop>
+  <tabstop>findBackwards</tabstop>
+  <tabstop>promptOnReplace</tabstop>
+  <tabstop>selectedText</tabstop>
   <tabstop>replaceAllButton</tabstop>
  </tabstops>
  <resources>

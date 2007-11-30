@@ -61,6 +61,7 @@ public slots:
 	void		showFindWidget();
 	void		showReplaceWidget();
 	void		showGotoLineWidget();
+	void		clearSearchHighlight();
 	void		findNext();
 	void		findPrev();
 	void		toggleBookmark();
@@ -77,7 +78,8 @@ protected slots:
 	void		on_searchText_editingFinished();
 	void		on_replaceWidget_expand( bool checked );
 	void		on_replaceOldText_textChanged( const QString & text );
-	void		on_replaceOldText_editingFinished();
+	void		on_replaceOldText_returnPressed();
+	void		on_lineNumber_editingFinished();
 	void		on_lineNumber_valueChanged(int i);
 	void		on_cursorPositionChanged();
 	void		on_textDocument_contentsChanged();
@@ -94,7 +96,7 @@ protected:
 	void		printWhiteSpaces( QPainter &p, const QTextBlock &block, const QFontMetrics &fm );
 	void		printCurrentLines( QPainter &p, const QTextBlock &block );
 	void		printMatchingBraces( QPainter &p );
-	void		printSearchString( QPainter &p, const QTextBlock &block, const QFontMetrics &fm );
+	void		printHighlightString( QPainter &p, const QTextBlock &block, const QFontMetrics &fm );
 	void		printMargins( QPainter &p );
 	
 	void		updateMarkIcons();
@@ -107,11 +109,13 @@ protected:
 	virtual void	findMatching( QChar c, QTextBlock &block );
 	PrivateBlockData*	getPrivateBlockData( QTextBlock block, bool createIfNotExisting=false );
 	QFlags<QTextDocument::FindFlag> getSearchFlags();
+	QFlags<QTextDocument::FindFlag> getReplaceFlags();
 
 public:
 	QAction	*actionFind;
 	QAction	*actionFindNext;
 	QAction	*actionFindPrev;
+	QAction	*actionClearSearchHighlight;
 	QAction	*actionReplace;
 	QAction	*actionGotoLine;
 	
@@ -124,7 +128,6 @@ public:
 	QAction	*actionTogglebreakpoint;
 
 private:
-
 	QPixmap	tabPixmap;
 	QPixmap spacePixmap;
 	QColor	currentLineColor;
@@ -147,7 +150,7 @@ private:
 	int	matchEnd;
 	QChar	currentChar;
 	QChar	matchChar;
-	QString	searchString;
+	QString	highlightString;
 	QString	fileName;
 	QsvSyntaxHighlighter	*syntaxHighlighter;
 	QFileSystemWatcher	*fileSystemWatcher;
