@@ -14,6 +14,7 @@
 #include <QStyle>
 #include <QFileSystemWatcher>
 #include <QFileInfo>
+#include <QMessageBox>
 #include <QApplication>
 
 #include <QDebug>
@@ -153,6 +154,7 @@ LinesEditor::LinesEditor( QWidget *p ) :QTextEdit(p)
 	connect( ui_replaceWidget.replaceOldText, SIGNAL(returnPressed()), this, SLOT(on_replaceOldText_returnPressed()));
 	connect( ui_replaceWidget.replaceNewText, SIGNAL(returnPressed()), this, SLOT(on_replaceOldText_returnPressed()));
 	connect( ui_replaceWidget.replaceButton, SIGNAL(clicked()), this, SLOT(on_replaceOldText_returnPressed()));
+	connect( ui_replaceWidget.replaceAllButton, SIGNAL(clicked()), this, SLOT(on_replaceAll_clicked()));
 	connect( ui_replaceWidget.closeButton, SIGNAL(clicked()), this, SLOT(showReplaceWidget()));
 
 	connect( ui_gotoLineWidget.lineNumber, SIGNAL(editingFinished()), this, SLOT(on_lineNumber_editingFinished()));
@@ -738,27 +740,69 @@ void	LinesEditor::on_replaceOldText_textChanged( const QString & text )
 
 void	LinesEditor::on_replaceOldText_returnPressed()
 {
-	qDebug("starting replace");
-	QFlags<QTextDocument::FindFlag> f;
-
-	if (ui_replaceWidget.caseSensitive->isChecked())
-		f = f | QTextDocument::FindCaseSensitively;
-
-	if (ui_replaceWidget.wholeWords->isChecked())
-		f = f | QTextDocument::FindWholeWords;
-
-	if (ui_replaceWidget.findBackwards->isChecked())
-		f = f | QTextDocument::FindBackward;
-
+	if (QApplication::keyboardModifiers().testFlag(Qt::ControlModifier) ||
+	    QApplication::keyboardModifiers().testFlag(Qt::AltModifier) ||
+	    QApplication::keyboardModifiers().testFlag(Qt::ShiftModifier) )
+	{
+		on_replaceAll_clicked();
+		showReplaceWidget();
+		return;
+	}
+	
 	QTextCursor c = textCursor();
-	//c.movePosition(QTextCursor::Start);
-	c = document()->find( ui_replaceWidget.replaceOldText->text(), c, f );
+	c = document()->find( ui_replaceWidget.replaceOldText->text(), c, getReplaceFlags() );
 	if (c.isNull())
 		return;
 	
+	c.beginEditBlock();
 	c.deleteChar();
 	c.insertText( ui_replaceWidget.replaceNewText->text() );
+	c.endEditBlock();
 	setTextCursor( c );
+}
+
+void	LinesEditor::on_replaceAll_clicked()
+{
+	// WHY NOT HIDING THE WIDGET?
+	// it seems that if you hide the widget, when the replace all action 
+	// is triggered by pressing control+enter on the replace widget
+	// eventually an "enter event" is sent to the text eidtor.
+	// the work around is to update the transparency of the widget, to let the user
+	// see the text bellow the widget
+	
+	//showReplaceWidget();
+	
+	int replaceCount = 0;
+	replaceWidget->setWidgetTransparency( 0.2 );
+	QTextCursor c = textCursor();
+	c = document()->find( ui_replaceWidget.replaceOldText->text(), c, getReplaceFlags() );
+	
+	while (!c.isNull())
+	{
+		setTextCursor( c );
+		QMessageBox::StandardButton button = QMessageBox::question( this, tr("Replace all"), tr("Replace this text?"),
+		    QMessageBox::Yes | QMessageBox::Ignore | QMessageBox::Cancel );
+		
+		if (button == QMessageBox::Cancel)
+		{
+			break;
+			
+		}
+		else if (button == QMessageBox::Yes)
+		{
+			c.beginEditBlock();
+			c.deleteChar();
+			c.insertText( ui_replaceWidget.replaceNewText->text() );
+			c.endEditBlock();
+			setTextCursor( c );
+			replaceCount++;
+		}
+		
+		c = document()->find( ui_replaceWidget.replaceOldText->text(), c, getReplaceFlags() );
+	}
+	replaceWidget->setWidgetTransparency( 0.8 );
+	
+	QMessageBox::information( 0, tr("Replace all"), tr("%1 replacement(s) made").arg(replaceCount) );
 }
 
 void	LinesEditor::on_lineNumber_editingFinished()
@@ -884,7 +928,10 @@ void LinesEditor::keyPressEvent( QKeyEvent *event )
 		case Qt::Key_Enter:
 		case Qt::Key_Return:
 			if (findWidget->isVisible() || replaceWidget->isVisible() || gotoLineWidget->isVisible())
+			{
+				event->ignore();
 				return;
+			}
 			break;
 			
 		case Qt::Key_Tab:

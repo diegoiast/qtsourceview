@@ -79,6 +79,7 @@ protected slots:
 	void		on_replaceWidget_expand( bool checked );
 	void		on_replaceOldText_textChanged( const QString & text );
 	void		on_replaceOldText_returnPressed();
+	void		on_replaceAll_clicked();
 	void		on_lineNumber_editingFinished();
 	void		on_lineNumber_valueChanged(int i);
 	void		on_cursorPositionChanged();
@@ -157,10 +158,10 @@ private:
 	
 	QTextCursor		searchCursor;
 	SamplePanel		*panel;
-	QWidget			*findWidget;
-	QWidget			*replaceWidget;
-	QWidget			*gotoLineWidget;
-	QWidget			*fileMessage;
+	TransparentWidget	*findWidget;
+	TransparentWidget	*replaceWidget;
+	TransparentWidget	*gotoLineWidget;
+	TransparentWidget	*fileMessage;
 	Ui::FindWidget		ui_findWidget;
 	Ui::ReplaceWidget	ui_replaceWidget;
 	Ui::GotoLineWidget	ui_gotoLineWidget;

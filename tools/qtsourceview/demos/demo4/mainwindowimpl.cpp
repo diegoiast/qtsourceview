@@ -113,15 +113,19 @@ void MainWindowImpl::on_action_Open_triggered()
 	if (i==-1)
 		s = s.lastIndexOf("\\");
 	
+	textEdit->loadFile(s);
 	if (i!=-1)
+	{
 		lastDir = s.left( i );
+		s = s.mid( i+1 );
+	}
 	else
 		lastDir.clear();
 	
 	setWindowTitle( tr("QtSourceView demo4 - %1").arg(s));
-	textEdit->loadFile(s);
 	langDefinition = QsvLangDefFactory::getInstanse()->getHighlight( s );
 	textEdit->getSyntaxHighlighter()->setHighlight( langDefinition );
+	statusBar()->showMessage( tr("File %1 loaded").arg(s), 5000 );
 }
 
 void MainWindowImpl::on_actionE_xit_triggered()
