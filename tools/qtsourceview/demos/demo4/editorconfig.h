@@ -23,6 +23,7 @@ struct EditorConfigData
 	bool			showMargins;
 	bool			matchBrackes;
 	bool			lineWrapping;
+	bool			smartHome;
 	int			tabSize;
 	int			marginsWidth;
 	QString			matchBrackesList;

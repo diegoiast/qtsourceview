@@ -28,7 +28,7 @@ HEADERS += samplepanel.h \
  ../../src/qsvlangdeffactory.h \
  ../../src/qsvsyntaxhighlighter.h \
  privateblockdata.h
-CONFIG += warn_on debug_and_release console
+CONFIG += warn_on console debug_and_release
 FORMS += findwidget.ui \
  mainwindow.ui \
  configdialog.ui \

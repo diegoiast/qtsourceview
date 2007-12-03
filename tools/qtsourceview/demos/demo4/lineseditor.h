@@ -51,6 +51,8 @@ public:
 	void		setDisplayMatchingBrackets( bool );
 	QString		getMatchingString();
 	void		setMatchingString( QString );
+	bool		getUsingSmartHome();
+	void		setUsingSmartHome( bool );
 	void		setBookmark( BookmarkAction action, QTextBlock block );
 	void		setBreakpoint( BookmarkAction action, QTextBlock block );
 	QWidget*	getPanel();
@@ -71,6 +73,8 @@ public slots:
 	void		transformBlockToUpper();
 	void		transformBlockToLower();
 	void		transformBlockCase();
+	void		smartHome();
+	void		smartEnd();
 
 protected slots:
 	void		updateCurrentLine();
@@ -100,7 +104,6 @@ protected:
 	void		printHighlightString( QPainter &p, const QTextBlock &block, const QFontMetrics &fm );
 	void		printMargins( QPainter &p );
 	
-	void		updateMarkIcons();
 	void		widgetToBottom( QWidget *w );
 	void		widgetToTop( QWidget *w );
 	bool		handleKeyPressEvent( QKeyEvent *event );
@@ -129,8 +132,6 @@ public:
 	QAction	*actionTogglebreakpoint;
 
 private:
-	QPixmap	tabPixmap;
-	QPixmap spacePixmap;
 	QColor	currentLineColor;
 	QColor	bookmarkLineColor;
 	QColor	breakpointLineColor;
@@ -144,8 +145,10 @@ private:
 	bool	showWhiteSpaces;
 	bool	showMatchingBraces;
 	bool	showPrintingMargins;
+	bool	usingSmartHome;
 	int	printMarginWidth;
-	QString matchingString;
+	QString	matchingString;
+	
 
 	int	matchStart;
 	int	matchEnd;

@@ -128,6 +128,7 @@ EditorConfigData  EditorConfig::getDefaultConfiguration()
 	defaultConfiguration.matchBrackes	= true;
 	defaultConfiguration.showMargins	= true;
 	defaultConfiguration.lineWrapping	= false;
+	defaultConfiguration.smartHome		= true;
 	defaultConfiguration.tabSize		= 8;
 	defaultConfiguration.marginsWidth	= 80;
 	defaultConfiguration.matchBrackesList	= "()[]{}\"\"''``";
@@ -154,6 +155,7 @@ EditorConfigData EditorConfig::getUserConfiguration()
 	userConfig.lineWrapping		= ui.wrapLines->isChecked();
 	userConfig.tabSize		= ui.tabSize->value();
 	userConfig.currentFont		= ui.labelFontPreview->font();
+	userConfig.smartHome		= ui.useSmartHome->isChecked();
 	
 	userConfig.tabSize		= ui.tabSize->value();
 	userConfig.marginsWidth		= ui.marginSize->value();
@@ -181,6 +183,7 @@ void EditorConfig::applyConfiguration( EditorConfigData c, LinesEditor *editor )
 	editor->setDisplayWhiteSpaces( c.showWhiteSpaces );
 	editor->setDisplayMatchingBrackets( c.matchBrackes );
 	editor->setMatchingString( c.matchBrackesList );
+	editor->setUsingSmartHome( c.smartHome );
 	if (c.showMargins)
 		editor->setMargin( c.marginsWidth );
 	else
@@ -247,8 +250,7 @@ void EditorConfig::updateConfiguration()
 	ui.showLineNumbers->setChecked( currentConfig.showLineNumbers );
 	ui.showWhiteSpaces->setChecked( currentConfig.showWhiteSpaces );
 	ui.matchBrackets->setChecked( currentConfig.matchBrackes );
-	ui.matchBrackets->setChecked ( currentConfig.tabSize	 );
-
+	ui.useSmartHome->setChecked( currentConfig.smartHome );
 	ui.matchCraketsList->setText( currentConfig.matchBrackesList );
 	ui.tabSize->setValue( currentConfig.tabSize );
 	ui.labelFontPreview->setText( currentConfig.currentFont.toString() );

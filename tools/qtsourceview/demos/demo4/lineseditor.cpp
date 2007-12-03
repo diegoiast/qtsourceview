@@ -27,48 +27,8 @@
 
 const int floatingWidgetTimeout = 0;
 
-static const char * tabPixmap_img[] = 
-{
-/* width height ncolors cpp [x_hot y_hot] */
-	"8 8 3 2 0 0",
-/* colors */
-	"  s none       m none  c none",
-	"O s iconColor1 m black c black",
-	"X s iconColor2 m black c #E0E0E0",
-/* pixels */
-	"  X     X       ",
-	"    X     X     ",
-	"      X     X   ",
-	"        X     X ",
-	"      X     X   ",
-	"    X     X     ",
-	"  X     X       ",
-	"                ",
-};
-
-static const char * spacePixmap_img[] = 
-{
-/* width height ncolors cpp [x_hot y_hot] */
-	"8 8 3 2 0 0",
-/* colors */
-	"  s none       m none  c none",
-	"O s iconColor1 m black c black",
-	"X s iconColor2 m black c #E0E0E0",
-/* pixels */
-	"                ",
-	"                ",
-	"                ",
-	"                ",
-	"                ",
-	"      X         ",
-	"      X X       ",
-	"                ",
-};
-
 LinesEditor::LinesEditor( QWidget *p ) :QTextEdit(p)
 {
-	tabPixmap		= QPixmap( tabPixmap_img ); 
-	spacePixmap		= QPixmap( spacePixmap_img ); 
 	currentLineColor	= QColor( "#DCE4F9" );
 	bookmarkLineColor	= QColor( "#0000FF" );
 	breakpointLineColor	= QColor( "#FF0000" );
@@ -80,6 +40,7 @@ LinesEditor::LinesEditor( QWidget *p ) :QTextEdit(p)
 	showWhiteSpaces		= true;
 	showMatchingBraces	= true;
 	showPrintingMargins	= true;
+	usingSmartHome		= true;
 	printMarginWidth	= 80;
 	matchStart		= -1;
 	matchEnd		= -1;
@@ -286,7 +247,6 @@ void LinesEditor::setItemColor( ItemColors role, QColor c )
 			break;
 		case WhiteSpaceColor:
 			whiteSpaceColor = c;
-			updateMarkIcons();
 			break;
 		case BookmarkLineColor:
 			bookmarkLineColor = c;
@@ -368,6 +328,16 @@ QString LinesEditor::getMatchingString()
 void LinesEditor::setMatchingString( QString s )
 {
 	matchingString = s;	
+}
+
+bool	LinesEditor::getUsingSmartHome()
+{
+	return usingSmartHome;
+}
+
+void	LinesEditor::setUsingSmartHome( bool newValue )
+{
+	usingSmartHome = newValue;
 }
 
 void	LinesEditor::setBookmark( BookmarkAction action, QTextBlock block  )
@@ -455,32 +425,6 @@ int LinesEditor::loadFile( QString s )
 	fileSystemWatcher->addPath( fileName );
 	
 	return 0;
-}
-
-void LinesEditor::updateMarkIcons()
-{
-	int x, y;
-	QImage img;
-	
-	img = tabPixmap.toImage();
-	for( x=0; x< tabPixmap.width(); x++ )
-		for( y=0; y< tabPixmap.height(); y++ )
-		{
-			uint rgb = qRgb(  whiteSpaceColor.red(), whiteSpaceColor.green(), whiteSpaceColor.blue() );
-			if (img.pixel(x,y) != 0)
-				img.setPixel( x, y, rgb );
-		}
-	tabPixmap = QPixmap::fromImage( img );
-
-	img = spacePixmap.toImage();
-	for( x=0; x< tabPixmap.width(); x++ )
-		for( y=0; y< tabPixmap.height(); y++ )
-		{
-			uint rgb = qRgb(  whiteSpaceColor.red(), whiteSpaceColor.green(), whiteSpaceColor.blue() );
-			if (img.pixel(x,y) != 0)
-				img.setPixel( x, y, rgb );
-		}
-	spacePixmap = QPixmap::fromImage( img );
 }
 
 void	LinesEditor::showFindWidget()
@@ -679,6 +623,62 @@ void	LinesEditor::transformBlockCase()
 		cursor.endEditBlock();
 		setTextCursor( cursor );
 	}
+}
+
+void	LinesEditor::smartHome()
+{
+	QTextCursor c = textCursor();
+	int blockLen = c.block().text().length();
+	if (blockLen == 0 )
+		return;
+
+	int originalPosition = c.position();
+	c.movePosition(QTextCursor::StartOfLine);
+	int startOfLine = c.position();
+	int i = 0;
+	
+	while ( c.block().text()[i].isSpace())
+	{
+		i ++;
+		if (i==blockLen)
+		{
+			i = 0;
+			break;
+		}
+	}
+	
+	if ((originalPosition == startOfLine) || (startOfLine + i != originalPosition ))
+		c.setPosition( startOfLine + i );
+	setTextCursor( c );
+}
+
+void	LinesEditor::smartEnd()
+{
+	QTextCursor c = textCursor();
+	int blockLen = c.block().text().length();
+	if (blockLen == 0)
+		return;
+
+	int originalPosition = c.position();
+	c.movePosition(QTextCursor::StartOfLine);
+	int startOfLine = c.position();
+	c.movePosition(QTextCursor::EndOfLine);
+	int i = blockLen;
+	
+	while (c.block().text()[i-1].isSpace())
+	{
+		i --;
+		if (i==1)
+		{
+			i = blockLen;
+			break;
+		}
+	}
+
+	if ((originalPosition == startOfLine) || (startOfLine + i != originalPosition ))
+		c.setPosition( startOfLine + i );
+
+	setTextCursor( c );
 }
 
 void	LinesEditor::updateCurrentLine()
@@ -924,6 +924,34 @@ void LinesEditor::keyPressEvent( QKeyEvent *event )
 				}
 			}
 			break;
+		
+		case Qt::Key_Home:
+			if (!usingSmartHome)
+				break;
+			smartHome();
+			event->accept();
+			return;
+			
+		case Qt::Key_End:
+			if (!usingSmartHome)
+				break;
+			smartEnd();
+			event->accept();
+			return;
+		
+		case Qt::Key_Down:
+			if (!QApplication::keyboardModifiers().testFlag(Qt::ControlModifier))
+				break;
+			verticalScrollBar()->triggerAction( QAbstractSlider::SliderSingleStepAdd );
+			event->accept();
+			break;
+			
+		case Qt::Key_Up:
+			if (!QApplication::keyboardModifiers().testFlag(Qt::ControlModifier))
+				break;
+			verticalScrollBar()->triggerAction( QAbstractSlider::SliderSingleStepSub );
+			event->accept();
+			break;
 			
 		case Qt::Key_Enter:
 		case Qt::Key_Return:
@@ -1040,15 +1068,19 @@ void	LinesEditor::printWhiteSpaces( QPainter &p, const QTextBlock &block, const 
 {
 	const QString txt = block.text();
 	const int len = txt.length();
+	QChar printChar = 'X';
+	int dx = 0 + fm.leading() + fm.width( printChar ) - fm.leftBearing( printChar );
+	int dy = 0 + fm.height() - fm.descent();
 	
+	p.setFont( document()->defaultFont() );
+	p.setPen( whiteSpaceColor );
 	for ( int i=0; i<len; i++ )
 	{
-		QPixmap *p1 = 0;
 		
 		if (txt[i] == ' ' )
-			p1 = &spacePixmap;
+			printChar = 0xB7; // ·
 		else if (txt[i] == '\t' )
-			p1 = &tabPixmap;
+			printChar = 0xBB; // »
 		else 
 			continue;
 		
@@ -1057,9 +1089,9 @@ void	LinesEditor::printWhiteSpaces( QPainter &p, const QTextBlock &block, const 
 		cursor.setPosition( block.position() + i, QTextCursor::MoveAnchor);
 		
 		QRect r = cursorRect( cursor );
-		int x = r.x() + 4;
-		int y = r.y() + fm.height() / 2 - 5;
-		p.drawPixmap( x, y, *p1 );
+		int x = r.x() + dx;
+		int y = r.y() + dy;
+		p.drawText( x, y, printChar );
 	}
 }
 
@@ -1110,7 +1142,7 @@ void	LinesEditor::printMatchingBraces( QPainter &p )
 		
 	cursor.setPosition(matchEnd+1, QTextCursor::MoveAnchor);
 	r = cursorRect( cursor );
-		p.drawText(r.x()-1, r.y(), r.width(), r.height(), Qt::AlignLeft | Qt::AlignVCenter, matchChar );
+	p.drawText(r.x()-1, r.y(), r.width(), r.height(), Qt::AlignLeft | Qt::AlignVCenter, matchChar );
 }
 
 void	LinesEditor::printHighlightString( QPainter &p, const QTextBlock &block, const QFontMetrics &fm )
