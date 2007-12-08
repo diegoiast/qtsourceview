@@ -633,7 +633,10 @@ void	LinesEditor::smartHome()
 		return;
 
 	int originalPosition = c.position();
-	c.movePosition(QTextCursor::StartOfLine);
+	QTextCursor::MoveMode moveAnchor = QApplication::keyboardModifiers().testFlag(Qt::ShiftModifier)? 
+		 QTextCursor::KeepAnchor:QTextCursor::MoveAnchor;
+	
+	c.movePosition(QTextCursor::StartOfLine, moveAnchor);
 	int startOfLine = c.position();
 	int i = 0;
 	
@@ -648,7 +651,7 @@ void	LinesEditor::smartHome()
 	}
 	
 	if ((originalPosition == startOfLine) || (startOfLine + i != originalPosition ))
-		c.setPosition( startOfLine + i );
+		c.setPosition( startOfLine + i, moveAnchor );
 	setTextCursor( c );
 }
 
@@ -660,9 +663,11 @@ void	LinesEditor::smartEnd()
 		return;
 
 	int originalPosition = c.position();
-	c.movePosition(QTextCursor::StartOfLine);
+	QTextCursor::MoveMode moveAnchor = QApplication::keyboardModifiers().testFlag(Qt::ShiftModifier)? 
+		 QTextCursor::KeepAnchor:QTextCursor::MoveAnchor;
+	c.movePosition(QTextCursor::StartOfLine,moveAnchor);
 	int startOfLine = c.position();
-	c.movePosition(QTextCursor::EndOfLine);
+	c.movePosition(QTextCursor::EndOfLine,moveAnchor);
 	int i = blockLen;
 	
 	while (c.block().text()[i-1].isSpace())
@@ -676,7 +681,7 @@ void	LinesEditor::smartEnd()
 	}
 
 	if ((originalPosition == startOfLine) || (startOfLine + i != originalPosition ))
-		c.setPosition( startOfLine + i );
+		c.setPosition( startOfLine + i, moveAnchor );
 
 	setTextCursor( c );
 }
@@ -781,7 +786,7 @@ void	LinesEditor::on_replaceAll_clicked()
 	{
 		setTextCursor( c );
 		QMessageBox::StandardButton button = QMessageBox::question( this, tr("Replace all"), tr("Replace this text?"),
-		    QMessageBox::Yes | QMessageBox::Ignore | QMessageBox::Cancel );
+			QMessageBox::Yes | QMessageBox::Ignore | QMessageBox::Cancel );
 		
 		if (button == QMessageBox::Cancel)
 		{
@@ -926,14 +931,14 @@ void LinesEditor::keyPressEvent( QKeyEvent *event )
 			break;
 		
 		case Qt::Key_Home:
-			if (!usingSmartHome)
+			if (!usingSmartHome || QApplication::keyboardModifiers().testFlag(Qt::ControlModifier) )
 				break;
 			smartHome();
 			event->accept();
 			return;
 			
 		case Qt::Key_End:
-			if (!usingSmartHome)
+			if (!usingSmartHome || QApplication::keyboardModifiers().testFlag(Qt::ControlModifier) )
 				break;
 			smartEnd();
 			event->accept();

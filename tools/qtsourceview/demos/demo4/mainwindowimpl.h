@@ -16,9 +16,9 @@ public:
 	MainWindowImpl( QWidget * parent = 0, Qt::WFlags f = 0 );
 private slots:
 	void on_action_New_triggered();
-		void on_action_Open_triggered();
-		void on_actionE_xit_triggered();
-		void on_action_setup_triggered();
+	void on_action_Open_triggered();
+	void on_actionE_xit_triggered();
+	void on_action_setup_triggered();
 	
 	// not auto-connected
 public slots:
