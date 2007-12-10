@@ -6,10 +6,9 @@
 class LinesEditor;
 class QsvLangDef;
 
-class HAIQ_CORE_INTERFACE_EXPORT QsvHaiqEditorInterface: public HaiQEditorInterface
+class QsvHaiqEditorInterface: public HaiQEditorInterface
 {
-// 	Q_OBJECT
-// 	Q_INTERFACES(HaiQEditorInterface)
+private:
 public:
 	QsvHaiqEditorInterface();
 	virtual ~QsvHaiqEditorInterface();
@@ -38,7 +37,7 @@ public:
 // 	virtual void deleteCharacter();
 // 	virtual void removeSelectedText();
 // 	virtual void insertText(const QString &txt);
-	virtual QRect cursorRect();
+// 	virtual QRect cursorRect();
 	
 	/*
 	virtual void undo();
@@ -73,6 +72,7 @@ signals:
 	void findInFile();
 */
 private:
+	QString		m_path;
 	LinesEditor	*m_editor;
 	QsvLangDef	*m_langDefinition;
 };

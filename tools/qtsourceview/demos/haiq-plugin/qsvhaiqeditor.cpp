@@ -1,64 +1,59 @@
 #include <QtPlugin>
 #include <QApplication>
 #include <QStringList>
-#include <haiqcoreinterface.h>
 
 #include "qsvhaiqeditor.h"
+#include "qsvhaiqeditorinterface.h"
 
-Q_EXPORT_PLUGIN2(qtsourceview,QsvHaiqEditor)
+Q_EXPORT_PLUGIN2(qtsourceview,QsvHaiqEditorPlugin)
 
 
-QsvHaiqEditor::QsvHaiqEditor()
-{
-	qDebug("constcutor");
-}
-
-QsvHaiqEditor::~QsvHaiqEditor()
+QsvHaiqEditorPlugin::QsvHaiqEditorPlugin()
 {
 }
 
-void QsvHaiqEditor::initialize(HaiQCoreInterface *core_in) 
+QsvHaiqEditorPlugin::~QsvHaiqEditorPlugin()
 {
-	qDebug("initialize");
-	core=core_in;
 }
 
-QString QsvHaiqEditor::name()
+void QsvHaiqEditorPlugin::initialize(HaiQCoreInterface *core_in) 
 {
-	return "QsvHaiqEditor";
+	Q_UNUSED( core_in );
 }
 
-QString QsvHaiqEditor::description()
+QString QsvHaiqEditorPlugin::name()
+{
+	return "QsvHaiqEditorPlugin";
+}
+
+QString QsvHaiqEditorPlugin::description()
 {
 	return "General purpose, kickass editor based on QtSourceView";
 }
 
-QString QsvHaiqEditor::authors()
+QString QsvHaiqEditorPlugin::authors()
 {
 	return "Diego Iastrubni";
 }
 
-QString QsvHaiqEditor::lastModified()
+QString QsvHaiqEditorPlugin::lastModified()
 {
 	return __DATE__;
 }
 
-double QsvHaiqEditor::loadOrder()
+double QsvHaiqEditorPlugin::loadOrder()
 {
 	return 50;
 };
 
-HaiQEditorInterface* QsvHaiqEditor::newInterface()
+HaiQEditorInterface* QsvHaiqEditorPlugin::newInterface()
 {
-// 	DefaultEditorInterface *ret=new DefaultEditorInterface;
-// 	ProHighlighter *highlighter=new ProHighlighter;
-// 	highlighter->setDocument(ret->textedit_window()->document());
-	return NULL;
+	return new QsvHaiqEditorInterface;
 }
 
-QStringList QsvHaiqEditor::fileTypes()
+QStringList QsvHaiqEditorPlugin::fileTypes()
 {
 	QStringList ret;
-	ret << "*.cpp" << "*.h" << "*.h" << "*.*";
+	ret << "c" << "cpp" << "h" << "";
 	return ret;
 };

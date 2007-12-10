@@ -5,14 +5,13 @@
 #include <QObject>
 #include <haiqeditorplugin.h>
 
-class QsvHaiqEditor : public QObject, public HaiQEditorPlugin
+class QsvHaiqEditorPlugin : public QObject, public HaiQEditorPlugin
 {
 	Q_OBJECT
 	Q_INTERFACES(HaiQEditorPlugin)
-	HaiQCoreInterface *core;
 public:
-	QsvHaiqEditor();
-	virtual ~QsvHaiqEditor();
+	QsvHaiqEditorPlugin();
+	virtual ~QsvHaiqEditorPlugin();
 	
 	void initialize(HaiQCoreInterface *core_in);
 	QString name();
@@ -25,4 +24,4 @@ public:
 	QStringList fileTypes();
 };
 
-#endif
+#endif //__QSVHAIQEDITOR_H__
