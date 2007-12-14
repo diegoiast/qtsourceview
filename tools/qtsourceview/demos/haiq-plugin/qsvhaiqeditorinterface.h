@@ -14,38 +14,38 @@ public:
 	virtual ~QsvHaiqEditorInterface();
 	
 	virtual QWidget *editorWindow();
-	virtual void loadContent(const QString &path);
-	virtual void saveContent(const QString &path);
+	virtual void loadContent(const QString &fileName);
+	virtual void saveContent(const QString &fileName);
 	virtual QString path();
 	virtual void setPath(const QString &path_in);
 	
-// 	virtual int currentLineNumber();
-// 	virtual int currentColumnNumber();
-// 	virtual bool isModified();
-// 	virtual void setModified(bool val);
+	virtual int currentLineNumber();
+	virtual int currentColumnNumber();
+	virtual bool isModified();
+	virtual void setModified(bool val);
 	virtual QString text();
 // 	virtual QString textForFind();
 // 	virtual int replaceAll(const QString &str, const QString &str2);
-// 	virtual QString selectedText();
+	virtual QString selectedText();
 // 	virtual void gotoLine(int line_number,bool highlight=false);
-// 	virtual void ensureCursorVisible();
-// 	virtual QString currentLine();
+	virtual void ensureCursorVisible();
+	virtual QString currentLine();
 // 	virtual int position(int where=AT_CURSOR);
 // 	virtual void setPosition(int pos);
 // 	virtual void selectText(int startpos,int endpos);
-// 	virtual bool backspace();
-// 	virtual void deleteCharacter();
-// 	virtual void removeSelectedText();
+	virtual bool backspace();
+	virtual void deleteCharacter();
+	virtual void removeSelectedText();
 // 	virtual void insertText(const QString &txt);
 // 	virtual QRect cursorRect();
 	
-	/*
 	virtual void undo();
 	virtual void redo();
 	virtual void cut();
 	virtual void copy();
 	virtual void paste();
 	virtual void selectAll();
+/*
 	virtual void processKey(QKeyEvent event);
 	virtual bool emitKeyOnlyMode();
 	virtual void setEmitKeyOnlyMode(bool val);
@@ -71,10 +71,17 @@ signals:
 	void pathChanged();
 	void findInFile();
 */
+
+	virtual void findInFile();
+	virtual void findAgain();
+	virtual void replaceInFile();
+
 private:
-	QString		m_path;
-	LinesEditor	*m_editor;
-	QsvLangDef	*m_langDefinition;
+	QString			m_path;
+	LinesEditor		*m_editor;
+	QsvSyntaxHighlighter	*m_syntaxHighlighter;
+	QsvLangDef		*m_langDefinition;
+	QsvColorDefFactory	*m_colorScheme;
 };
 
 #endif //__QSV_HAIQ_EDITORINTERFACE_H__

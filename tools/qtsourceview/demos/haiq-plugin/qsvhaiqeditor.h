@@ -21,7 +21,16 @@ public:
 	double loadOrder();
 	
 	HaiQEditorInterface *newInterface();
+	void activate(HaiQEditorInterface *interface);
+	void deactivate();
 	QStringList fileTypes();
+	
+private slots:
+	void on_actionConfigQtSourceView_triggered();
+	
+private:
+	HaiQCoreInterface	*m_core;
+	QAction			*m_actionConfigQtSourceView;
 };
 
 #endif //__QSVHAIQEDITOR_H__
