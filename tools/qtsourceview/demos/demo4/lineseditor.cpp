@@ -1029,12 +1029,15 @@ void LinesEditor::paintEvent(QPaintEvent *e)
 	if (highlightCurrentLine || showWhiteSpaces || showMatchingBraces)
 	{
 		QPainter p( viewport() );
-		
 		printBackgrounds(p);
+		p.end();
+		
 		QTextEdit::paintEvent(e);
 		
+		p.begin( viewport() );
 		if (showMatchingBraces)
 			printMatchingBraces( p );
+		p.end();
 	}
 	else
 		QTextEdit::paintEvent(e);
