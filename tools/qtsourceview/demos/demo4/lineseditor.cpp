@@ -41,6 +41,7 @@ LinesEditor::LinesEditor( QWidget *p ) :QTextEdit(p)
 	showMatchingBraces	= true;
 	showPrintingMargins	= true;
 	usingSmartHome		= true;
+	usingAutoBrackets	= true;
 	printMarginWidth	= 80;
 	matchStart		= -1;
 	matchEnd		= -1;
@@ -106,6 +107,10 @@ LinesEditor::LinesEditor( QWidget *p ) :QTextEdit(p)
 	connect( ui_findWidget.searchText, SIGNAL(textChanged(const QString)), this, SLOT(on_searchText_textChanged(const QString)));
 	connect( ui_findWidget.searchText, SIGNAL(editingFinished()), this, SLOT(on_searchText_editingFinished()));
 	connect( ui_findWidget.searchText, SIGNAL(returnPressed()), this, SLOT(showFindWidget()));
+
+	connect( ui_findWidget.caseSensitive, SIGNAL(clicked()), this, SLOT(on_searchText_editingFinished()));
+	connect( ui_findWidget.wholeWords, SIGNAL(clicked()), this, SLOT(on_searchText_editingFinished()));
+
 	connect( ui_findWidget.prevButton, SIGNAL(clicked()), this, SLOT(findPrev()));
 	connect( ui_findWidget.nextButton, SIGNAL(clicked()), this, SLOT(findNext()));
 	connect( ui_findWidget.closeButton, SIGNAL(clicked()), this, SLOT(showFindWidget()));
@@ -288,6 +293,7 @@ void LinesEditor::setSyntaxHighlighter( QsvSyntaxHighlighter *newSyntaxHighlight
 {
 	syntaxHighlighter = newSyntaxHighlighter;
 	syntaxHighlighter->rehighlight();
+	removeModifications();
 }
 
 bool LinesEditor::getDisplayCurrentLine()
@@ -338,6 +344,16 @@ bool	LinesEditor::getUsingSmartHome()
 void	LinesEditor::setUsingSmartHome( bool newValue )
 {
 	usingSmartHome = newValue;
+}
+
+bool	LinesEditor::getUsingAutoBrackets()
+{
+	return usingAutoBrackets;
+}
+
+void	LinesEditor::setUsingAutoBrackets( bool newValue )
+{
+	usingAutoBrackets = newValue;
 }
 
 void	LinesEditor::setBookmark( BookmarkAction action, QTextBlock block  )
@@ -427,6 +443,33 @@ int LinesEditor::loadFile( QString s )
 	return 0;
 }
 
+void	LinesEditor::removeModifications()
+{
+	int i = 1;
+	for ( QTextBlock block = document()->begin(); block.isValid(); block = block.next() )
+	{
+		PrivateBlockData *data = dynamic_cast<PrivateBlockData*>( block.userData() );
+		if (!data)
+			continue;
+		data->m_isModified = false;
+		i ++;
+	}
+	
+	panel->update();
+}
+
+void	LinesEditor::pauseFileSystemWatch()
+{
+	disconnect( fileSystemWatcher, SIGNAL(fileChanged(const QString&)), this, SLOT(on_fileChanged(const QString&)));
+	
+}
+
+void	LinesEditor::resumeFileSystemWatch()
+{
+	connect( fileSystemWatcher, SIGNAL(fileChanged(const QString&)), this, SLOT(on_fileChanged(const QString&)));
+}
+
+
 void	LinesEditor::showFindWidget()
 {
 	if (replaceWidget->isVisible())
@@ -479,7 +522,7 @@ void	LinesEditor::showGotoLineWidget()
 
 	if (gotoLineWidget->isVisible())
 	{
-		QTimer::singleShot( floatingWidgetTimeout, gotoLineWidget, SLOT(hide()) );
+		QTimer::singleShot( floatingWidgetTimeout, gotoLineWidget, SLOT(hide()));
 		this->setFocus();
 		return;
 	}
@@ -711,6 +754,7 @@ void	LinesEditor::on_searchText_editingFinished()
 {
 	//showFindWidget();
 	highlightString = ui_findWidget.searchText->text();
+	on_searchText_textChanged(highlightString);
 	viewport()->update();
 }
 
@@ -981,7 +1025,7 @@ void LinesEditor::keyPressEvent( QKeyEvent *event )
 					return; 
 			}
 		default:
-			if (handleKeyPressEvent(event))
+			if (usingAutoBrackets && handleKeyPressEvent(event))
 				return;
 	} // end case
 	
@@ -1153,6 +1197,28 @@ void	LinesEditor::printMatchingBraces( QPainter &p )
 	p.drawText(r.x()-1, r.y(), r.width(), r.height(), Qt::AlignLeft | Qt::AlignVCenter, matchChar );
 }
 
+bool isFullWord( QString s1, QString s2, int location )
+{
+	bool startOk = false;
+	bool endOk = false;
+	
+	if (location == 0)
+		startOk = true;
+	else
+		startOk = ! s1.at(location-1).isLetterOrNumber();
+
+	if (location + s2.length() >= s1.length())
+		endOk = true;
+	else
+		if (location + s2.length() +1 == s1.length())
+			endOk = false;
+		else 
+			endOk = ! s1.at(location + s2.length() + 1).isLetterOrNumber();
+	
+	//qDebug("%s %d %s in %s, starting at %d is %d,%d", __FILE__, __LINE__, qPrintable(s2), qPrintable(s1), location, startOk, endOk );
+	return startOk & endOk;
+}
+
 void	LinesEditor::printHighlightString( QPainter &p, const QTextBlock &block, const QFontMetrics &fm )
 {
 	int highlightStringLen = fm.width( highlightString );
@@ -1160,6 +1226,7 @@ void	LinesEditor::printHighlightString( QPainter &p, const QTextBlock &block, co
 	QTextCursor cursor = textCursor();
 	Qt::CaseSensitivity caseSensitive = getSearchFlags().testFlag(QTextDocument::FindCaseSensitively)?
 		Qt::CaseSensitive : Qt::CaseInsensitive;
+	bool searchWholeWords = getSearchFlags().testFlag(QTextDocument::FindWholeWords);
 	QRect r;
 	
 	int k=0;
@@ -1169,8 +1236,14 @@ void	LinesEditor::printHighlightString( QPainter &p, const QTextBlock &block, co
 		k = t.indexOf( highlightString, k, caseSensitive );
 		if (k == -1)
 			break;
+			
+		if (searchWholeWords && (!isFullWord( t, highlightString, k )))
+		{
+			k = k + highlightString.length();
+			continue;
+		}
 
-		cursor.setPosition( block.position()+k+1, QTextCursor::MoveAnchor);
+		cursor.setPosition(block.position()+k+1, QTextCursor::MoveAnchor);
 		r = cursorRect( cursor );
 		p.setOpacity( 0.7 );
 		p.fillRect(r.x()-1, r.y(), highlightStringLen, r.height(), Qt::yellow );
@@ -1182,7 +1255,7 @@ void	LinesEditor::printHighlightString( QPainter &p, const QTextBlock &block, co
 void	LinesEditor::printMargins( QPainter &p )
 {
 	int lineLocation;
-	
+
 	p.setFont( document()->defaultFont() );
 	p.setPen( whiteSpaceColor );
 	lineLocation = p.fontMetrics().width( " " ) * printMarginWidth + 0;
@@ -1225,7 +1298,8 @@ bool	LinesEditor::handleKeyPressEvent( QKeyEvent *event )
 	int i,j;
 	QString s;
 	
-	if (event->key() == Qt::Key_Delete)
+	// handle automatic deletcion of mathcing brackets
+	if ( (event->key() == Qt::Key_Delete) || (event->key() == Qt::Key_Backspace) )
 	{
 		if (cursor.hasSelection())
 			return false;
@@ -1236,25 +1310,19 @@ bool	LinesEditor::handleKeyPressEvent( QKeyEvent *event )
 		if (j == -1)
 			return false;
 		
-		if (j%2 == 0)
-		{
-			qDebug("Deleting forward");
-			QChar c2 = cursor.block().text()[ i+1 ];
-			if (c2 != matchingString[j+1])
-				return false;
-			cursor.deletePreviousChar();
-			cursor.deleteChar();
-		}
-		else
-		{
-			qDebug("Deleting backward");
-			QChar c2 = cursor.block().text()[ i-1 ];
-			if (c2 != matchingString[j-1])
-				return false;
-			cursor.deletePreviousChar();
-			cursor.deleteChar();
-		}
+		if (i == 0)
+			return false;
 		
+		if (matchingString[j+1] == matchingString[j])
+			j++;
+		
+		QChar c2 = cursor.block().text()[ i-1 ];
+		if (c2 != matchingString[j-1])
+			return false;
+		cursor.deletePreviousChar();
+		cursor.deleteChar();
+		matchStart = matchEnd = -1;
+		matchChar = 0;
 		goto FUNCTION_END;
 	}
 	
@@ -1270,6 +1338,7 @@ bool	LinesEditor::handleKeyPressEvent( QKeyEvent *event )
 	
 	i = cursor.position();
 	
+	// handle automatic insert of matching brackets
 	if (!cursor.hasSelection())
 	{
 		cursor.insertText( QString(matchingString[j]) );
@@ -1433,7 +1502,7 @@ QFlags<QTextDocument::FindFlag> LinesEditor::getSearchFlags()
 	
 	if (ui_findWidget.wholeWords->isChecked())
 		f = f | QTextDocument::FindWholeWords;
-		
+	
 	return f;
 }
 

@@ -64,7 +64,6 @@ void QsvHaiqEditorInterface::loadContent(const QString &fileName)
 	// setup the syntax highlighter
 	m_langDefinition = QsvLangDefFactory::getInstanse()->getHighlight(fileName);
 	m_colorScheme = EditorConfig::getInstance()->getCurrentConfiguration().currentColorScheme;
-	
 	if (!m_syntaxHighlighter)
 	{
 		m_syntaxHighlighter = new QsvSyntaxHighlighter( m_editor, m_colorScheme, m_langDefinition );
@@ -76,11 +75,14 @@ void QsvHaiqEditorInterface::loadContent(const QString &fileName)
 		m_syntaxHighlighter->setColorsDef( m_colorScheme );
 		m_syntaxHighlighter->rehighlight();
 	}
+	m_editor->removeModifications();
 }
 
 void QsvHaiqEditorInterface::saveContent(const QString &fileName)
 {
+	m_editor->pauseFileSystemWatch();
 	write_text_file(fileName,m_editor->toPlainText());
+	m_editor->resumeFileSystemWatch();
 }
 
 QString QsvHaiqEditorInterface::path()

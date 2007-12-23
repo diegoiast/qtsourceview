@@ -125,6 +125,7 @@ void MainWindowImpl::on_action_Open_triggered()
 	setWindowTitle( tr("QtSourceView demo4 - %1").arg(s));
 	langDefinition = QsvLangDefFactory::getInstanse()->getHighlight( s );
 	textEdit->getSyntaxHighlighter()->setHighlight( langDefinition );
+	textEdit->removeModifications();
 	statusBar()->showMessage( tr("File %1 loaded").arg(s), 5000 );
 }
 

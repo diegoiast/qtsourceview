@@ -90,15 +90,27 @@ QString QsvHaiqEditorPlugin::lastModified()
 double QsvHaiqEditorPlugin::loadOrder()
 {
 	return 50;
-};
+}
 
 HaiQEditorInterface* QsvHaiqEditorPlugin::newInterface()
 {
-	return new QsvHaiqEditorInterface;
+	HaiQEditorInterface *e = new QsvHaiqEditorInterface;
+	//LinesEditor *editor = qobject_cast<LinesEditor*>(e->editorWindow());
+	//editor->adjustMarginWidgets();
+	return e;
 }
 
 void QsvHaiqEditorPlugin::activate(HaiQEditorInterface *interface)
 {
+	QsvHaiqEditorInterface *qsvInterface = dynamic_cast<QsvHaiqEditorInterface*>(interface);
+	if (!qsvInterface)
+		return;
+	
+	LinesEditor *editor = qobject_cast<LinesEditor*>(qsvInterface->editorWindow());
+	if (!editor)
+		return;
+	
+	editor->adjustMarginWidgets();
 }
 
 void QsvHaiqEditorPlugin::deactivate()
@@ -110,7 +122,7 @@ QStringList QsvHaiqEditorPlugin::fileTypes()
 	QStringList ret;
 	ret << "c" << "cpp" << "h" << "pro" << "";
 	return ret;
-};
+}
 
 void QsvHaiqEditorPlugin::on_actionConfigQtSourceView_triggered()
 {

@@ -30,7 +30,7 @@ EditorConfig::EditorConfig()
 
 	// set configuration will be done on display	
 	colorsModel = NULL;
-	currentConfig = getDefaultConfiguration();	
+	currentConfig = getDefaultConfiguration();
 
 	connect( ui.buttonBox	, SIGNAL(clicked(QAbstractButton *))	, this, SLOT(on_buttonBox_clicked(QAbstractButton*)));
 	connect( ui.btnChooseFont, SIGNAL(clicked())			, this, SLOT(on_btnChooseFont_clicked()));
@@ -110,6 +110,10 @@ void EditorConfig::loadColorsDirectory( QString directory )
 	//ui.comboBox->setModel( 0 );
 	colorsModel = new ColorsModel( &colorSchemes, this );
 	ui.colorsCombo->setModel( colorsModel );
+	
+	// TODO is this a smart thing...?
+	if (currentConfig.currentColorScheme == NULL)
+		currentConfig.currentColorScheme = colorSchemes[0];
 }
 
 
@@ -177,7 +181,7 @@ void EditorConfig::setConfiguration( EditorConfigData c )
 
 void EditorConfig::applyConfiguration( EditorConfigData c, LinesEditor *editor )
 {
-	//textEdit->setAutoBrackets( c.autoBrackets );
+	editor->setUsingAutoBrackets( c.autoBrackets );
 	editor->setDisplayCurrentLine( c.markCurrentLine );
 	editor->getPanel()->setVisible( c.showLineNumbers );
 	editor->setDisplayWhiteSpaces( c.showWhiteSpaces );

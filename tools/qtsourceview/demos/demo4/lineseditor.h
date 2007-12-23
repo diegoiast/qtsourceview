@@ -53,10 +53,15 @@ public:
 	void		setMatchingString( QString );
 	bool		getUsingSmartHome();
 	void		setUsingSmartHome( bool );
+	bool		getUsingAutoBrackets();
+	void		setUsingAutoBrackets( bool );
 	void		setBookmark( BookmarkAction action, QTextBlock block );
 	void		setBreakpoint( BookmarkAction action, QTextBlock block );
 	QWidget*	getPanel();
 	int		loadFile( QString );
+	void		removeModifications();
+	void		pauseFileSystemWatch();
+	void		resumeFileSystemWatch();
 	
 public slots:
 	void		adjustMarginWidgets();
@@ -146,10 +151,11 @@ private:
 	bool	showMatchingBraces;
 	bool	showPrintingMargins;
 	bool	usingSmartHome;
+	bool	usingAutoBrackets;
 	int	printMarginWidth;
 	QString	matchingString;
 	
-
+	bool	ignoreFileSystemWatch;
 	int	matchStart;
 	int	matchEnd;
 	QChar	currentChar;
