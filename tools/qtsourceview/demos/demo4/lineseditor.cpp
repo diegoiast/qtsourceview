@@ -103,7 +103,7 @@ LinesEditor::LinesEditor( QWidget *p ) :QTextEdit(p)
 	//connect( horizontalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(adjustMarginWidgets()));
 	//connect( verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(adjustMarginWidgets()));
 	connect( this, SIGNAL(cursorPositionChanged()), this, SLOT(on_cursorPositionChanged()));
-	connect( document(), SIGNAL(contentsChanged()), this, SLOT(on_textDocument_contentsChanged()));
+	connect( document(), SIGNAL(contentsChange(int,int,int)), this, SLOT(on_textDocument_contentsChange(int,int,int)));
 	connect( ui_findWidget.searchText, SIGNAL(textChanged(const QString)), this, SLOT(on_searchText_textChanged(const QString)));
 	connect( ui_findWidget.searchText, SIGNAL(editingFinished()), this, SLOT(on_searchText_editingFinished()));
 	connect( ui_findWidget.searchText, SIGNAL(returnPressed()), this, SLOT(showFindWidget()));
@@ -129,6 +129,11 @@ LinesEditor::LinesEditor( QWidget *p ) :QTextEdit(p)
 
 	connect( ui_fileMessage.closeButton, SIGNAL(clicked()), fileMessage, SLOT(hide()));
 	connect( fileSystemWatcher, SIGNAL(fileChanged(const QString&)), this, SLOT(on_fileChanged(const QString&)));
+}
+
+LinesEditor::~LinesEditor()
+{
+	// do we need to do something here...? 
 }
 
 void LinesEditor::setupActions()
@@ -292,7 +297,10 @@ QsvSyntaxHighlighter* LinesEditor::getSyntaxHighlighter()
 void LinesEditor::setSyntaxHighlighter( QsvSyntaxHighlighter *newSyntaxHighlighter )
 {
 	syntaxHighlighter = newSyntaxHighlighter;
-	syntaxHighlighter->rehighlight();
+	
+	// TODO should we re-highlight?
+	//syntaxHighlighter->rehighlight();
+	
 	removeModifications();
 }
 
@@ -409,7 +417,7 @@ void	LinesEditor::adjustMarginWidgets()
 {
 	if (panel->isVisible())
 	{
-		setViewportMargins( panel->width()-1, 0, 0, 0);
+		setViewportMargins( panel->width()-1, 0, 0, 0 );
 		QRect viewportRect = viewport()->geometry();
 		QRect lrect = QRect(viewportRect.topLeft(), viewportRect.bottomLeft());
 		lrect.adjust( -panel->width(), 0, 0, 0 );
@@ -417,7 +425,7 @@ void	LinesEditor::adjustMarginWidgets()
 	}
 	else
 	{
-		setViewportMargins( 0, 0, 0, 0);
+		setViewportMargins( 0, 0, 0, 0 );
 	}
 }
 
@@ -439,7 +447,7 @@ int LinesEditor::loadFile( QString s )
 	
 	fileName = fileInfo.absoluteFilePath();
 	fileSystemWatcher->addPath( fileName );
-	
+	removeModifications();
 	return 0;
 }
 
@@ -461,12 +469,13 @@ void	LinesEditor::removeModifications()
 void	LinesEditor::pauseFileSystemWatch()
 {
 	disconnect( fileSystemWatcher, SIGNAL(fileChanged(const QString&)), this, SLOT(on_fileChanged(const QString&)));
-	
+	fileSystemWatcher->removePath( fileName );
 }
 
 void	LinesEditor::resumeFileSystemWatch()
 {
 	connect( fileSystemWatcher, SIGNAL(fileChanged(const QString&)), this, SLOT(on_fileChanged(const QString&)));
+	fileSystemWatcher->addPath( fileName );
 }
 
 
@@ -914,17 +923,32 @@ void	LinesEditor::on_cursorPositionChanged()
 	updateCurrentLine();
 }
 
-void	LinesEditor::on_textDocument_contentsChanged()
+void	LinesEditor::on_textDocument_contentsChange( int position, int charsRemoved, int charsAdded )
 {
-	PrivateBlockData* data = getPrivateBlockData( textCursor().block(), true );
-	if (!data)
-		return;
-	
-	if (data->m_isModified)
-		return;
-	
-	data->m_isModified = true;
+	if (charsAdded < 2)
+	{
+		PrivateBlockData* data = getPrivateBlockData( textCursor().block(), true );
+		if (!data)		return;
+		if (data->m_isModified)	return;
+		data->m_isModified = true;
+	}
+	else
+	{
+		int remaining = 0;
+		QTextCursor cursor( document() );
+		cursor.setPosition( position );
+		while (remaining+1 < charsAdded)
+		{
+			PrivateBlockData* data = getPrivateBlockData( cursor.block(), true );
+			if (data) 
+				data->m_isModified = true;	// should not happen, but can't be too safe
+			cursor.movePosition( QTextCursor::NextBlock );
+			remaining = cursor.position() - position;
+		}
+	}
 	panel->update();
+	
+	Q_UNUSED( charsRemoved );
 }
 
 void	LinesEditor::on_fileChanged( const QString &fName )
@@ -1130,9 +1154,9 @@ void	LinesEditor::printWhiteSpaces( QPainter &p, const QTextBlock &block, const 
 	{
 		
 		if (txt[i] == ' ' )
-			printChar = 0xB7; // ·
+			printChar = 0xB7; // ?
 		else if (txt[i] == '\t' )
-			printChar = 0xBB; // »
+			printChar = 0xBB; // ?
 		else 
 			continue;
 		

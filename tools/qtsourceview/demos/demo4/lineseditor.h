@@ -32,6 +32,7 @@ class LinesEditor: public QTextEdit
 public:
 	
 	LinesEditor( QWidget *p=NULL );
+	virtual		~LinesEditor();
 	void		setupActions();
 
 	QColor		getItemColor( ItemColors role );
@@ -60,10 +61,10 @@ public:
 	QWidget*	getPanel();
 	int		loadFile( QString );
 	void		removeModifications();
-	void		pauseFileSystemWatch();
-	void		resumeFileSystemWatch();
 	
 public slots:
+	void		pauseFileSystemWatch();
+	void		resumeFileSystemWatch();
 	void		adjustMarginWidgets();
 	void		showFindWidget();
 	void		showReplaceWidget();
@@ -92,7 +93,7 @@ protected slots:
 	void		on_lineNumber_editingFinished();
 	void		on_lineNumber_valueChanged(int i);
 	void		on_cursorPositionChanged();
-	void		on_textDocument_contentsChanged();
+	void		on_textDocument_contentsChange( int position, int charsRemoved, int charsAdded );
 	void		on_fileChanged( const QString &fName );
 	void		on_fileMessage_clicked( QString s );
 	

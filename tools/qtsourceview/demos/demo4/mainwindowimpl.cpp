@@ -40,13 +40,14 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
 	
 	QString loadedFile;
 	loadedFile = "mainwindowimpl.cpp";
+	loadedFile = "lineseditor.cpp";
 	//loadedFile = "../../tests/highlight.pas";
-	textEdit->loadFile( loadedFile );
+
 	langDefinition = QsvLangDefFactory::getInstanse()->getHighlight(loadedFile);
-	//highlight = new QsvSyntaxHighlighter( textEdit, defColors, langDefinition );
-	
-	textEdit->setSyntaxHighlighter( new QsvSyntaxHighlighter( textEdit, defColors, langDefinition ) );
-	setWindowTitle( tr("QtSourceView demo4 - %1").arg("mainwindowimpl.cpp"));
+	QsvSyntaxHighlighter *newSyntaxHighlighter = new QsvSyntaxHighlighter( textEdit, defColors, langDefinition ); // bing 
+	textEdit->setSyntaxHighlighter( newSyntaxHighlighter );
+	textEdit->loadFile( loadedFile ); // bing
+	setWindowTitle( tr("QtSourceView demo4 - %1").arg(loadedFile));
 	connect( EditorConfig::getInstance(), SIGNAL(configurationModified()), this, SLOT(configuration_updated()));
 	
 	textEdit->setupActions();
@@ -98,6 +99,7 @@ void MainWindowImpl::on_action_New_triggered()
 
 void MainWindowImpl::on_action_Open_triggered()
 {	
+	qDebug("-------------------");
 	QString s = QFileDialog::getOpenFileName( this, tr("Open File"),
 		lastDir,
 		tr("C/C++ source files")	+ " (*.c *.cpp *.h *.hpp );;" + 
@@ -113,7 +115,6 @@ void MainWindowImpl::on_action_Open_triggered()
 	if (i==-1)
 		s = s.lastIndexOf("\\");
 	
-	textEdit->loadFile(s);
 	if (i!=-1)
 	{
 		lastDir = s.left( i );
@@ -122,10 +123,13 @@ void MainWindowImpl::on_action_Open_triggered()
 	else
 		lastDir.clear();
 	
-	setWindowTitle( tr("QtSourceView demo4 - %1").arg(s));
+	textEdit->clear();	// bing
 	langDefinition = QsvLangDefFactory::getInstanse()->getHighlight( s );
 	textEdit->getSyntaxHighlighter()->setHighlight( langDefinition );
-	textEdit->removeModifications();
+	//textEdit->removeModifications();
+	textEdit->loadFile(s);	// bing
+
+	setWindowTitle( tr("QtSourceView demo4 - %1").arg(s));
 	statusBar()->showMessage( tr("File %1 loaded").arg(s), 5000 );
 }
 

@@ -1,6 +1,7 @@
 // Qt includes
 #include <QtPlugin>
 #include <QTextCursor>
+#include <QTimer>
 
 // HaiQ incluudes
 #include <haiqcommon.h>
@@ -82,7 +83,11 @@ void QsvHaiqEditorInterface::saveContent(const QString &fileName)
 {
 	m_editor->pauseFileSystemWatch();
 	write_text_file(fileName,m_editor->toPlainText());
-	m_editor->resumeFileSystemWatch();
+	
+	// this is done to avoid race conditions, otherwise the
+	// event is raised to the editor after the FSM is up.
+	//m_editor->resumeFileSystemWatch();
+	QTimer::singleShot( 1000, m_editor, SLOT(resumeFileSystemWatch()) );
 }
 
 QString QsvHaiqEditorInterface::path()
