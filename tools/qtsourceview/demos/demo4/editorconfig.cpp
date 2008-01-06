@@ -56,7 +56,7 @@ void EditorConfig::showConfigDialog()
 	{
 		QsvLangDef *langDefinition = QsvLangDefFactory::getInstanse()->getHighlight("1.cpp");
 		currentConfig = this->getDefaultConfiguration();
-		ui.sampleEdit->setText(
+		ui.sampleEdit->setPlainText(
 "#include <stdio.h>\n\
 \n\
 // main application entry\n\
@@ -68,7 +68,7 @@ int main( int argc, char *argv[])\n\
 		);
 
 		ui.sampleEdit->setSyntaxHighlighter(
-			new QsvSyntaxHighlighter( ui.sampleEdit, currentConfig.currentColorScheme, langDefinition ) 
+			new QsvSyntaxHighlighter( ui.sampleEdit->document(), currentConfig.currentColorScheme, langDefinition ) 
 		);
 	}
 	
@@ -202,18 +202,20 @@ void EditorConfig::applyConfiguration( EditorConfigData c, LinesEditor *editor )
 		if (c.showMargins)
 		{
 			const QFontMetrics fm = QFontMetrics( editor->document()->defaultFont() );
+#if QT_VERSION < 0x040400
 			const int newWrapWidth = fm.width( " " ) * c.marginsWidth;
-			editor->setLineWrapMode( QTextEdit::FixedPixelWidth );
+			editor->setLineWrapMode( QTextEditorControl::FixedPixelWidth );
 			editor->setLineWrapColumnOrWidth( newWrapWidth );
+#endif
 		}
 		else
 		{
-			editor->setLineWrapMode( QTextEdit::WidgetWidth );
+			editor->setLineWrapMode( QTextEditorControl::WidgetWidth );
 		}
 	}
 	else
 	{
-		editor->setLineWrapMode( QTextEdit::NoWrap );
+		editor->setLineWrapMode( QTextEditorControl::NoWrap );
 	}
 	
 	if (c.currentColorScheme == NULL )
@@ -223,7 +225,9 @@ void EditorConfig::applyConfiguration( EditorConfigData c, LinesEditor *editor )
 		QPalette p( editor->palette() );
 		p.setColor( QPalette::Base, c.currentColorScheme->getColorDef("dsWidgetBackground").getBackground() );
 		editor->setPalette( p );
+#if QT_VERSION < 0x040400
 		editor->setTextColor( c.currentColorScheme->getColorDef("dsNormal").getColor() );
+#endif
 		editor->setItemColor( LinesPanel, c.currentColorScheme->getColorDef("dsWidgetLinesPanel").getBackground() );
 		editor->setItemColor( ModifiedColor, c.currentColorScheme->getColorDef("dsWidgetModifiedLine").getBackground() );
 		editor->setItemColor( CurrentLine, c.currentColorScheme->getColorDef("dsWidgetCurLine").getBackground() );

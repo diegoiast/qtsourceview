@@ -26,6 +26,7 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
 	: QMainWindow(parent, f)
 {
 	setupUi(this);
+	
 #ifdef WIN32
 	QString dataPath  = QApplication::applicationDirPath() + "/../../..";
 #else
@@ -40,11 +41,11 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
 	
 	QString loadedFile;
 	loadedFile = "mainwindowimpl.cpp";
-	loadedFile = "lineseditor.cpp";
+	//loadedFile = "lineseditor.cpp";
 	//loadedFile = "../../tests/highlight.pas";
 
 	langDefinition = QsvLangDefFactory::getInstanse()->getHighlight(loadedFile);
-	QsvSyntaxHighlighter *newSyntaxHighlighter = new QsvSyntaxHighlighter( textEdit, defColors, langDefinition ); // bing 
+	QsvSyntaxHighlighter *newSyntaxHighlighter = new QsvSyntaxHighlighter( textEdit->document(), defColors, langDefinition ); // bing 
 	textEdit->setSyntaxHighlighter( newSyntaxHighlighter );
 	textEdit->loadFile( loadedFile ); // bing
 	setWindowTitle( tr("QtSourceView demo4 - %1").arg(loadedFile));
@@ -94,12 +95,13 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
 
 void MainWindowImpl::on_action_New_triggered()
 {
-	// TODO
+	textEdit->clearEditor();
+	setWindowTitle( tr("QtSourceView demo4 - no file loaded") );
+	statusBar()->showMessage( tr("New file"), 5000 );
 }
 
 void MainWindowImpl::on_action_Open_triggered()
-{	
-	qDebug("-------------------");
+{
 	QString s = QFileDialog::getOpenFileName( this, tr("Open File"),
 		lastDir,
 		tr("C/C++ source files")	+ " (*.c *.cpp *.h *.hpp );;" + 
@@ -126,7 +128,7 @@ void MainWindowImpl::on_action_Open_triggered()
 	textEdit->clear();	// bing
 	langDefinition = QsvLangDefFactory::getInstanse()->getHighlight( s );
 	textEdit->getSyntaxHighlighter()->setHighlight( langDefinition );
-	//textEdit->removeModifications();
+	textEdit->removeModifications();
 	textEdit->loadFile(s);	// bing
 
 	setWindowTitle( tr("QtSourceView demo4 - %1").arg(s));

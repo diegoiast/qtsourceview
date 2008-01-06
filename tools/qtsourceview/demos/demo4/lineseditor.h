@@ -1,7 +1,15 @@
 #ifndef __LINESEDITOR_H__
 #define __LINESEDITOR_H__
 
-#include <QTextEdit>
+#if QT_VERSION >= 0x040400
+#	include <QPlainTextEdit>
+#	define	QTextEditorControl	QPlainTextEdit
+#	warning	"Using QPlainTextEdit as the text editor control"
+#else
+#	include <QTextEdit>
+#	define	QTextEditorControl	QTextEdit
+#endif
+
 #include <QTextBlock>
 #include "ui_findwidget.h"
 #include "ui_replacewidget.h"
@@ -26,7 +34,7 @@ enum BookmarkAction {
 	Toggle, Enable, Disable
 };
 
-class LinesEditor: public QTextEdit
+class LinesEditor: public QTextEditorControl
 {
 	Q_OBJECT
 public:
@@ -42,7 +50,7 @@ public:
 	int		getTabSize();
 	void		setTabSize( int size );
 	QsvSyntaxHighlighter*	getSyntaxHighlighter();
-	void		setSyntaxHighlighter( QsvSyntaxHighlighter *newSyntaxHighlighter );	
+	void		setSyntaxHighlighter( QsvSyntaxHighlighter *newSyntaxHighlighter );
 	QTextCursor	getCurrentTextCursor();
 	bool		getDisplayCurrentLine();
 	void		setDisplayCurrentLine( bool );
@@ -59,6 +67,9 @@ public:
 	void		setBookmark( BookmarkAction action, QTextBlock block );
 	void		setBreakpoint( BookmarkAction action, QTextBlock block );
 	QWidget*	getPanel();
+	void		displayBannerMessage( QString );
+	void		hideBannerMessage();
+	void		clearEditor();
 	int		loadFile( QString );
 	void		removeModifications();
 	

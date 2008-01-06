@@ -1,6 +1,11 @@
+#if QT_VERSION >= 0x040400
+#	include <QPlainTextEdit>
+#else
+#	include <QTextEdit>
+#endif
+
 #include <QPainter>
 #include <QPaintEvent>
-#include <QTextEdit>
 #include <QTextBlock>
 #include <QTextLayout>
 #include <QScrollBar>

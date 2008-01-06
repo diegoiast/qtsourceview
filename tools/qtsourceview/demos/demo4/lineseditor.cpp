@@ -1,5 +1,4 @@
 #include <QPainter>
-#include <QTextEdit>
 #include <QTextDocument>
 #include <QTextBlock>
 #include <QTextLayout>
@@ -27,7 +26,7 @@
 
 const int floatingWidgetTimeout = 0;
 
-LinesEditor::LinesEditor( QWidget *p ) :QTextEdit(p)
+LinesEditor::LinesEditor( QWidget *p ) : QTextEditorControl(p)
 {
 	currentLineColor	= QColor( "#DCE4F9" );
 	bookmarkLineColor	= QColor( "#0000FF" );
@@ -62,8 +61,10 @@ LinesEditor::LinesEditor( QWidget *p ) :QTextEdit(p)
 	panel->setVisible( true );
 
 	setFrameStyle( QFrame::NoFrame );
-	setLineWrapMode( QTextEdit::NoWrap );
+	setLineWrapMode( QTextEditorControl::NoWrap );
+#if QT_VERSION < 0x040400
 	setAcceptRichText( false );
+#endif
 	QTimer::singleShot( 0, this, SLOT(adjustMarginWidgets()));
 	syntaxHighlighter = NULL;
 
@@ -429,7 +430,28 @@ void	LinesEditor::adjustMarginWidgets()
 	}
 }
 
-int LinesEditor::loadFile( QString s )
+void	LinesEditor::displayBannerMessage( QString message )
+{
+	ui_fileMessage.label->setText( message );
+	widgetToTop( fileMessage );
+}
+
+void	LinesEditor::hideBannerMessage()
+{
+	fileMessage->hide();
+}
+
+void	LinesEditor::clearEditor()
+{
+	hideBannerMessage();
+	pauseFileSystemWatch();
+	fileName.clear();
+	clear();
+	removeModifications();
+	setReadOnly( false );
+}
+
+int	LinesEditor::loadFile( QString s )
 {
 	QFile file(s);
 	QFileInfo fileInfo(file);
@@ -448,6 +470,17 @@ int LinesEditor::loadFile( QString s )
 	fileName = fileInfo.absoluteFilePath();
 	fileSystemWatcher->addPath( fileName );
 	removeModifications();
+	
+	if (!fileInfo.isWritable())
+	{
+		this->setReadOnly( true );
+		displayBannerMessage( tr("The file is readonly. Click <a href=':forcerw' title='Click here to try and change the file attributes for write access'>here to force write access.</a>") );
+	}
+	else
+	{
+		hideBannerMessage();
+		this->setReadOnly( false );
+	}
 	return 0;
 }
 
@@ -477,7 +510,6 @@ void	LinesEditor::resumeFileSystemWatch()
 	connect( fileSystemWatcher, SIGNAL(fileChanged(const QString&)), this, SLOT(on_fileChanged(const QString&)));
 	fileSystemWatcher->addPath( fileName );
 }
-
 
 void	LinesEditor::showFindWidget()
 {
@@ -956,14 +988,15 @@ void	LinesEditor::on_fileChanged( const QString &fName )
 	if (fName != fileName)
 		return;
 		
-	QFileInfo f (fileName);
+	QFileInfo f(fileName);
+	QString message;
 	
 	if (f.exists())
-		ui_fileMessage.label->setText( tr("File has been modified outside the editor. <a href=':reload' title='Clicking this links will revert all changes to this editor'>Click here to reload.</a>") );
+		message = tr("File has been modified outside the editor. <a href=':reload' title='Clicking this links will revert all changes to this editor'>Click here to reload.</a>");
 	else
-		ui_fileMessage.label->setText( tr("File has been deleted outside the editor.") );
+		message = tr("File has been deleted outside the editor.");
 	
-	widgetToTop( fileMessage );
+	displayBannerMessage( message );
 }
 
 void	LinesEditor::on_fileMessage_clicked( QString s )
@@ -972,6 +1005,10 @@ void	LinesEditor::on_fileMessage_clicked( QString s )
 	{
 		loadFile( fileName );
 		ui_fileMessage.label->setText( "" );
+		fileMessage->hide();
+	} else if (s == ":forcerw")
+	{
+		// TODO how to do it in a portable way?
 		fileMessage->hide();
 	}
 }
@@ -1053,12 +1090,12 @@ void LinesEditor::keyPressEvent( QKeyEvent *event )
 				return;
 	} // end case
 	
-	QTextEdit::keyPressEvent( event );
+	QTextEditorControl::keyPressEvent( event );
 }
 
 void LinesEditor::resizeEvent ( QResizeEvent *event )
 {
-	QTextEdit::resizeEvent( event );
+	QTextEditorControl::resizeEvent( event );
 	adjustMarginWidgets();
 
 	if (findWidget->isVisible())
@@ -1100,7 +1137,7 @@ void LinesEditor::paintEvent(QPaintEvent *e)
 		printBackgrounds(p);
 		p.end();
 		
-		QTextEdit::paintEvent(e);
+		QTextEditorControl::paintEvent(e);
 		
 		p.begin( viewport() );
 		if (showMatchingBraces)
@@ -1108,7 +1145,7 @@ void LinesEditor::paintEvent(QPaintEvent *e)
 		p.end();
 	}
 	else
-		QTextEdit::paintEvent(e);
+		QTextEditorControl::paintEvent(e);
 }
 
 void	LinesEditor::printBackgrounds( QPainter &p )

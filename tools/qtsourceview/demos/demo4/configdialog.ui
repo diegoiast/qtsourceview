@@ -334,5 +334,22 @@
   <tabstop>sampleEdit</tabstop>
  </tabstops>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>showMargins</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>marginSize</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>85</x>
+     <y>176</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>177</x>
+     <y>182</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>
