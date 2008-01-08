@@ -71,7 +71,6 @@ void SamplePanel::paintEvent(QPaintEvent*)
 		{
 			if (data->m_isBookmark)
 				p.drawPixmap( 2, qRound(position.y() - contentsY + ascent - m_bookMarkImage.height()), m_bookMarkImage ); 
-				
 			if (data->m_isModified)
 				p.fillRect( width()- 3, qRound(position.y()-contentsY), 2, qRound(boundingRect.height()), m_modifiedColor );
 		}

@@ -92,6 +92,7 @@ public slots:
 	void		transformBlockCase();
 	void		smartHome();
 	void		smartEnd();
+	void		findMatchingBracket();
 
 protected slots:
 	void		updateCurrentLine();
@@ -147,6 +148,7 @@ public:
 	QAction	*actionChangeCase;
 	QAction	*actionToggleBookmark;
 	QAction	*actionTogglebreakpoint;
+	QAction	*actionFindMatchingBracket;
 
 private:
 	QColor	currentLineColor;

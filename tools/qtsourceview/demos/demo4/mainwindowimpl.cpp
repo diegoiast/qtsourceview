@@ -70,6 +70,7 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
 		tmpMenu->addMenu( new_menu );
 
 		tmpMenu->addAction( textEdit->actionTogglebreakpoint );
+		tmpMenu->addAction( textEdit->actionFindMatchingBracket );
 	}
 	
 	tmpMenu = menuBar()->findChildren<QMenu*>( "menu_Search" )[0];

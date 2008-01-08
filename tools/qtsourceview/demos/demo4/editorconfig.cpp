@@ -231,6 +231,7 @@ void EditorConfig::applyConfiguration( EditorConfigData c, LinesEditor *editor )
 		editor->setItemColor( LinesPanel, c.currentColorScheme->getColorDef("dsWidgetLinesPanel").getBackground() );
 		editor->setItemColor( ModifiedColor, c.currentColorScheme->getColorDef("dsWidgetModifiedLine").getBackground() );
 		editor->setItemColor( CurrentLine, c.currentColorScheme->getColorDef("dsWidgetCurLine").getBackground() );
+		editor->setItemColor( MatchBrackets, c.currentColorScheme->getColorDef("dsCurrectBracket").getBackground() );
 		editor->setItemColor( WhiteSpaceColor, c.currentColorScheme->getColorDef("dsWhiteSpace").getColor() );
 		editor->setItemColor( BookmarkLineColor, c.currentColorScheme->getColorDef("dsWidgetBookmark").getBackground() );
 		editor->setItemColor( BreakpointLineColor, c.currentColorScheme->getColorDef("dsWidgetActiveBreakpoint").getBackground() );

@@ -31,7 +31,8 @@ LinesEditor::LinesEditor( QWidget *p ) : QTextEditorControl(p)
 	currentLineColor	= QColor( "#DCE4F9" );
 	bookmarkLineColor	= QColor( "#0000FF" );
 	breakpointLineColor	= QColor( "#FF0000" );
-	matchBracesColor	= QColor( "#FF0000" );
+	//matchBracesColor	= QColor( "#FF0000" );
+	matchBracesColor	= QColor( "#FFFF00" );
 	searchFoundColor	= QColor( "#DDDDFF" ); //QColor::fromRgb( 220, 220, 255)
 	searchNotFoundColor	= QColor( "#FFAAAA" ); //QColor::fromRgb( 255, 102, 102) "#FF6666"
 	whiteSpaceColor		= QColor( "#E0E0E0" );
@@ -207,6 +208,14 @@ void LinesEditor::setupActions()
 	actionTogglebreakpoint->setObjectName( "actionTogglebreakpoint" );
 	actionTogglebreakpoint->setShortcut( QKeySequence("F9") );
 	connect( actionTogglebreakpoint, SIGNAL(triggered()), this, SLOT(toggleBreakpoint()) );
+	
+	actionFindMatchingBracket = new QAction( "Goto matching bracket", this );
+	actionFindMatchingBracket->setObjectName( "actionFindMatchingBracket" );
+	QList<QKeySequence> l;
+	l << QKeySequence( Qt::CTRL | Qt::Key_BracketRight );
+	l << QKeySequence( Qt::CTRL | Qt::Key_BracketLeft );
+	actionFindMatchingBracket->setShortcuts( l );
+	connect( actionFindMatchingBracket, SIGNAL(triggered()), this, SLOT(findMatchingBracket()) );
 }
 
 QColor LinesEditor::getItemColor( ItemColors role )
@@ -217,9 +226,11 @@ QColor LinesEditor::getItemColor( ItemColors role )
 		case ModifiedColor:	return panel->m_modifiedColor;
 		case CurrentLine:	return currentLineColor;
 		case MatchBrackets:	return matchBracesColor;
+		
 		case NoText:		return searchNoText;
 		case TextFound:		return searchFoundColor;
 		case TextNoFound:	return searchNotFoundColor;
+		
 		case WhiteSpaceColor:	return whiteSpaceColor;
 		case BookmarkLineColor:	return bookmarkLineColor;
 		case BreakpointLineColor: return breakpointLineColor;
@@ -770,6 +781,19 @@ void	LinesEditor::smartEnd()
 	setTextCursor( c );
 }
 
+void	LinesEditor::findMatchingBracket()
+{
+	if (matchStart==-1)
+		return;
+
+	QTextCursor c = textCursor();
+	if (c.position() == matchStart)
+		c.setPosition(matchEnd);
+	else if (c.position() == matchEnd)
+		c.setPosition(matchStart);
+	setTextCursor( c );
+}
+
 void	LinesEditor::updateCurrentLine()
 {
 	if (highlightCurrentLine)
@@ -1135,14 +1159,11 @@ void LinesEditor::paintEvent(QPaintEvent *e)
 	{
 		QPainter p( viewport() );
 		printBackgrounds(p);
-		p.end();
-		
-		QTextEditorControl::paintEvent(e);
-		
-		p.begin( viewport() );
 		if (showMatchingBraces)
 			printMatchingBraces( p );
 		p.end();
+		
+		QTextEditorControl::paintEvent(e);
 	}
 	else
 		QTextEditorControl::paintEvent(e);
@@ -1242,20 +1263,25 @@ void	LinesEditor::printMatchingBraces( QPainter &p )
 		
 	QFont f = document()->defaultFont();
 	QTextCursor cursor = textCursor();
+	const QFontMetrics fm = QFontMetrics( document()->defaultFont() );
+	int charWidth = fm.width( 'X' );
 
-	f.setBold( true );
+	//f.setBold( true );
 	p.setFont( f );
 	p.setPen( matchBracesColor );
 	cursor.setPosition(matchStart+1, QTextCursor::MoveAnchor);
 	QRect r = cursorRect( cursor );
-	p.drawText(r.x()-1, r.y(), r.width(), r.height(), Qt::AlignLeft | Qt::AlignVCenter, currentChar );
+	p.fillRect( r.x()-1, r.y(), charWidth, r.height(), matchBracesColor.lighter() );
+	//p.drawText( r.x()-1, r.y(), r.width(), r.height(), Qt::AlignLeft | Qt::AlignVCenter, currentChar );
 
 	if (matchEnd == -1)
 		return;
 		
 	cursor.setPosition(matchEnd+1, QTextCursor::MoveAnchor);
 	r = cursorRect( cursor );
-	p.drawText(r.x()-1, r.y(), r.width(), r.height(), Qt::AlignLeft | Qt::AlignVCenter, matchChar );
+	//p.fillRect( r.x()-1, r.y(), charWidth, r.height(), matchBracesColor.darker() );
+	p.fillRect( r.x()-1, r.y(), charWidth, r.height(), matchBracesColor );
+	//p.drawText( r.x()-1, r.y(), charWidth, r.height(), Qt::AlignLeft | Qt::AlignVCenter, matchChar );
 }
 
 bool isFullWord( QString s1, QString s2, int location )

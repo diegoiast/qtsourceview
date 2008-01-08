@@ -33,4 +33,5 @@
 	<itemData defStyleNum="dsWidgetLinesPanel"   name="Widget lines marker"       background="#8080F0"  />
 	<itemData defStyleNum="dsWidgetModifiedLine" name="Line modification marker"  background="#00ff00"  />
 	<itemData defStyleNum="dsWhiteSpace"         name="White spaces color"        color="#0B60C2"  />
+	<itemData defStyleNum="dsCurrectBracket"     name="Mark current bracket"      background="#0000FF" />
 </itemDatas>
