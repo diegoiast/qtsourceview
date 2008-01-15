@@ -1,7 +1,7 @@
 /**
  * \file qsvlangdef.cpp
  * \brief Implementation of the language definition, and support structs
- * \author Diego Iastrubni (elcuco@kde.org)
+ * \author Diego Iastrubni (diegoiast@gmail.com)
  * License LGPL
  * \see QsvLangDef
  */

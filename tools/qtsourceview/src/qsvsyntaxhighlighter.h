@@ -4,7 +4,7 @@
 /**
  * \file qsvsyntaxhighlighter.h
  * \brief Definition of the syntax highlighter
- * \author Diego Iastrubni (elcuco@kde.org)
+ * \author Diego Iastrubni (diegoiast@gmail.com)
  * License LGPL
  * \see QsvSyntaxHighlighter
  */

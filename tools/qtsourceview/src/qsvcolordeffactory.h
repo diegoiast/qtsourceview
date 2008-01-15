@@ -4,7 +4,7 @@
 /**
  * \file qsvcolordeffactory.h
  * \brief Definition of the color defintion factory
- * \author Diego Iastrubni (elcuco@kde.org)
+ * \author Diego Iastrubni (diegoiast@gmail.com)
  * License LGPL
  * \see QsvColorDefFactory
  */

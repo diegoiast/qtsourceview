@@ -1,7 +1,7 @@
 /**
  * \file qsvcolordef.cpp
  * \brief Implementation of the color defintion
- * \author Diego Iastrubni (elcuco@kde.org)
+ * \author Diego Iastrubni (diegoiast@gmail.com)
  * License LGPL
  * \see QsvColorDef
  */

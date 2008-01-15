@@ -4,7 +4,7 @@
 /**
  * \file qsvcolordef.h
  * \brief Definition of the color defintion
- * \author Diego Iastrubni (elcuco@kde.org)
+ * \author Diego Iastrubni (diegoiast@gmail.com)
  * License LGPL
  * \see QsvColorDef
  */

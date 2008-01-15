@@ -71,7 +71,7 @@ void MainWindow1::on_action_About_triggered()
 {
 	QMessageBox::information(this, "Demo 1",
     "First demo of the qtsourceview library.\n"
-    "Diego Iastrubni <elcuco@kde.org> 2006, lincensed under the terms of the LGPL.");
+    "Diego Iastrubni <diegoiast@gmail.com> 2006, lincensed under the terms of the LGPL.");
 }
 
 void MainWindow1::on_actionAbout_Qt_triggered()

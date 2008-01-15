@@ -2,7 +2,7 @@
  * \file qsvlangdeffactory.cpp
  * \brief Implementation of the language definition factory
  * \date 2006-07-21 23:15:55
- * \author Diego Iastrubni (elcuco@kde.org)
+ * \author Diego Iastrubni (diegoiast@gmail.com)
  * License LGPL
  * \see QsvLangDefFactory
  */

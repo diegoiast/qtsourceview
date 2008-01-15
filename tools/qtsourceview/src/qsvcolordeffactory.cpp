@@ -1,7 +1,7 @@
 /**
  * \file qsvcolordeffactory.cpp
  * \brief Implementation of the color defintion factory
- * \author Diego Iastrubni (elcuco@kde.org)
+ * \author Diego Iastrubni (diegoiast@gmail.com)
  * \date 2006-07-22 01:58:07
  * License LGPL
  * \see QsvColorDefFactory
