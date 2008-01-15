@@ -71,6 +71,7 @@ public:
 	void		hideBannerMessage();
 	void		clearEditor();
 	int		loadFile( QString );
+	QString		getFileName();
 	void		removeModifications();
 	
 public slots:

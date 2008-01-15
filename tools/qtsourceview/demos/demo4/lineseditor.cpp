@@ -1,6 +1,7 @@
 #include <QPainter>
 #include <QTextDocument>
 #include <QTextBlock>
+#include <QTextCodec>
 #include <QTextLayout>
 #include <QScrollBar>
 #include <QPushButton>
@@ -31,8 +32,7 @@ LinesEditor::LinesEditor( QWidget *p ) : QTextEditorControl(p)
 	currentLineColor	= QColor( "#DCE4F9" );
 	bookmarkLineColor	= QColor( "#0000FF" );
 	breakpointLineColor	= QColor( "#FF0000" );
-	//matchBracesColor	= QColor( "#FF0000" );
-	matchBracesColor	= QColor( "#FFFF00" );
+	matchBracesColor	= QColor( "#FFFF00" ); // was: QColor( "#FF0000" );
 	searchFoundColor	= QColor( "#DDDDFF" ); //QColor::fromRgb( 220, 220, 255)
 	searchNotFoundColor	= QColor( "#FFAAAA" ); //QColor::fromRgb( 255, 102, 102) "#FF6666"
 	whiteSpaceColor		= QColor( "#E0E0E0" );
@@ -95,7 +95,7 @@ LinesEditor::LinesEditor( QWidget *p ) : QTextEditorControl(p)
 	ui_gotoLineWidget.setupUi( gotoLineWidget );
 	gotoLineWidget->hide();
 
-	fileMessage = new TransparentWidget( this, 0.8 );
+	fileMessage = new TransparentWidget( this, 0.80 );
 	ui_fileMessage.setupUi( fileMessage );
 	connect( ui_fileMessage.label, SIGNAL(linkActivated(const QString&)), this, SLOT(on_fileMessage_clicked(QString)));
 	fileMessage->hide();
@@ -131,6 +131,8 @@ LinesEditor::LinesEditor( QWidget *p ) : QTextEditorControl(p)
 
 	connect( ui_fileMessage.closeButton, SIGNAL(clicked()), fileMessage, SLOT(hide()));
 	connect( fileSystemWatcher, SIGNAL(fileChanged(const QString&)), this, SLOT(on_fileChanged(const QString&)));
+
+	adjustMarginWidgets();
 }
 
 LinesEditor::~LinesEditor()
@@ -141,76 +143,76 @@ LinesEditor::~LinesEditor()
 void LinesEditor::setupActions()
 {
 	actionFind = new QAction( "&Find...", this );
-	actionFind->setObjectName("actionFind");
+	actionFind->setObjectName("LinesEditor::actionFind");
 	actionFind->setShortcut( QKeySequence("Ctrl+F") );
 	connect( actionFind, SIGNAL(triggered()), this, SLOT(showFindWidget()) );
 
 	actionReplace = new QAction( "&Replace...", this );
-	actionReplace->setObjectName("actionReplace");
+	actionReplace->setObjectName("LinesEditor::actionReplace");
 	actionReplace->setShortcut( QKeySequence("Ctrl+R") );
 	connect( actionReplace, SIGNAL(triggered()), this, SLOT(showReplaceWidget()) );
 
 	actionGotoLine = new QAction( "&Goto line...", this );
-	actionGotoLine->setObjectName("actionGotoLine");
+	actionGotoLine->setObjectName("LinesEditor::actionGotoLine");
 	actionGotoLine->setShortcut( QKeySequence("Ctrl+G") );
 	connect( actionGotoLine, SIGNAL(triggered()), this, SLOT(showGotoLineWidget()) );
 
 	actionFindNext = new QAction( "Find &next", this );
-	actionFindNext->setObjectName("actionFindNext");
+	actionFindNext->setObjectName("LinesEditor::actionFindNext");
 	actionFindNext->setShortcut( QKeySequence("F3") );
 	connect( actionFindNext, SIGNAL(triggered()), this, SLOT(findNext()) );
 	
 	actionFindPrev = new QAction( "Find &previous", this );
-	actionFindPrev->setObjectName("actionFindPrev");
+	actionFindPrev->setObjectName("LinesEditor::actionFindPrev");
 	actionFindPrev->setShortcut( QKeySequence("Shift+F3") );
 	connect( actionFindPrev, SIGNAL(triggered()), this, SLOT(findPrev()) );
 	
 	actionClearSearchHighlight = new QAction( "Clear search &highlight", this );
-	actionClearSearchHighlight->setObjectName("actionClearSearchHighlight");
+	actionClearSearchHighlight->setObjectName("LinesEditor::actionClearSearchHighlight");
 	//actionClearSearchHighlight->setShortcut( QKeySequence("Shift+F3") );
 	connect( actionClearSearchHighlight, SIGNAL(triggered()), this, SLOT(clearSearchHighlight()) );
 	
 	actionCapitalize = new QAction( "Change to &capital letters", this );
-	actionCapitalize->setObjectName( "actionCapitalize" );
+	actionCapitalize->setObjectName( "LinesEditor::actionCapitalize" );
 	actionCapitalize->setShortcut( QKeySequence( Qt::CTRL | Qt::Key_U ) );
 	connect( actionCapitalize, SIGNAL(triggered()), this, SLOT(transformBlockToUpper()) );
 
 	actionLowerCase = new QAction( "Change to &lower letters", this );
-	actionLowerCase->setObjectName( "actionLowerCase" );
+	actionLowerCase->setObjectName( "LinesEditor::actionLowerCase" );
 	actionLowerCase->setShortcut( QKeySequence( Qt::CTRL | Qt::SHIFT | Qt::Key_U  ) );
 	connect( actionLowerCase, SIGNAL(triggered()), this, SLOT(transformBlockToLower()) );
 
 	actionChangeCase = new QAction( "Change ca&se", this );
-	actionChangeCase->setObjectName( "actionChangeCase" );
+	actionChangeCase->setObjectName( "LinesEditor::actionChangeCase" );
 	connect( actionChangeCase, SIGNAL(triggered()), this, SLOT(transformBlockCase()) );
 
 	actionToggleBookmark = new QAction( "&Toggle line bookmark", this );
-	actionToggleBookmark->setObjectName( "actionToggleBookmark" );
+	actionToggleBookmark->setObjectName( "LinesEditor::actionToggleBookmark" );
 	actionToggleBookmark->setShortcut( QKeySequence( Qt::CTRL | Qt::Key_B  ) );
 	connect( actionToggleBookmark, SIGNAL(triggered()), this, SLOT(toggleBookmark()) );
 
 	actionPrevBookmark = new QAction( "&Previous bookmark", this );
-	actionPrevBookmark->setObjectName( "actionPrevBookmark" );
+	actionPrevBookmark->setObjectName( "LinesEditor::actionPrevBookmark" );
 	actionPrevBookmark->setShortcut( QKeySequence( Qt::CTRL | Qt::Key_PageUp ) );
 	connect( actionPrevBookmark, SIGNAL(triggered()), this, SLOT(gotoPrevBookmark()) );
 
 	actionNextBookmark = new QAction( "&Next bookmark", this );
-	actionNextBookmark->setObjectName( "actionNextBookmark" );
+	actionNextBookmark->setObjectName( "LinesEditor::actionNextBookmark" );
 	actionNextBookmark->setShortcut( QKeySequence( Qt::CTRL | Qt::Key_PageDown ) );
 	connect( actionNextBookmark, SIGNAL(triggered()), this, SLOT(gotoNextBookmark()) );
 
 	actionToggleBookmark = new QAction( "Toggle line &bookmark", this );
-	actionToggleBookmark->setObjectName( "actionToggleBookmark" );
+	actionToggleBookmark->setObjectName( "LinesEditor::actionToggleBookmark" );
 	actionToggleBookmark->setShortcut( QKeySequence( Qt::CTRL | Qt::Key_B  ) );
 	connect( actionToggleBookmark, SIGNAL(triggered()), this, SLOT(toggleBookmark()) );
 
 	actionTogglebreakpoint = new QAction( "Toggle b&reakpoint", this );
-	actionTogglebreakpoint->setObjectName( "actionTogglebreakpoint" );
+	actionTogglebreakpoint->setObjectName( "LinesEditor::actionTogglebreakpoint" );
 	actionTogglebreakpoint->setShortcut( QKeySequence("F9") );
 	connect( actionTogglebreakpoint, SIGNAL(triggered()), this, SLOT(toggleBreakpoint()) );
 	
 	actionFindMatchingBracket = new QAction( "Goto matching bracket", this );
-	actionFindMatchingBracket->setObjectName( "actionFindMatchingBracket" );
+	actionFindMatchingBracket->setObjectName( "LinesEditor::actionFindMatchingBracket" );
 	QList<QKeySequence> l;
 	l << QKeySequence( Qt::CTRL | Qt::Key_BracketRight );
 	l << QKeySequence( Qt::CTRL | Qt::Key_BracketLeft );
@@ -425,6 +427,7 @@ QWidget* LinesEditor::getPanel()
 	return panel;
 }
 
+// TODO cache state of panel->visible in the widget
 void	LinesEditor::adjustMarginWidgets()
 {
 	if (panel->isVisible())
@@ -464,35 +467,48 @@ void	LinesEditor::clearEditor()
 
 int	LinesEditor::loadFile( QString s )
 {
-	QFile file(s);
-	QFileInfo fileInfo(file);
-	
-	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-		return -1;
-	
-	QTextStream in(&file);
-	setPlainText( in.readAll() );
-	
 	// clear older watches, and add a new one
 	QStringList sl = fileSystemWatcher->directories();
 	if (!sl.isEmpty())
 		fileSystemWatcher->removePaths( sl );
 	
-	fileName = fileInfo.absoluteFilePath();
-	fileSystemWatcher->addPath( fileName );
-	removeModifications();
+	hideBannerMessage();
+	this->setReadOnly( false );
 	
-	if (!fileInfo.isWritable())
+	if (!s.isEmpty())
 	{
-		this->setReadOnly( true );
-		displayBannerMessage( tr("The file is readonly. Click <a href=':forcerw' title='Click here to try and change the file attributes for write access'>here to force write access.</a>") );
+		QFile file(s);
+		QFileInfo fileInfo(file);
+		
+		if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+			return -1;
+		
+		// TODO make it a member variable
+		QTextCodec *c = NULL;
+		if (c == NULL)
+			c = QTextCodec::codecForLocale();
+
+		QTextStream textStream(&file);
+		textStream.setCodec( c );
+		setPlainText( textStream.readAll() );
+		file.close();
+	
+		fileName = fileInfo.absoluteFilePath();
+		fileSystemWatcher->addPath( fileName );
+		if (!fileInfo.isWritable())
+		{
+			this->setReadOnly( true );
+			displayBannerMessage( tr("The file is readonly. Click <a href=':forcerw' title='Click here to try and change the file attributes for write access'>here to force write access.</a>") );
+		}
 	}
-	else
-	{
-		hideBannerMessage();
-		this->setReadOnly( false );
-	}
+	
+	removeModifications();
 	return 0;
+}
+
+QString	LinesEditor::getFileName()
+{
+	return fileName;
 }
 
 void	LinesEditor::removeModifications()
