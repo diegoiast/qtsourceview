@@ -1,3 +1,8 @@
+QtSourceView - SOMEDAY 
+ * Support for non case-sensitve languages
+ * new demo: a text editor control
+ * new demo: editor plugin for HaiQ
+ 
 QtSourceView - 18 Aug 06 - 0.0.2
  * Second release
  * Added 3 new language definitions from GtkSourceView: scheme, octave, changelog
