@@ -6,12 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>574</width>
-    <height>162</height>
+    <width>627</width>
+    <height>182</height>
    </rect>
   </property>
   <property name="sizePolicy" >
-   <sizepolicy vsizetype="MinimumExpanding" hsizetype="Preferred" >
+   <sizepolicy>
+    <hsizetype>1</hsizetype>
+    <vsizetype>4</vsizetype>
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -20,19 +22,10 @@
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" >
+   <property name="margin" >
+    <number>0</number>
+   </property>
    <property name="spacing" >
-    <number>0</number>
-   </property>
-   <property name="leftMargin" >
-    <number>0</number>
-   </property>
-   <property name="topMargin" >
-    <number>0</number>
-   </property>
-   <property name="rightMargin" >
-    <number>0</number>
-   </property>
-   <property name="bottomMargin" >
     <number>0</number>
    </property>
    <item>
@@ -44,22 +37,10 @@
       <enum>QFrame::Plain</enum>
      </property>
      <layout class="QGridLayout" >
-      <property name="leftMargin" >
+      <property name="margin" >
        <number>0</number>
       </property>
-      <property name="topMargin" >
-       <number>0</number>
-      </property>
-      <property name="rightMargin" >
-       <number>0</number>
-      </property>
-      <property name="bottomMargin" >
-       <number>0</number>
-      </property>
-      <property name="horizontalSpacing" >
-       <number>0</number>
-      </property>
-      <property name="verticalSpacing" >
+      <property name="spacing" >
        <number>0</number>
       </property>
       <item row="0" column="0" >
@@ -80,6 +61,9 @@
       </item>
       <item row="0" column="1" >
        <layout class="QVBoxLayout" >
+        <property name="margin" >
+         <number>0</number>
+        </property>
         <property name="spacing" >
          <number>0</number>
         </property>
@@ -107,6 +91,9 @@
       </item>
       <item row="0" column="2" >
        <layout class="QVBoxLayout" >
+        <property name="margin" >
+         <number>0</number>
+        </property>
         <property name="spacing" >
          <number>0</number>
         </property>
@@ -136,6 +123,12 @@
       </item>
       <item row="0" column="4" >
        <layout class="QVBoxLayout" >
+        <property name="margin" >
+         <number>0</number>
+        </property>
+        <property name="spacing" >
+         <number>6</number>
+        </property>
         <item>
          <widget class="QPushButton" name="replaceButton" >
           <property name="toolTip" >
@@ -149,13 +142,12 @@
         <item>
          <widget class="QToolButton" name="moreButton" >
           <property name="sizePolicy" >
-           <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+           <sizepolicy>
+            <hsizetype>0</hsizetype>
+            <vsizetype>0</vsizetype>
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
-          </property>
-          <property name="cursor" >
-           <cursorShape>PointingHandCursor</cursorShape>
           </property>
           <property name="focusPolicy" >
            <enum>Qt::StrongFocus</enum>
@@ -201,6 +193,12 @@
          <number>0</number>
         </property>
         <layout class="QGridLayout" >
+         <property name="margin" >
+          <number>0</number>
+         </property>
+         <property name="spacing" >
+          <number>0</number>
+         </property>
          <item row="0" column="0" >
           <widget class="QCheckBox" name="caseSensitive" >
            <property name="text" >
@@ -320,21 +318,4 @@
   <include location="textlines.qrc" />
  </resources>
  <connections/>
- <designerdata>
-  <property name="gridDeltaX" >
-   <number>10</number>
-  </property>
-  <property name="gridDeltaY" >
-   <number>10</number>
-  </property>
-  <property name="gridSnapX" >
-   <bool>true</bool>
-  </property>
-  <property name="gridSnapY" >
-   <bool>true</bool>
-  </property>
-  <property name="gridVisible" >
-   <bool>true</bool>
-  </property>
- </designerdata>
 </ui>

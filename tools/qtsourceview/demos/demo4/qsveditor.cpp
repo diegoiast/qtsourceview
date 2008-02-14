@@ -104,10 +104,13 @@ QsvEditor::QsvEditor( QWidget *p ) : QTextEditorControl(p)
 	findWidget = new QsvTransparentWidget( this, 0.80 );
 	ui_findWidget.setupUi( findWidget );
 	ui_findWidget.searchText->setIcon( QPixmap(":/images/edit-undo.png") );
+	ui_findWidget.frame->adjustSize();
+	findWidget->adjustSize();
 	findWidget->hide();
 
 	replaceWidget = new QsvTransparentWidget( this, 0.80 );
 	ui_replaceWidget.setupUi( replaceWidget );
+	ui_replaceWidget.frame->adjustSize();
 	ui_replaceWidget.replaceOldText->setIcon( QPixmap(":/images/edit-undo.png") );
 	ui_replaceWidget.replaceNewText->setIcon( QPixmap(":/images/edit-undo.png") );
 	ui_replaceWidget.optionsFrame->hide();
@@ -116,6 +119,8 @@ QsvEditor::QsvEditor( QWidget *p ) : QTextEditorControl(p)
 	
 	gotoLineWidget = new QsvTransparentWidget( this, 0.80 );
 	ui_gotoLineWidget.setupUi( gotoLineWidget );
+	ui_gotoLineWidget.frame->adjustSize();
+	gotoLineWidget->adjustSize();
 	gotoLineWidget->hide();
 
 	fileMessage = new QsvTransparentWidget( this, 0.80 );
@@ -743,11 +748,14 @@ void	QsvEditor::transformBlockCase()
 	uint s_len = s_before.length();
 	
 	for( uint i=0; i< s_len; i++ )
-		if (s_after[i].isLower())
-			s_after[i] = s_after[i].toUpper();
-		else if (s_after[i].isUpper())
-			s_after[i] = s_after[i].toLower();
-		
+	{
+		QChar c = s_after[i];
+		if (c.isLower())
+			c = c.toUpper();
+		else if (c.isUpper())
+			c = c.toLower();
+		s_after[i] = c;
+	}	
 		
 	if (s_before != s_after)
 	{
@@ -1302,6 +1310,14 @@ void	QsvEditor::printMatchingBraces( QPainter &p )
 		
 	QFont f = document()->defaultFont();
 	QTextCursor cursor = textCursor();
+
+#if QT_VERSION > 0x040300
+        QColor lighter = matchBracesColor.lighter();	
+#else
+	// STUPID QT 4.2 on etch
+        QColor lighter = matchBracesColor.light(150);
+#endif
+		
 	const QFontMetrics fm = QFontMetrics( document()->defaultFont() );
 	int charWidth = fm.width( 'X' );
 
@@ -1310,7 +1326,7 @@ void	QsvEditor::printMatchingBraces( QPainter &p )
 	p.setPen( matchBracesColor );
 	cursor.setPosition(matchStart+1, QTextCursor::MoveAnchor);
 	QRect r = cursorRect( cursor );
-	p.fillRect( r.x()-1, r.y(), charWidth, r.height(), matchBracesColor.lighter() );
+	p.fillRect( r.x()-1, r.y(), charWidth, r.height(), lighter );
 	//p.drawText( r.x()-1, r.y(), r.width(), r.height(), Qt::AlignLeft | Qt::AlignVCenter, currentChar );
 
 	if (matchEnd == -1)
@@ -1368,6 +1384,7 @@ void	QsvEditor::printMargins( QPainter &p )
 
 void	QsvEditor::widgetToBottom( QWidget *w )
 {
+        w->adjustSize();
 	QRect r1 = viewport()->geometry();
 	QRect r2 = w->geometry();
 

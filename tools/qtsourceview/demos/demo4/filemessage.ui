@@ -1,16 +1,19 @@
 <ui version="4.0" >
+ <author>Diego Iastrubni &lt;diegoiast@gmail.com></author>
  <class>FileMessage</class>
  <widget class="QWidget" name="FileMessage" >
   <property name="geometry" >
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>490</width>
-    <height>34</height>
+    <width>545</width>
+    <height>60</height>
    </rect>
   </property>
   <property name="sizePolicy" >
-   <sizepolicy vsizetype="Maximum" hsizetype="Preferred" >
+   <sizepolicy>
+    <hsizetype>4</hsizetype>
+    <vsizetype>3</vsizetype>
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -24,115 +27,93 @@
   <property name="windowTitle" >
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" >
-   <property name="spacing" >
-    <number>0</number>
+  <widget class="QFrame" name="frame" >
+   <property name="geometry" >
+    <rect>
+     <x>-5</x>
+     <y>0</y>
+     <width>551</width>
+     <height>64</height>
+    </rect>
    </property>
-   <property name="leftMargin" >
-    <number>0</number>
+   <property name="sizePolicy" >
+    <sizepolicy>
+     <hsizetype>4</hsizetype>
+     <vsizetype>1</vsizetype>
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
    </property>
-   <property name="topMargin" >
-    <number>0</number>
+   <property name="frameShape" >
+    <enum>QFrame::StyledPanel</enum>
    </property>
-   <property name="rightMargin" >
-    <number>0</number>
+   <property name="frameShadow" >
+    <enum>QFrame::Plain</enum>
    </property>
-   <property name="bottomMargin" >
-    <number>0</number>
-   </property>
-   <item>
-    <widget class="QFrame" name="frame" >
-     <property name="sizePolicy" >
-      <sizepolicy vsizetype="Minimum" hsizetype="Preferred" >
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="frameShape" >
-      <enum>QFrame::StyledPanel</enum>
-     </property>
-     <property name="frameShadow" >
-      <enum>QFrame::Plain</enum>
-     </property>
-     <layout class="QHBoxLayout" >
-      <property name="spacing" >
-       <number>0</number>
+   <layout class="QHBoxLayout" >
+    <property name="margin" >
+     <number>0</number>
+    </property>
+    <property name="spacing" >
+     <number>0</number>
+    </property>
+    <item>
+     <spacer>
+      <property name="orientation" >
+       <enum>Qt::Horizontal</enum>
       </property>
-      <property name="leftMargin" >
-       <number>0</number>
+      <property name="sizeType" >
+       <enum>QSizePolicy::Fixed</enum>
       </property>
-      <property name="topMargin" >
-       <number>0</number>
+      <property name="sizeHint" >
+       <size>
+        <width>21</width>
+        <height>42</height>
+       </size>
       </property>
-      <property name="rightMargin" >
-       <number>0</number>
+     </spacer>
+    </item>
+    <item>
+     <widget class="QLabel" name="label" >
+      <property name="text" >
+       <string>TextLabel</string>
       </property>
-      <property name="bottomMargin" >
-       <number>0</number>
+     </widget>
+    </item>
+    <item>
+     <widget class="QToolButton" name="closeButton" >
+      <property name="text" >
+       <string>x</string>
       </property>
-      <item>
-       <spacer>
-        <property name="orientation" >
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeType" >
-         <enum>QSizePolicy::Minimum</enum>
-        </property>
-        <property name="sizeHint" >
-         <size>
-          <width>21</width>
-          <height>42</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
-       <widget class="QLabel" name="label" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Maximum" hsizetype="MinimumExpanding" >
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text" >
-         <string>TextLabel</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QToolButton" name="closeButton" >
-        <property name="text" >
-         <string>x</string>
-        </property>
-        <property name="icon" >
-         <iconset resource="textlines.qrc" >:/images/process-stop.png</iconset>
-        </property>
-        <property name="autoRaise" >
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <spacer>
-        <property name="orientation" >
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeType" >
-         <enum>QSizePolicy::Minimum</enum>
-        </property>
-        <property name="sizeHint" >
-         <size>
-          <width>21</width>
-          <height>42</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-     </layout>
-    </widget>
-   </item>
-  </layout>
+      <property name="icon" >
+       <iconset resource="textlines.qrc" >:/images/process-stop.png</iconset>
+      </property>
+      <property name="autoRaise" >
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <spacer>
+      <property name="orientation" >
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeType" >
+       <enum>QSizePolicy::Fixed</enum>
+      </property>
+      <property name="sizeHint" >
+       <size>
+        <width>21</width>
+        <height>42</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+   </layout>
+  </widget>
  </widget>
+ <layoutdefault spacing="0" margin="0" />
+ <includes/>
  <resources>
   <include location="textlines.qrc" />
  </resources>

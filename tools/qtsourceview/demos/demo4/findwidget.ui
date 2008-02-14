@@ -6,12 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>713</width>
-    <height>26</height>
+    <width>644</width>
+    <height>34</height>
    </rect>
   </property>
   <property name="sizePolicy" >
-   <sizepolicy vsizetype="Minimum" hsizetype="Preferred" >
+   <sizepolicy>
+    <hsizetype>1</hsizetype>
+    <vsizetype>4</vsizetype>
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -20,29 +22,14 @@
    <string>Form</string>
   </property>
   <layout class="QHBoxLayout" >
+   <property name="margin" >
+    <number>0</number>
+   </property>
    <property name="spacing" >
-    <number>0</number>
-   </property>
-   <property name="leftMargin" >
-    <number>0</number>
-   </property>
-   <property name="topMargin" >
-    <number>0</number>
-   </property>
-   <property name="rightMargin" >
-    <number>0</number>
-   </property>
-   <property name="bottomMargin" >
     <number>0</number>
    </property>
    <item>
     <widget class="QFrame" name="frame" >
-     <property name="sizePolicy" >
-      <sizepolicy vsizetype="Minimum" hsizetype="Preferred" >
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
      <property name="frameShape" >
       <enum>QFrame::StyledPanel</enum>
      </property>
@@ -50,19 +37,10 @@
       <enum>QFrame::Plain</enum>
      </property>
      <layout class="QHBoxLayout" >
+      <property name="margin" >
+       <number>0</number>
+      </property>
       <property name="spacing" >
-       <number>0</number>
-      </property>
-      <property name="leftMargin" >
-       <number>0</number>
-      </property>
-      <property name="topMargin" >
-       <number>0</number>
-      </property>
-      <property name="rightMargin" >
-       <number>0</number>
-      </property>
-      <property name="bottomMargin" >
        <number>0</number>
       </property>
       <item>
@@ -308,6 +286,7 @@
    </item>
   </layout>
  </widget>
+ <layoutdefault spacing="0" margin="0" />
  <customwidgets>
   <customwidget>
    <class>QsvLineEdit</class>
@@ -315,6 +294,7 @@
    <header>qsvlineedit.h</header>
   </customwidget>
  </customwidgets>
+ <includes/>
  <resources>
   <include location="textlines.qrc" />
  </resources>
