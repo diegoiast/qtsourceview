@@ -119,7 +119,7 @@
            <string>...</string>
           </property>
           <property name="icon" >
-           <iconset resource="textlines.qrc" >:/images/process-stop.png</iconset>
+           <iconset>:/trolltech/styles/commonstyle/images/standardbutton-no-16.png</iconset>
           </property>
           <property name="autoRaise" >
            <bool>true</bool>
@@ -150,7 +150,6 @@
   </layout>
  </widget>
  <layoutdefault spacing="0" margin="0" />
- <includes/>
  <resources>
   <include location="textlines.qrc" />
  </resources>
