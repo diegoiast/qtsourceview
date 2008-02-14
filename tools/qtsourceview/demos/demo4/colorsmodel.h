@@ -3,6 +3,7 @@
 
 #include <QAbstractItemModel>
 #include <QList>
+
 class QsvColorDefFactory;
 
 class ColorsModel : public QAbstractItemModel
@@ -20,4 +21,5 @@ public:
 private:
 	QList<QsvColorDefFactory*> *colors;
 };
+
 #endif

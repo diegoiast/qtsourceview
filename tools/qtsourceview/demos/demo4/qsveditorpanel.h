@@ -9,22 +9,23 @@
 #endif
 
 #include <QWidget>
-class LinesEditor;
 class QTextEdit;
 class QTextEditorControl;
 
-class SamplePanel : public QWidget
+class QsvEditor;
+
+class QsvEditorPanel : public QWidget
 {
 	Q_OBJECT
 public:
-	SamplePanel(LinesEditor *a);
+	QsvEditorPanel(QTextEditorControl *editor);
 private:
 	void paintEvent(QPaintEvent*);
 	QTextEditorControl *m_edit;
 	QColor m_panelColor;
 	QColor m_modifiedColor;
 	QPixmap m_bookMarkImage;
-friend class LinesEditor;
+friend class QsvEditor;
 };
 
 #endif // __SAMPLEPANEL_H__

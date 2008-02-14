@@ -1,12 +1,12 @@
-#ifndef __TRANSPARENTWIDGET_H__
-#define __TRANSPARENTWIDGET_H__
+#ifndef __QSV_TRANSPARENTWIDGET_H__
+#define __QSV_TRANSPARENTWIDGET_H__
 
 #include <QWidget>
 
-class TransparentWidget: public QWidget
+class QsvTransparentWidget: public QWidget
 {
 public:
-	TransparentWidget( QWidget *parent, qreal t=1 );
+	QsvTransparentWidget( QWidget *parent, qreal t=1 );
 	qreal getWidgetTransparency();
 	void setWidgetTransparency( qreal );
 	
@@ -17,4 +17,4 @@ private:
 	qreal widgetTransparency;
 };
 
-#endif // __TRANSPARENTWIDGET_H__
+#endif // __QSV_TRANSPARENTWIDGET_H__

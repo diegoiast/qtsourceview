@@ -10,11 +10,11 @@
 #include <QTextLayout>
 #include <QScrollBar>
 
-#include "privateblockdata.h"
-#include "samplepanel.h"
-#include "lineseditor.h"
+#include "qsvprivateblockdata.h"
+#include "qsveditorpanel.h"
+#include "qsveditor.h"
 
-SamplePanel::SamplePanel(LinesEditor *a): QWidget(a)//, m_area(a)
+QsvEditorPanel::QsvEditorPanel(QTextEditorControl *a): QWidget(a)//, m_area(a)
 {
 	m_edit = a;
 	m_modifiedColor = Qt::green;
@@ -25,7 +25,7 @@ SamplePanel::SamplePanel(LinesEditor *a): QWidget(a)//, m_area(a)
 	connect(m_edit->verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(update()));
 }
 
-void SamplePanel::paintEvent(QPaintEvent*)
+void QsvEditorPanel::paintEvent(QPaintEvent*)
 {
 	QPainter p( this );
 	QRect r = geometry();
@@ -44,7 +44,7 @@ void SamplePanel::paintEvent(QPaintEvent*)
 		QTextLayout* layout = block.layout();
 		const QRectF boundingRect = layout->boundingRect();
 		QPointF position = layout->position();
-		PrivateBlockData *data = dynamic_cast<PrivateBlockData*>( block.userData() );
+		QsvPrivateBlockData *data = dynamic_cast<QsvPrivateBlockData*>( block.userData() );
 
 		if ( position.y() +boundingRect.height() < contentsY )
 			continue;

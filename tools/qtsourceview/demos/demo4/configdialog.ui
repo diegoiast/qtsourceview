@@ -1,4 +1,5 @@
 <ui version="4.0" >
+ <author>Diego Iastrubni &lt;diegoiast@gmail.com></author>
  <class>ConfigDialog</class>
  <widget class="QDialog" name="ConfigDialog" >
   <property name="geometry" >
@@ -294,7 +295,7 @@
         </widget>
        </item>
        <item>
-        <widget class="LinesEditor" name="sampleEdit" />
+        <widget class="QsvEditor" name="sampleEdit" />
        </item>
       </layout>
      </widget>
@@ -314,9 +315,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>LinesEditor</class>
+   <class>QsvEditor</class>
    <extends>QTextEdit</extends>
-   <header>lineseditor.h</header>
+   <header>qsveditor.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
@@ -333,6 +334,7 @@
   <tabstop>colorsCombo</tabstop>
   <tabstop>sampleEdit</tabstop>
  </tabstops>
+ <includes/>
  <resources/>
  <connections>
   <connection>

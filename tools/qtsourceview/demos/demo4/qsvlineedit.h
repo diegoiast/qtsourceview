@@ -1,15 +1,15 @@
-#ifndef NEWLINEEDIT_H
-#define NEWLINEEDIT_H
+#ifndef __QSV_LINEEDIT_H__
+#define __QSV_LINEEDIT_H__
 
 #include <QLineEdit>
 class QPixmap;
 class QToolButton;
 
-class NewLineEdit : public QLineEdit
+class QsvLineEdit : public QLineEdit
 {
 	Q_OBJECT
 public:
-	NewLineEdit(QWidget *parent );
+	QsvLineEdit(QWidget *parent );
 	void setIcon(QPixmap i);
 
 protected:
@@ -21,4 +21,4 @@ private:
 	QToolButton *clearButton;	
 };
 
-#endif
+#endif	// __QSV_LINEEDIT_H__

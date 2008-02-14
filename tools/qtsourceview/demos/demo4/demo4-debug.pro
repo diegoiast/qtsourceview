@@ -1,9 +1,6 @@
 TEMPLATE = app
 SOURCES += main.cpp \
- samplepanel.cpp \
- lineseditor.cpp \
  transparentwidget.cpp \
- newlineedit.cpp \
  mainwindowimpl.cpp \
  editorconfig.cpp \
  colorsmodel.cpp \
@@ -12,11 +9,11 @@ SOURCES += main.cpp \
  ../../src/qsvlangdef.cpp \
  ../../src/qsvlangdeffactory.cpp \
  ../../src/qsvsyntaxhighlighter.cpp \
- privateblockdata.cpp
-HEADERS += samplepanel.h \
- lineseditor.h \
- transparentwidget.h \
- newlineedit.h \
+ qsveditorpanel.cpp \
+ qsveditor.cpp \
+ qsvprivateblockdata.cpp \
+ qsvlineedit.cpp
+HEADERS += transparentwidget.h \
  mainwindowimpl.h \
  editorconfig.h \
  colorsmodel.h \
@@ -27,7 +24,10 @@ HEADERS += samplepanel.h \
  ../../src/qsvlangdef.h \
  ../../src/qsvlangdeffactory.h \
  ../../src/qsvsyntaxhighlighter.h \
- privateblockdata.h
+ qsveditorpanel.h \
+ qsveditor.h \
+ qsvprivateblockdata.h \
+ qsvlineedit.h
 CONFIG += warn_on console debug_and_release
 FORMS += findwidget.ui \
  mainwindow.ui \

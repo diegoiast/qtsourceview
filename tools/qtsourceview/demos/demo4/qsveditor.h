@@ -1,5 +1,5 @@
-#ifndef __LINESEDITOR_H__
-#define __LINESEDITOR_H__
+#ifndef __QSV_EDITOR_H__
+#define __QSV_EDITOR_H__
 
 #if QT_VERSION >= 0x040400
 #	include <QPlainTextEdit>
@@ -21,26 +21,27 @@ class QFileSystemWatcher;
 class QTextCursor;
 enum QTextDocument::FindFlag;
 
-class SamplePanel;
-class TransparentWidget;
-class PrivateBlockData;
+class QsvEditorPanel;
+class QsvPrivateBlockData;
+class QsvTransparentWidget;
 
-enum ItemColors {
-	 LinesPanel, CurrentLine, MatchBrackets, NoText, TextFound, TextNoFound, WhiteSpaceColor, 
-	 BookmarkLineColor, BreakpointLineColor, ModifiedColor
-};
+bool isFullWord( QString s1, QString s2, int location );
 
-enum BookmarkAction {
-	Toggle, Enable, Disable
-};
-
-class LinesEditor: public QTextEditorControl
+class QsvEditor: public QTextEditorControl
 {
 	Q_OBJECT
 public:
+	enum ItemColors {
+		 LinesPanel, CurrentLine, MatchBrackets, NoText, TextFound, TextNoFound, WhiteSpaceColor, 
+		 BookmarkLineColor, BreakpointLineColor, ModifiedColor
+	};
 	
-	LinesEditor( QWidget *p=NULL );
-	virtual		~LinesEditor();
+	enum BookmarkAction {
+		Toggle, Enable, Disable
+	};
+	
+	QsvEditor( QWidget *p=NULL );
+	virtual		~QsvEditor();
 	void		setupActions();
 
 	QColor		getItemColor( ItemColors role );
@@ -94,8 +95,7 @@ public slots:
 	void		smartHome();
 	void		smartEnd();
 	void		findMatchingBracket();
-
-protected slots:
+	
 	void		updateCurrentLine();
 	void		on_searchText_textChanged( const QString & text );
 	void		on_searchText_editingFinished();
@@ -130,7 +130,7 @@ protected:
 	bool		issue_search( const QString &text, QTextCursor newCursor, QFlags<QTextDocument::FindFlag> findOptions );
 	virtual void	findMatching( QChar c1, QChar c2, bool forward, QTextBlock &block );
 	virtual void	findMatching( QChar c, QTextBlock &block );
-	PrivateBlockData*	getPrivateBlockData( QTextBlock block, bool createIfNotExisting=false );
+	QsvPrivateBlockData*	getPrivateBlockData( QTextBlock block, bool createIfNotExisting=false );
 	QFlags<QTextDocument::FindFlag> getSearchFlags();
 	QFlags<QTextDocument::FindFlag> getReplaceFlags();
 
@@ -177,19 +177,20 @@ private:
 	QChar	matchChar;
 	QString	highlightString;
 	QString	fileName;
-	QsvSyntaxHighlighter	*syntaxHighlighter;
 	QFileSystemWatcher	*fileSystemWatcher;
 	
+	QsvSyntaxHighlighter	*syntaxHighlighter;	
 	QTextCursor		searchCursor;
-	SamplePanel		*panel;
-	TransparentWidget	*findWidget;
-	TransparentWidget	*replaceWidget;
-	TransparentWidget	*gotoLineWidget;
-	TransparentWidget	*fileMessage;
+	QsvEditorPanel		*panel;
+	
+	QsvTransparentWidget	*findWidget;
+	QsvTransparentWidget	*replaceWidget;
+	QsvTransparentWidget	*gotoLineWidget;
+	QsvTransparentWidget	*fileMessage;
 	Ui::FindWidget		ui_findWidget;
 	Ui::ReplaceWidget	ui_replaceWidget;
 	Ui::GotoLineWidget	ui_gotoLineWidget;
 	Ui::FileMessage		ui_fileMessage;
 };
 
-#endif // __LINESEDITOR_H__
+#endif // __QSV_EDITOR_H__

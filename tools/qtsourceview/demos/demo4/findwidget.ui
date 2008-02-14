@@ -92,7 +92,7 @@
        </widget>
       </item>
       <item>
-       <widget class="NewLineEdit" name="searchText" >
+       <widget class="QsvLineEdit" name="searchText" >
         <property name="palette" >
          <palette>
           <active>
@@ -310,9 +310,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>NewLineEdit</class>
+   <class>QsvLineEdit</class>
    <extends>QLineEdit</extends>
-   <header>newlineedit.h</header>
+   <header>qsvlineedit.h</header>
   </customwidget>
  </customwidgets>
  <resources>

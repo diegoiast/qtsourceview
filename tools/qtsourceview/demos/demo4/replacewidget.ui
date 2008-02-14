@@ -111,10 +111,10 @@
          <number>0</number>
         </property>
         <item>
-         <widget class="NewLineEdit" name="replaceOldText" />
+         <widget class="QsvLineEdit" name="replaceOldText" />
         </item>
         <item>
-         <widget class="NewLineEdit" name="replaceNewText" />
+         <widget class="QsvLineEdit" name="replaceNewText" />
         </item>
        </layout>
       </item>
@@ -298,9 +298,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>NewLineEdit</class>
+   <class>QsvLineEdit</class>
    <extends>QLineEdit</extends>
-   <header>newlineedit.h</header>
+   <header>qsvlineedit.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

@@ -1,6 +1,6 @@
-#include "privateblockdata.h"
+#include "qsvprivateblockdata.h"
 
-PrivateBlockData::PrivateBlockData(  ) 
+QsvPrivateBlockData::QsvPrivateBlockData(  ) 
 	: QTextBlockUserData()
 {
 	// TODO

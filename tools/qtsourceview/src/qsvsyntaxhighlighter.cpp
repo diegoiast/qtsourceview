@@ -213,7 +213,7 @@ void QsvSyntaxHighlighter::setColorsDef( QsvColorDefFactory *newColors )
 		return;
 		
 	colors = newColors;
-	LanguageEntity *entity;
+	QsvLanguageEntity *entity;
 	
 	// update available mappings
 	for(int i = 0; i < mappings.keys().size(); ++i) 
@@ -256,7 +256,7 @@ void QsvSyntaxHighlighter::highlightBlock(const QString &text)
 	}
 	
 	// set the whole text to the default format to begin with
-	QOrderedMapNode<QString,LanguageEntity> pattern;
+	QOrderedMapNode<QString,QsvLanguageEntity> pattern;
 	
 	// optimizations...
 	if (text.simplified().isEmpty())
@@ -315,7 +315,7 @@ HANDLE_BLOCK_COMMENTS:
 void QsvSyntaxHighlighter::addMapping( const QString mappingName, const QString &pattern, const QTextCharFormat &format, bool fullWord, Qt::CaseSensitivity cs )
 {	
 	QString p = pattern;
-	LanguageEntity newEntity;
+	QsvLanguageEntity newEntity;
 	
 	if (fullWord)
 		p = "\\b" + p + "\\b";

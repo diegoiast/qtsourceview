@@ -1,9 +1,9 @@
 #include <QPixmap>
 #include <QToolButton>
 #include <QStyle>
-#include "newlineedit.h"
+#include "qsvlineedit.h"
 
-NewLineEdit::NewLineEdit( QWidget *parent ) 
+QsvLineEdit::QsvLineEdit( QWidget *parent ) 
 	: QLineEdit(parent)
 {
 	clearButton = new QToolButton( this );
@@ -22,13 +22,13 @@ NewLineEdit::NewLineEdit( QWidget *parent )
 	connect(this, SIGNAL(textChanged(const QString&)), this, SLOT(updateEditLine()));
 }
 
-void NewLineEdit::setIcon(QPixmap i)
+void	QsvLineEdit::setIcon(QPixmap i)
 {
 	clearButton->setIcon( i );
 	//clearButton->setIconSize(i.size());
 }
 
-void NewLineEdit::resizeEvent(QResizeEvent *e)
+void	QsvLineEdit::resizeEvent(QResizeEvent *e)
 {
 	QLineEdit::resizeEvent( e );
 
@@ -37,7 +37,7 @@ void NewLineEdit::resizeEvent(QResizeEvent *e)
 	clearButton->move( rect().right() - frameWidth - sz.width(), (rect().bottom() + 1 - sz.height())/2 );	
 }
 
-void NewLineEdit::updateEditLine()
+void	QsvLineEdit::updateEditLine()
 {
 	clearButton->setVisible( ! displayText().isEmpty() );
 }

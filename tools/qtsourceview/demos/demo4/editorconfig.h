@@ -5,7 +5,7 @@
 #include <QList>
 #include "ui_configdialog.h"
 #include "qsvcolordeffactory.h"
-#include "lineseditor.h"
+#include "qsveditor.h"
 
 class QFont;
 class QString;
@@ -14,7 +14,7 @@ class QsvColorDefFactory;
 class QsvSyntaxHighlighter;
 class ColorsModel;
 
-struct EditorConfigData
+struct QsvEditorConfigData
 {
 	bool			autoBrackets;
 	bool			markCurrentLine;
@@ -46,24 +46,24 @@ public:
 	
 	// gets the currently saved configuration
 	// does not modify object status
-	EditorConfigData getCurrentConfiguration();
+	QsvEditorConfigData getCurrentConfiguration();
 	
 	// gets a default set of configuration
 	// does not modify object status
-	EditorConfigData getDefaultConfiguration();
+	QsvEditorConfigData getDefaultConfiguration();
 	
 	// gets the configuration which the user is working on, 
 	// by reading from the gui
 	// does not modify object status
-	EditorConfigData getUserConfiguration();
+	QsvEditorConfigData getUserConfiguration();
 	
 	// sets the current configuration to c
 	// does not modify the GUI
-	void setConfiguration( EditorConfigData c );
+	void setConfiguration( QsvEditorConfigData c );
 	
 	// enforce a configuration set on an editor
 	// modifies object status
-	static void applyConfiguration( EditorConfigData c, LinesEditor *editor );
+	static void applyConfiguration( QsvEditorConfigData c, QsvEditor *editor );
 
 	// updates the GUI to refelct the new configuration
 	void updateConfiguration();
@@ -85,7 +85,7 @@ private:
 	QDialog *dialog;
 	ColorsModel *colorsModel;
 	Ui::ConfigDialog ui;
-	EditorConfigData currentConfig;
+	QsvEditorConfigData currentConfig;
 };
 
 #endif // __EDITORCONFIG_H__

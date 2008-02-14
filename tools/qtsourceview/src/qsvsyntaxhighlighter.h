@@ -16,7 +16,7 @@ class QTextCharFormat;
 class QsvLangDef;
 class QsvColorDefFactory;
 
-struct LanguageEntity
+struct QsvLanguageEntity
 {
 	QString name;
 	QTextCharFormat charFormat;
@@ -45,7 +45,7 @@ private:
 
 	QsvColorDefFactory	*colors;
 	QsvLangDef		*language;
-	QOrderedMap<QString,LanguageEntity> mappings;
+	QOrderedMap<QString,QsvLanguageEntity> mappings;
 };
 
 #endif  // __QSV_SYNTAXHIGHLIGHTER__

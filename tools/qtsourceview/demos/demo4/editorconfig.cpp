@@ -117,14 +117,14 @@ void EditorConfig::loadColorsDirectory( QString directory )
 }
 
 
-EditorConfigData EditorConfig::getCurrentConfiguration()
+QsvEditorConfigData EditorConfig::getCurrentConfiguration()
 {
 	return currentConfig;
 }
 
-EditorConfigData  EditorConfig::getDefaultConfiguration()
+QsvEditorConfigData  EditorConfig::getDefaultConfiguration()
 {
-	EditorConfigData  defaultConfiguration;
+	QsvEditorConfigData  defaultConfiguration;
 	defaultConfiguration.autoBrackets	= true;
 	defaultConfiguration.markCurrentLine	= true;
 	defaultConfiguration.showLineNumbers	= true;
@@ -145,9 +145,9 @@ EditorConfigData  EditorConfig::getDefaultConfiguration()
 	return defaultConfiguration;
 }
 
-EditorConfigData EditorConfig::getUserConfiguration()
+QsvEditorConfigData EditorConfig::getUserConfiguration()
 {
-	EditorConfigData userConfig;
+	QsvEditorConfigData userConfig;
 
 	userConfig.autoBrackets		= ui.autoBrackets->isChecked();
 	userConfig.markCurrentLine	= ui.markCurrentLine->isChecked();
@@ -174,12 +174,12 @@ EditorConfigData EditorConfig::getUserConfiguration()
 	return userConfig;
 }
 
-void EditorConfig::setConfiguration( EditorConfigData c )
+void EditorConfig::setConfiguration( QsvEditorConfigData c )
 {
 	currentConfig = c;
 }
 
-void EditorConfig::applyConfiguration( EditorConfigData c, LinesEditor *editor )
+void EditorConfig::applyConfiguration( QsvEditorConfigData c, QsvEditor *editor )
 {
 	editor->setUsingAutoBrackets( c.autoBrackets );
 	editor->setDisplayCurrentLine( c.markCurrentLine );
@@ -228,13 +228,13 @@ void EditorConfig::applyConfiguration( EditorConfigData c, LinesEditor *editor )
 #if QT_VERSION < 0x040400
 		editor->setTextColor( c.currentColorScheme->getColorDef("dsNormal").getColor() );
 #endif
-		editor->setItemColor( LinesPanel, c.currentColorScheme->getColorDef("dsWidgetLinesPanel").getBackground() );
-		editor->setItemColor( ModifiedColor, c.currentColorScheme->getColorDef("dsWidgetModifiedLine").getBackground() );
-		editor->setItemColor( CurrentLine, c.currentColorScheme->getColorDef("dsWidgetCurLine").getBackground() );
-		editor->setItemColor( MatchBrackets, c.currentColorScheme->getColorDef("dsCurrectBracket").getBackground() );
-		editor->setItemColor( WhiteSpaceColor, c.currentColorScheme->getColorDef("dsWhiteSpace").getColor() );
-		editor->setItemColor( BookmarkLineColor, c.currentColorScheme->getColorDef("dsWidgetBookmark").getBackground() );
-		editor->setItemColor( BreakpointLineColor, c.currentColorScheme->getColorDef("dsWidgetActiveBreakpoint").getBackground() );
+		editor->setItemColor( QsvEditor::LinesPanel, c.currentColorScheme->getColorDef("dsWidgetLinesPanel").getBackground() );
+		editor->setItemColor( QsvEditor::ModifiedColor, c.currentColorScheme->getColorDef("dsWidgetModifiedLine").getBackground() );
+		editor->setItemColor( QsvEditor::CurrentLine, c.currentColorScheme->getColorDef("dsWidgetCurLine").getBackground() );
+		editor->setItemColor( QsvEditor::MatchBrackets, c.currentColorScheme->getColorDef("dsCurrectBracket").getBackground() );
+		editor->setItemColor( QsvEditor::WhiteSpaceColor, c.currentColorScheme->getColorDef("dsWhiteSpace").getColor() );
+		editor->setItemColor( QsvEditor::BookmarkLineColor, c.currentColorScheme->getColorDef("dsWidgetBookmark").getBackground() );
+		editor->setItemColor( QsvEditor::BreakpointLineColor, c.currentColorScheme->getColorDef("dsWidgetActiveBreakpoint").getBackground() );
 		
 		QsvSyntaxHighlighter *sh = editor->getSyntaxHighlighter();
 		if (sh)
@@ -327,14 +327,14 @@ void EditorConfig::on_tabWidget_currentChanged(int index)
 	if (index != 1)
 		return;
 
-	EditorConfigData c = getUserConfiguration();
+	QsvEditorConfigData c = getUserConfiguration();
 	applyConfiguration( c , ui.sampleEdit );
 }
 
 void EditorConfig::on_colorsCombo_currentIndexChanged( int index )
 {
 	Q_UNUSED( index );
-	EditorConfigData c = getUserConfiguration();
+	QsvEditorConfigData c = getUserConfiguration();
 	
 	applyConfiguration( c , ui.sampleEdit );
 }
