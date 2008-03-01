@@ -4,6 +4,7 @@
 #include <QMenu>
 #include <QMenuItem>
 #include <QDebug>
+#include <QTime>
 
 // QtSourceView includes
 #include "qsvcolordef.h"
@@ -25,8 +26,7 @@
 MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f) 
 	: QMainWindow(parent, f)
 {
-	setupUi(this);
-	
+	initGUI();
 #ifdef WIN32
 	QString dataPath  = QApplication::applicationDirPath() + "/../../..";
 #else
@@ -36,21 +36,33 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
 	QsvLangDefFactory::getInstanse()->addMimeTypes( dataPath  + "/src/mime.types" );
 	QsvLangDefFactory::getInstanse()->loadDirectory( dataPath + "/data/langs/" );
 	EditorConfig::getInstance()->loadColorsDirectory( dataPath + "/data/colors/" );
-	
 	defColors = new QsvColorDefFactory( dataPath + "/data/colors/kate.xml" );
 	
+	QTime t;
+	t.start();
 	QString loadedFile;
-	loadedFile = "mainwindowimpl.cpp";
-	//loadedFile = "lineseditor.cpp";
+	//loadedFile = "qsveditor.cpp";
 	//loadedFile = "../../tests/highlight.pas";
+	loadedFile = "mainwindowimpl.cpp";
 
+	// first load file without any highlight
+	textEdit->setSyntaxHighlighter( NULL );
+	textEdit->loadFile( loadedFile );
+	QApplication::processEvents();
+
+	// then assign it a new highlight
 	langDefinition = QsvLangDefFactory::getInstanse()->getHighlight(loadedFile);
-	QsvSyntaxHighlighter *newSyntaxHighlighter = new QsvSyntaxHighlighter( textEdit->document(), defColors, langDefinition ); // bing 
-	textEdit->setSyntaxHighlighter( newSyntaxHighlighter );
-	textEdit->loadFile( loadedFile ); // bing
-	setWindowTitle( tr("QtSourceView demo4 - %1").arg(loadedFile));
-	connect( EditorConfig::getInstance(), SIGNAL(configurationModified()), this, SLOT(configuration_updated()));
+	textEdit->setSyntaxHighlighter( new QsvSyntaxHighlighter( defColors, langDefinition ) );
+	qDebug("Time elapsed: %d ms", t.elapsed());
 	
+	setWindowTitle( tr("QtSourceView demo4 - %1").arg(loadedFile));
+}
+
+void MainWindowImpl::initGUI()
+{
+	setupUi(this);
+	showMaximized();
+
 	textEdit->setupActions();
 	QMenu *tmpMenu = menuBar()->findChildren<QMenu*>( "menu_Edit" )[0];
 	if (tmpMenu)
@@ -88,10 +100,10 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
 	
 	connect( actionUndo, SIGNAL(triggered()), textEdit, SLOT(undo()));
 	connect( actionRedo, SIGNAL(triggered()), textEdit, SLOT(redo()));
-
 	connect( actionCopy, SIGNAL(triggered()), textEdit, SLOT(copy()));
 	connect( actionCut, SIGNAL(triggered()), textEdit, SLOT(cut()));
 	connect( actionPaste, SIGNAL(triggered()), textEdit, SLOT(paste()));
+	connect( EditorConfig::getInstance(), SIGNAL(configurationModified()), this, SLOT(configuration_updated()));
 }
 
 void MainWindowImpl::on_action_New_triggered()
@@ -113,7 +125,13 @@ void MainWindowImpl::on_action_Open_triggered()
 	
 	if (s.isEmpty())
 		return;
-		
+	
+	textEdit->clear();	// bing
+	langDefinition = QsvLangDefFactory::getInstanse()->getHighlight( s );
+	textEdit->getSyntaxHighlighter()->setHighlight( langDefinition );
+	textEdit->removeModifications();
+	textEdit->loadFile(s);	// bing
+	
 	int i = s.lastIndexOf("/");
 	if (i==-1)
 		s = s.lastIndexOf("\\");
@@ -125,12 +143,6 @@ void MainWindowImpl::on_action_Open_triggered()
 	}
 	else
 		lastDir.clear();
-	
-	textEdit->clear();	// bing
-	langDefinition = QsvLangDefFactory::getInstanse()->getHighlight( s );
-	textEdit->getSyntaxHighlighter()->setHighlight( langDefinition );
-	textEdit->removeModifications();
-	textEdit->loadFile(s);	// bing
 
 	setWindowTitle( tr("QtSourceView demo4 - %1").arg(s));
 	statusBar()->showMessage( tr("File %1 loaded").arg(s), 5000 );

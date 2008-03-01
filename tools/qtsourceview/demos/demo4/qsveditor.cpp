@@ -26,6 +26,7 @@
 #include "qsvsyntaxhighlighter.h"
 #include "transparentwidget.h"
 
+
 const int floatingWidgetTimeout = 0;
 
 bool isFullWord( QString s1, QString s2, int location )
@@ -65,6 +66,7 @@ QsvEditor::QsvEditor( QWidget *p ) : QTextEditorControl(p)
 	showPrintingMargins	= true;
 	usingSmartHome		= true;
 	usingAutoBrackets	= true;
+	modificationsLookupEnabled = true;
 	printMarginWidth	= 80;
 	matchStart		= -1;
 	matchEnd		= -1;
@@ -110,10 +112,11 @@ QsvEditor::QsvEditor( QWidget *p ) : QTextEditorControl(p)
 
 	replaceWidget = new QsvTransparentWidget( this, 0.80 );
 	ui_replaceWidget.setupUi( replaceWidget );
-	ui_replaceWidget.frame->adjustSize();
+	QApplication::processEvents();
 	ui_replaceWidget.replaceOldText->setIcon( QPixmap(":/images/edit-undo.png") );
 	ui_replaceWidget.replaceNewText->setIcon( QPixmap(":/images/edit-undo.png") );
 	ui_replaceWidget.optionsFrame->hide();
+	ui_replaceWidget.frame->adjustSize();
 	replaceWidget->adjustSize();
 	replaceWidget->hide();
 	
@@ -338,12 +341,19 @@ QsvSyntaxHighlighter* QsvEditor::getSyntaxHighlighter()
 
 void	QsvEditor::setSyntaxHighlighter( QsvSyntaxHighlighter *newSyntaxHighlighter )
 {
+	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+
+	pauseModificationsLookup();
 	syntaxHighlighter = newSyntaxHighlighter;
+	if (syntaxHighlighter)
+		syntaxHighlighter->setDocument( this->document() );
 	
 	// TODO should we re-highlight?
 	//syntaxHighlighter->rehighlight();
 	
-	removeModifications();
+	QApplication::processEvents();
+	QApplication::restoreOverrideCursor();
+	resumeModificationsLookup();
 }
 
 bool	QsvEditor::getDisplayCurrentLine()
@@ -499,10 +509,12 @@ int	QsvEditor::loadFile( QString s )
 	QStringList sl = fileSystemWatcher->directories();
 	if (!sl.isEmpty())
 		fileSystemWatcher->removePaths( sl );
-	
+
+	pauseModificationsLookup();	
 	hideBannerMessage();
 	this->setReadOnly( false );
-	
+	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+	QApplication::processEvents();
 	if (!s.isEmpty())
 	{
 		QFile file(s);
@@ -530,7 +542,10 @@ int	QsvEditor::loadFile( QString s )
 		}
 	}
 	
+	resumeModificationsLookup();
 	removeModifications();
+
+	QApplication::restoreOverrideCursor();
 	return 0;
 }
 
@@ -564,6 +579,16 @@ void	QsvEditor::resumeFileSystemWatch()
 {
 	connect( fileSystemWatcher, SIGNAL(fileChanged(const QString&)), this, SLOT(on_fileChanged(const QString&)));
 	fileSystemWatcher->addPath( fileName );
+}
+
+void	QsvEditor::pauseModificationsLookup()
+{
+	modificationsLookupEnabled = false;
+}
+
+void	QsvEditor::resumeModificationsLookup()
+{
+	modificationsLookupEnabled = true;
 }
 
 void	QsvEditor::showFindWidget()
@@ -1028,6 +1053,9 @@ void	QsvEditor::on_cursorPositionChanged()
 
 void	QsvEditor::on_textDocument_contentsChange( int position, int charsRemoved, int charsAdded )
 {
+	if (!modificationsLookupEnabled)
+		return;
+	
 	if (charsAdded < 2)
 	{
 		QsvPrivateBlockData* data = getPrivateBlockData( textCursor().block(), true );
@@ -1040,8 +1068,11 @@ void	QsvEditor::on_textDocument_contentsChange( int position, int charsRemoved, 
 		int remaining = 0;
 		QTextCursor cursor( document() );
 		cursor.setPosition( position );
-		while (remaining+1 < charsAdded)
+		int oldRemaining = -1;
+		//while (remaining+1 < charsAdded)
+		while ( (remaining+1 < charsAdded) && (oldRemaining != remaining) )
 		{
+			oldRemaining = remaining;
 			QsvPrivateBlockData* data = getPrivateBlockData( cursor.block(), true );
 			if (data) 
 				data->m_isModified = true;	// should not happen, but can't be too safe
@@ -1388,6 +1419,7 @@ void	QsvEditor::widgetToBottom( QWidget *w )
 	QRect r1 = viewport()->geometry();
 	QRect r2 = w->geometry();
 
+	w->adjustSize();
 	int i = r2.height();
 	r2.setX( r1.left() + 5 );
 	r2.setY( r1.height() - i - 5 );
@@ -1403,6 +1435,7 @@ void	QsvEditor::widgetToTop( QWidget *w )
 	QRect r1 = viewport()->geometry();
 	QRect r2 = w->geometry();
 
+	w->adjustSize();
 	int i = r2.height();
 	r2.setX( r1.left() + 5 );
 	r2.setY( 5 );
@@ -1410,7 +1443,7 @@ void	QsvEditor::widgetToTop( QWidget *w )
 	r2.setHeight( i );
 	
 	w->setGeometry(r2);
-	w->show();	
+	w->show();
 }
 
 bool	QsvEditor::handleKeyPressEvent( QKeyEvent *event )

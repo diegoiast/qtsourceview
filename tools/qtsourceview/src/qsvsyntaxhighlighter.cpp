@@ -65,6 +65,14 @@ being used by gedit, MonoDevelop, Glimmer and several other projects.
  * arround with those internal functions, and you need only to create new syntax definitions
  * by writing XML files.
  */
+
+QsvSyntaxHighlighter::QsvSyntaxHighlighter( QsvColorDefFactory *colors, QsvLangDef *lang )
+	:QSyntaxHighlighter( (QObject*)NULL)
+{
+	language = NULL;
+	this->colors = colors;
+	setHighlight( lang );
+}
  
 /**
  * \brief construct a syntax highlighter 

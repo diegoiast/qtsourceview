@@ -26,6 +26,7 @@ struct QsvLanguageEntity
 class QsvSyntaxHighlighter: public QSyntaxHighlighter
 {
 public:
+	QsvSyntaxHighlighter( QsvColorDefFactory *colors, QsvLangDef *lang );
 	QsvSyntaxHighlighter( QTextDocument *parent = 0, QsvColorDefFactory *colors=0, QsvLangDef *lang=0 );
 	QsvSyntaxHighlighter( QTextEdit *parent = 0, QsvColorDefFactory *colors=0, QsvLangDef *lang=0 );
 	~QsvSyntaxHighlighter();

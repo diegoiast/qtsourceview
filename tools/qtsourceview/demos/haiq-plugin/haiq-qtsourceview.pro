@@ -5,8 +5,8 @@ CONFIG += plugin qt release
 #CONFIG += warn_on console debug_and_release
 
 TARGET = qtsourceview
-include($$HAIQDIR/translations.pri)
-include($$HAIQDIR/haiqplugin.pri)
+include($$HAIQDIR/src/translations.pri)
+include($$HAIQDIR/src/haiqplugin.pri)
 DESTDIR=./
 
 TMP_DIR =   tmp

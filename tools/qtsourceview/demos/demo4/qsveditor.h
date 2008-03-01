@@ -78,6 +78,8 @@ public:
 public slots:
 	void		pauseFileSystemWatch();
 	void		resumeFileSystemWatch();
+	void		pauseModificationsLookup();
+	void		resumeModificationsLookup();
 	void		adjustMarginWidgets();
 	void		showFindWidget();
 	void		showReplaceWidget();
@@ -167,6 +169,7 @@ private:
 	bool	showPrintingMargins;
 	bool	usingSmartHome;
 	bool	usingAutoBrackets;
+	bool	modificationsLookupEnabled;
 	int	printMarginWidth;
 	QString	matchingString;
 	
