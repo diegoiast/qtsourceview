@@ -74,6 +74,8 @@ public:
 	int		loadFile( QString );
 	QString		getFileName();
 	void		removeModifications();
+	int		getIndentationSize( const QString s );
+	QString		updateIndentation( QString s, int indentation );
 	
 public slots:
 	void		pauseFileSystemWatch();

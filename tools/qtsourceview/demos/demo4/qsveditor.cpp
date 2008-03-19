@@ -26,7 +26,6 @@
 #include "qsvsyntaxhighlighter.h"
 #include "transparentwidget.h"
 
-
 const int floatingWidgetTimeout = 0;
 
 bool isFullWord( QString s1, QString s2, int location )
@@ -47,7 +46,6 @@ bool isFullWord( QString s1, QString s2, int location )
 		else 
 			endOk = ! s1.at(location + s2.length() + 1).isLetterOrNumber();
 	
-	//qDebug("%s %d %s in %s, starting at %d is %d,%d", __FILE__, __LINE__, qPrintable(s2), qPrintable(s1), location, startOk, endOk );
 	return startOk & endOk;
 }
 
@@ -552,6 +550,56 @@ int	QsvEditor::loadFile( QString s )
 QString	QsvEditor::getFileName()
 {
 	return fileName;
+}
+
+int	QsvEditor::getIndentationSize( const QString s )
+{
+	int indentation = 0;
+	int i = 0;
+	int l = s.length();
+	QChar c = s.at(i);
+	
+	while( (i<l) && ((c == ' ') || (c == '\t')) )
+	{
+		if (c == '\t')
+		{
+			indentation ++;
+			i ++;
+		}
+		else if (c == ' ')
+		{
+			int k=0;
+			while(s.at(i+k) == ' ' )
+				k ++;
+			i += k;
+			indentation += k / getTabSize();
+		}
+
+		c = s.at(i);
+	}
+	
+	return indentation;
+}
+
+QString	QsvEditor::updateIndentation( QString s, int indentation )
+{
+	if (s.isEmpty())
+		return s;
+		
+	while ((s.at(0) == ' ') || (s.at(0) == '\t'))
+	{
+		s.remove(0,1);
+		if (s.isEmpty())
+			break;
+	}
+		
+	while( indentation != 0 )
+	{
+		s = s.insert( 0, QChar('\t') );
+		indentation --;
+	}
+	
+	return s;
 }
 
 void	QsvEditor::removeModifications()
@@ -1187,6 +1235,16 @@ void	QsvEditor::keyPressEvent( QKeyEvent *event )
 					// do not call original hanlder, if this was handled by that function
 					return; 
 			}
+		case Qt::Key_Backtab:
+			if (replaceWidget->isVisible())
+			{
+				event->ignore();
+				return;
+			}
+			//if (tabIndents)
+				if (handleIndentEvent(false))
+					return; 
+		
 		default:
 			if (usingAutoBrackets && handleKeyPressEvent(event))
 				return;
@@ -1517,13 +1575,45 @@ FUNCTION_END:
 
 bool	QsvEditor::handleIndentEvent( bool forward )
 {
-	QTextCursor cursor = textCursor();
-	if (!cursor.hasSelection())
+	QTextCursor cursor1 = textCursor();
+	if (!cursor1.hasSelection())
 	{	// TODO
-		qDebug("no selection, not handling");
-		return false;
+		cursor1.select( QTextCursor::LineUnderCursor );
+		//return false;
 	}
 	
+	QTextCursor cursor2 = cursor1;
+	cursor1.setPosition( cursor1.selectionStart() );
+	cursor2.setPosition( cursor2.selectionEnd() );
+	int startBlock = cursor1.blockNumber();
+	int endBlock = cursor2.blockNumber();
+	
+	int baseIndentation = getIndentationSize( cursor1.block().text() );
+	
+	if (forward)
+		baseIndentation++;
+	else if (baseIndentation!=0) baseIndentation--;
+
+	cursor1.beginEditBlock();
+	int origPos = cursor1.position();
+	while( cursor1.blockNumber() < endBlock )
+	{
+		int pos = cursor1.position();
+		QString s = cursor1.block().text();
+		cursor1.select( QTextCursor::LineUnderCursor );
+		
+		if (forward)
+			cursor1.insertText( '\t' + s );
+		else
+			cursor1.insertText( updateIndentation(s,baseIndentation) );
+
+		cursor1.setPosition( pos );
+		if (!cursor1.movePosition(QTextCursor::NextBlock))
+			break;
+	}
+	cursor1.setPosition( origPos, QTextCursor::KeepAnchor );
+	cursor1.endEditBlock();
+	setTextCursor( cursor1 );
 	return true;
 }
 
