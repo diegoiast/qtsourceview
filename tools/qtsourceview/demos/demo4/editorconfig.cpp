@@ -73,7 +73,7 @@ int main( int argc, char *argv[])\n\
 	}
 	
 	dialog->show();
-	setConfiguration( currentConfig );
+	ui.sampleEdit->applyConfiguration( currentConfig );
 	updateConfiguration();
 }
 
@@ -133,6 +133,7 @@ QsvEditorConfigData  EditorConfig::getDefaultConfiguration()
 	defaultConfiguration.showMargins	= true;
 	defaultConfiguration.lineWrapping	= false;
 	defaultConfiguration.smartHome		= true;
+	defaultConfiguration.insertSpacesInsteadOfTabs = false;
 	defaultConfiguration.tabSize		= 8;
 	defaultConfiguration.marginsWidth	= 80;
 	defaultConfiguration.matchBrackesList	= "()[]{}\"\"''``";
@@ -157,6 +158,7 @@ QsvEditorConfigData EditorConfig::getUserConfiguration()
 	userConfig.matchBrackes		= ui.matchBrackets->isChecked();
 	userConfig.matchBrackesList	= ui.matchCraketsList->text();
 	userConfig.lineWrapping		= ui.wrapLines->isChecked();
+	userConfig.insertSpacesInsteadOfTabs	= ui.insertTabs->isChecked();
 	userConfig.tabSize		= ui.tabSize->value();
 	userConfig.currentFont		= ui.labelFontPreview->font();
 	userConfig.smartHome		= ui.useSmartHome->isChecked();
@@ -174,81 +176,9 @@ QsvEditorConfigData EditorConfig::getUserConfiguration()
 	return userConfig;
 }
 
-void EditorConfig::setConfiguration( QsvEditorConfigData c )
+void EditorConfig::applyConfiguration( QsvEditorConfigData c )
 {
 	currentConfig = c;
-}
-
-void EditorConfig::applyConfiguration( QsvEditorConfigData c, QsvEditor *editor )
-{
-	editor->setUsingAutoBrackets( c.autoBrackets );
-	editor->setDisplayCurrentLine( c.markCurrentLine );
-	editor->getPanel()->setVisible( c.showLineNumbers );
-	editor->setDisplayWhiteSpaces( c.showWhiteSpaces );
-	editor->setDisplayMatchingBrackets( c.matchBrackes );
-	editor->setMatchingString( c.matchBrackesList );
-	editor->setUsingSmartHome( c.smartHome );
-	if (c.showMargins)
-		editor->setMargin( c.marginsWidth );
-	else
-		editor->setMargin( -1 );
-	
-	editor->document()->setDefaultFont( c.currentFont );
-	editor->setTabSize( c.tabSize );
-	editor->getPanel()->setFont( c.currentFont );
-	
-	if (	c.lineWrapping)
-	{
-		if (c.showMargins)
-		{
-			const QFontMetrics fm = QFontMetrics( editor->document()->defaultFont() );
-#if QT_VERSION < 0x040400
-			const int newWrapWidth = fm.width( " " ) * c.marginsWidth;
-			editor->setLineWrapMode( QTextEditorControl::FixedPixelWidth );
-			editor->setLineWrapColumnOrWidth( newWrapWidth );
-#endif
-		}
-		else
-		{
-			editor->setLineWrapMode( QTextEditorControl::WidgetWidth );
-		}
-	}
-	else
-	{
-		editor->setLineWrapMode( QTextEditorControl::NoWrap );
-	}
-	
-	if (c.currentColorScheme == NULL )
-		qDebug("%s %d - Warning - no color scheme found!", __FILE__, __LINE__ );
-	else
-	{
-		QPalette p( editor->palette() );
-		p.setColor( QPalette::Base, c.currentColorScheme->getColorDef("dsWidgetBackground").getBackground() );
-		editor->setPalette( p );
-#if QT_VERSION < 0x040400
-		editor->setTextColor( c.currentColorScheme->getColorDef("dsNormal").getColor() );
-#endif
-		editor->setItemColor( QsvEditor::LinesPanel, c.currentColorScheme->getColorDef("dsWidgetLinesPanel").getBackground() );
-		editor->setItemColor( QsvEditor::ModifiedColor, c.currentColorScheme->getColorDef("dsWidgetModifiedLine").getBackground() );
-		editor->setItemColor( QsvEditor::CurrentLine, c.currentColorScheme->getColorDef("dsWidgetCurLine").getBackground() );
-		editor->setItemColor( QsvEditor::MatchBrackets, c.currentColorScheme->getColorDef("dsCurrectBracket").getBackground() );
-		editor->setItemColor( QsvEditor::WhiteSpaceColor, c.currentColorScheme->getColorDef("dsWhiteSpace").getColor() );
-		editor->setItemColor( QsvEditor::BookmarkLineColor, c.currentColorScheme->getColorDef("dsWidgetBookmark").getBackground() );
-		editor->setItemColor( QsvEditor::BreakpointLineColor, c.currentColorScheme->getColorDef("dsWidgetActiveBreakpoint").getBackground() );
-		
-		QsvSyntaxHighlighter *sh = editor->getSyntaxHighlighter();
-		if (sh)
-		{
-			sh->setColorsDef( c.currentColorScheme );
-			sh->rehighlight();
-		}
-		/*else
-			qDebug( "%s %d - Warning no syntax highlighter found!", __FILE__, __LINE__ ); */
-	}
-	
-	editor->adjustMarginWidgets();
-	editor->update();
-	editor->viewport()->update();
 }
 
 void EditorConfig::updateConfiguration()
@@ -261,15 +191,16 @@ void EditorConfig::updateConfiguration()
 	ui.matchBrackets->setChecked( currentConfig.matchBrackes );
 	ui.useSmartHome->setChecked( currentConfig.smartHome );
 	ui.matchCraketsList->setText( currentConfig.matchBrackesList );
+	ui.insertTabs->setChecked( currentConfig.insertSpacesInsteadOfTabs ); 
 	ui.tabSize->setValue( currentConfig.tabSize );
 	ui.labelFontPreview->setText( currentConfig.currentFont.toString() );
 	ui.labelFontPreview->setFont( currentConfig.currentFont );
-	
+
 	int i = colorSchemes.indexOf( currentConfig.currentColorScheme );
 	ui.colorsCombo->setCurrentIndex(i);
 
 	// the color configuration is set by this function 	
-	applyConfiguration( currentConfig, ui.sampleEdit );
+	ui.sampleEdit->applyConfiguration( currentConfig );
 }
 
 void EditorConfig::on_buttonBox_clicked( QAbstractButton * button )
@@ -288,14 +219,14 @@ void EditorConfig::on_buttonBox_clicked( QAbstractButton * button )
 		// set the configuration internally and emit signal, no need to update GUI
 		currentConfig = getUserConfiguration();
 		dialog->close();
-		emit( configurationModified() );
+		emit( configurationModified(currentConfig) );
 	} 
 	else if (b == ui.buttonBox->button(QDialogButtonBox::Apply))
 	{
 		// set the configuration internally and emit signal
 		currentConfig = getUserConfiguration();
 		updateConfiguration();
-		emit( configurationModified() );
+		emit( configurationModified(currentConfig) );
 	}
 	else if (b == ui.buttonBox->button(QDialogButtonBox::Cancel))
 	{
@@ -305,7 +236,7 @@ void EditorConfig::on_buttonBox_clicked( QAbstractButton * button )
 	else if (b == ui.buttonBox->button(QDialogButtonBox::RestoreDefaults))
 	{
 		// restore default values
-		setConfiguration( getDefaultConfiguration() );
+		applyConfiguration( getDefaultConfiguration() );
 		updateConfiguration();
 	}
 }
@@ -328,7 +259,7 @@ void EditorConfig::on_tabWidget_currentChanged(int index)
 		return;
 
 	QsvEditorConfigData c = getUserConfiguration();
-	applyConfiguration( c , ui.sampleEdit );
+	ui.sampleEdit->applyConfiguration( c  );
 }
 
 void EditorConfig::on_colorsCombo_currentIndexChanged( int index )
@@ -336,6 +267,6 @@ void EditorConfig::on_colorsCombo_currentIndexChanged( int index )
 	Q_UNUSED( index );
 	QsvEditorConfigData c = getUserConfiguration();
 	
-	applyConfiguration( c , ui.sampleEdit );
+	ui.sampleEdit->applyConfiguration( c );
 }
 

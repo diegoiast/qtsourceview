@@ -22,10 +22,6 @@ private slots:
 	void on_actionE_xit_triggered();
 	void on_action_setup_triggered();
 	
-	// not auto-connected
-public slots:
-	void configuration_updated();
-
 private:
 	QString			lastDir;
 	QsvColorDefFactory	*defColors;

@@ -157,9 +157,3 @@ void MainWindowImpl::on_action_setup_triggered()
 {
 	EditorConfig::getInstance()->showConfigDialog();
 }
-
-void MainWindowImpl::configuration_updated()
-{
-	QsvEditorConfigData data = EditorConfig::getInstance()->getCurrentConfiguration();
-	EditorConfig::applyConfiguration( data, textEdit );
-}

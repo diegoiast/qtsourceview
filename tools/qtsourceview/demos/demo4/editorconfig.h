@@ -14,23 +14,6 @@ class QsvColorDefFactory;
 class QsvSyntaxHighlighter;
 class ColorsModel;
 
-struct QsvEditorConfigData
-{
-	bool			autoBrackets;
-	bool			markCurrentLine;
-	bool			showLineNumbers;
-	bool			showWhiteSpaces;
-	bool			showMargins;
-	bool			matchBrackes;
-	bool			lineWrapping;
-	bool			smartHome;
-	int			tabSize;
-	int			marginsWidth;
-	QString			matchBrackesList;
-	QFont			currentFont;
-	QsvColorDefFactory	*currentColorScheme;
-};
-
 class EditorConfig : public QObject
 {
 	Q_OBJECT
@@ -59,12 +42,8 @@ public:
 	
 	// sets the current configuration to c
 	// does not modify the GUI
-	void setConfiguration( QsvEditorConfigData c );
+	void applyConfiguration( QsvEditorConfigData c );
 	
-	// enforce a configuration set on an editor
-	// modifies object status
-	static void applyConfiguration( QsvEditorConfigData c, QsvEditor *editor );
-
 	// updates the GUI to refelct the new configuration
 	void updateConfiguration();
 
@@ -75,7 +54,7 @@ public slots:
 	void on_colorsCombo_currentIndexChanged(int index);
 
 signals:
-	void configurationModified();
+	void configurationModified(QsvEditorConfigData);
 
 private:
 	static EditorConfig *instance;

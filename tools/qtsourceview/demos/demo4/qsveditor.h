@@ -24,8 +24,27 @@ enum QTextDocument::FindFlag;
 class QsvEditorPanel;
 class QsvPrivateBlockData;
 class QsvTransparentWidget;
+class QsvColorDefFactory;
 
 bool isFullWord( QString s1, QString s2, int location );
+
+struct QsvEditorConfigData
+{
+	bool			autoBrackets;
+	bool			markCurrentLine;
+	bool			showLineNumbers;
+	bool			showWhiteSpaces;
+	bool			showMargins;
+	bool			matchBrackes;
+	bool			lineWrapping;
+	bool			smartHome;
+	bool			insertSpacesInsteadOfTabs;
+	int			tabSize;
+	int			marginsWidth;
+	QString			matchBrackesList;
+	QFont			currentFont;
+	QsvColorDefFactory	*currentColorScheme;
+};
 
 class QsvEditor: public QTextEditorControl
 {
@@ -50,6 +69,8 @@ public:
 	void		setMargin( int width );
 	int		getTabSize();
 	void		setTabSize( int size );
+	bool		getInsertSpacesInsteadOfTabs();
+	void		setInsertSpacesInsteadOfTabs(bool);
 	QsvSyntaxHighlighter*	getSyntaxHighlighter();
 	void		setSyntaxHighlighter( QsvSyntaxHighlighter *newSyntaxHighlighter );
 	QTextCursor	getCurrentTextCursor();
@@ -77,7 +98,9 @@ public:
 	int		getIndentationSize( const QString s );
 	QString		updateIndentation( QString s, int indentation );
 	
+	
 public slots:
+	void		applyConfiguration( QsvEditorConfigData c );
 	void		pauseFileSystemWatch();
 	void		resumeFileSystemWatch();
 	void		pauseModificationsLookup();
@@ -172,6 +195,7 @@ private:
 	bool	usingSmartHome;
 	bool	usingAutoBrackets;
 	bool	modificationsLookupEnabled;
+	bool	insertSpacesInsteadOfTabs;
 	int	printMarginWidth;
 	QString	matchingString;
 	

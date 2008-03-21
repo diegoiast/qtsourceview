@@ -24,6 +24,8 @@
 
 #include "qsvprivateblockdata.h"
 #include "qsvsyntaxhighlighter.h"
+#include "qsvcolordeffactory.h"
+#include "qsvcolordef.h"
 #include "transparentwidget.h"
 
 const int floatingWidgetTimeout = 0;
@@ -64,6 +66,7 @@ QsvEditor::QsvEditor( QWidget *p ) : QTextEditorControl(p)
 	showPrintingMargins	= true;
 	usingSmartHome		= true;
 	usingAutoBrackets	= true;
+	insertSpacesInsteadOfTabs = false;
 	modificationsLookupEnabled = true;
 	printMarginWidth	= 80;
 	matchStart		= -1;
@@ -319,6 +322,16 @@ int	QsvEditor::getMargin()
 	return printMarginWidth;
 }
 
+bool	QsvEditor::getInsertSpacesInsteadOfTabs()
+{
+	return insertSpacesInsteadOfTabs;
+}
+
+void	QsvEditor::setInsertSpacesInsteadOfTabs(bool newVal)
+{
+	insertSpacesInsteadOfTabs = newVal;
+}
+
 void	QsvEditor::setTabSize( int size )
 {
 	const QFontMetrics fm = QFontMetrics( document()->defaultFont() );
@@ -329,7 +342,7 @@ void	QsvEditor::setTabSize( int size )
 int	QsvEditor::getTabSize()
 {
 	const QFontMetrics fm = QFontMetrics( document()->defaultFont() );
-	return fm.width( " " ) / tabStopWidth();
+	return tabStopWidth()/ fm.width( " " );
 }
 
 QsvSyntaxHighlighter* QsvEditor::getSyntaxHighlighter()
@@ -581,21 +594,108 @@ int	QsvEditor::getIndentationSize( const QString s )
 	return indentation;
 }
 
+void	QsvEditor::applyConfiguration( QsvEditorConfigData c )
+{
+	setUsingAutoBrackets( c.autoBrackets );
+	setDisplayCurrentLine( c.markCurrentLine );
+	getPanel()->setVisible( c.showLineNumbers );
+	setDisplayWhiteSpaces( c.showWhiteSpaces );
+	setDisplayMatchingBrackets( c.matchBrackes );
+	setMatchingString( c.matchBrackesList );
+	setUsingSmartHome( c.smartHome );
+	if (c.showMargins)
+		setMargin( c.marginsWidth );
+	else
+		setMargin( -1 );
+	
+	document()->setDefaultFont( c.currentFont );
+	setInsertSpacesInsteadOfTabs( c.insertSpacesInsteadOfTabs );
+	setTabSize( c.tabSize );
+	getPanel()->setFont( c.currentFont );
+	
+	if (	c.lineWrapping)
+	{
+		if (c.showMargins)
+		{
+			const QFontMetrics fm = QFontMetrics( document()->defaultFont() );
+#if QT_VERSION < 0x040400
+			const int newWrapWidth = fm.width( " " ) * c.marginsWidth;
+			setLineWrapMode( QTextEditorControl::FixedPixelWidth );
+			setLineWrapColumnOrWidth( newWrapWidth );
+#endif
+		}
+		else
+		{
+			setLineWrapMode( QTextEditorControl::WidgetWidth );
+		}
+	}
+	else
+	{
+		setLineWrapMode( QTextEditorControl::NoWrap );
+	}
+	
+	if (c.currentColorScheme == NULL )
+		qDebug("%s %d - Warning - no color scheme found!", __FILE__, __LINE__ );
+	else
+	{
+		QPalette p( palette() );
+		p.setColor( QPalette::Base, c.currentColorScheme->getColorDef("dsWidgetBackground").getBackground() );
+		setPalette( p );
+#if QT_VERSION < 0x040400
+		setTextColor( c.currentColorScheme->getColorDef("dsNormal").getColor() );
+#endif
+		setItemColor( QsvEditor::LinesPanel, c.currentColorScheme->getColorDef("dsWidgetLinesPanel").getBackground() );
+		setItemColor( QsvEditor::ModifiedColor, c.currentColorScheme->getColorDef("dsWidgetModifiedLine").getBackground() );
+		setItemColor( QsvEditor::CurrentLine, c.currentColorScheme->getColorDef("dsWidgetCurLine").getBackground() );
+		setItemColor( QsvEditor::MatchBrackets, c.currentColorScheme->getColorDef("dsCurrectBracket").getBackground() );
+		setItemColor( QsvEditor::WhiteSpaceColor, c.currentColorScheme->getColorDef("dsWhiteSpace").getColor() );
+		setItemColor( QsvEditor::BookmarkLineColor, c.currentColorScheme->getColorDef("dsWidgetBookmark").getBackground() );
+		setItemColor( QsvEditor::BreakpointLineColor, c.currentColorScheme->getColorDef("dsWidgetActiveBreakpoint").getBackground() );
+
+		pauseModificationsLookup();
+		QsvSyntaxHighlighter *sh = getSyntaxHighlighter();
+		if (sh)
+		{
+			sh->setColorsDef( c.currentColorScheme );
+			sh->rehighlight();
+		}
+		/*else
+			qDebug( "%s %d - Warning no syntax highlighter found!", __FILE__, __LINE__ ); */
+
+		resumeModificationsLookup();
+	}
+	
+	adjustMarginWidgets();
+	update();
+	viewport()->update();
+}
+
 QString	QsvEditor::updateIndentation( QString s, int indentation )
 {
 	if (s.isEmpty())
 		return s;
 		
+	QString spaces;
+	if (insertSpacesInsteadOfTabs)
+	{
+		int k = getTabSize();
+		for(int i=0; i< k; i++ )
+			spaces = spaces.insert(0,' ');
+	}
+	
 	while ((s.at(0) == ' ') || (s.at(0) == '\t'))
 	{
 		s.remove(0,1);
 		if (s.isEmpty())
 			break;
 	}
-		
+	
 	while( indentation != 0 )
 	{
-		s = s.insert( 0, QChar('\t') );
+		if (insertSpacesInsteadOfTabs)
+			s = s.insert( 0, spaces );
+		else
+			s = s.insert( 0, QChar('\t') );
 		indentation --;
 	}
 	
@@ -1213,6 +1313,20 @@ void	QsvEditor::keyPressEvent( QKeyEvent *event )
 			event->accept();
 			break;
 			
+		case Qt::Key_PageDown:
+			if (!QApplication::keyboardModifiers().testFlag(Qt::ControlModifier))
+				break;
+			verticalScrollBar()->triggerAction( QAbstractSlider::SliderPageStepAdd);
+			event->accept();
+			break;
+
+		case Qt::Key_PageUp:
+			if (!QApplication::keyboardModifiers().testFlag(Qt::ControlModifier))
+				break;
+			verticalScrollBar()->triggerAction( QAbstractSlider::SliderPageStepSub );
+			event->accept();
+			break;
+			
 		case Qt::Key_Enter:
 		case Qt::Key_Return:
 			if (findWidget->isVisible() || replaceWidget->isVisible() || gotoLineWidget->isVisible())
@@ -1577,22 +1691,28 @@ bool	QsvEditor::handleIndentEvent( bool forward )
 {
 	QTextCursor cursor1 = textCursor();
 	if (!cursor1.hasSelection())
-	{	// TODO
 		cursor1.select( QTextCursor::LineUnderCursor );
-		//return false;
-	}
 	
 	QTextCursor cursor2 = cursor1;
 	cursor1.setPosition( cursor1.selectionStart() );
 	cursor2.setPosition( cursor2.selectionEnd() );
-	int startBlock = cursor1.blockNumber();
 	int endBlock = cursor2.blockNumber();
+	
+	QString spaces;
+	if (insertSpacesInsteadOfTabs)
+	{
+		int k = getTabSize();
+		for(int i=0; i< k; i++ )
+			spaces = spaces.insert(0,' ');
+			
+	}
 	
 	int baseIndentation = getIndentationSize( cursor1.block().text() );
 	
 	if (forward)
 		baseIndentation++;
-	else if (baseIndentation!=0) baseIndentation--;
+	else if (baseIndentation!=0) 
+		baseIndentation--;
 
 	cursor1.beginEditBlock();
 	int origPos = cursor1.position();
@@ -1603,7 +1723,7 @@ bool	QsvEditor::handleIndentEvent( bool forward )
 		cursor1.select( QTextCursor::LineUnderCursor );
 		
 		if (forward)
-			cursor1.insertText( '\t' + s );
+			cursor1.insertText( insertSpacesInsteadOfTabs? spaces + s : '\t' + s );
 		else
 			cursor1.insertText( updateIndentation(s,baseIndentation) );
 
