@@ -570,6 +570,10 @@ int	QsvEditor::getIndentationSize( const QString s )
 	int indentation = 0;
 	int i = 0;
 	int l = s.length();
+	
+	if (l == 0)
+		return 0;
+			
 	QChar c = s.at(i);
 	
 	while( (i<l) && ((c == ' ') || (c == '\t')) )
@@ -582,13 +586,14 @@ int	QsvEditor::getIndentationSize( const QString s )
 		else if (c == ' ')
 		{
 			int k=0;
-			while(s.at(i+k) == ' ' )
+			while( (i+k<l) && (s.at(i+k) == ' ' ))	
 				k ++;
 			i += k;
 			indentation += k / getTabSize();
 		}
 
-		c = s.at(i);
+		if (i<l)
+			c = s.at(i);
 	}
 	
 	return indentation;
@@ -1716,7 +1721,7 @@ bool	QsvEditor::handleIndentEvent( bool forward )
 
 	cursor1.beginEditBlock();
 	int origPos = cursor1.position();
-	while( cursor1.blockNumber() < endBlock )
+	do
 	{
 		int pos = cursor1.position();
 		QString s = cursor1.block().text();
@@ -1730,7 +1735,7 @@ bool	QsvEditor::handleIndentEvent( bool forward )
 		cursor1.setPosition( pos );
 		if (!cursor1.movePosition(QTextCursor::NextBlock))
 			break;
-	}
+	} while( cursor1.blockNumber() < endBlock );
 	cursor1.setPosition( origPos, QTextCursor::KeepAnchor );
 	cursor1.endEditBlock();
 	setTextCursor( cursor1 );

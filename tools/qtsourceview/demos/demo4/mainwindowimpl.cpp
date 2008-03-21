@@ -103,7 +103,7 @@ void MainWindowImpl::initGUI()
 	connect( actionCopy, SIGNAL(triggered()), textEdit, SLOT(copy()));
 	connect( actionCut, SIGNAL(triggered()), textEdit, SLOT(cut()));
 	connect( actionPaste, SIGNAL(triggered()), textEdit, SLOT(paste()));
-	connect( EditorConfig::getInstance(), SIGNAL(configurationModified()), this, SLOT(configuration_updated()));
+	connect( EditorConfig::getInstance(), SIGNAL(configurationModified(QsvEditorConfigData)), textEdit, SLOT(applyConfiguration(QsvEditorConfigData)));
 }
 
 void MainWindowImpl::on_action_New_triggered()

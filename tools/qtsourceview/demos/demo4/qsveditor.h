@@ -10,7 +10,6 @@
 #	define	QTextEditorControl	QTextEdit
 #endif
 
-#include <QTextBlock>
 #include "ui_findwidget.h"
 #include "ui_replacewidget.h"
 #include "ui_gotolinewidget.h"
