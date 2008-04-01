@@ -3,6 +3,7 @@
 #include <QDir>
 #include <QMenu>
 #include <QMenuItem>
+#include <QSettings>
 #include <QDebug>
 #include <QTime>
 
@@ -38,6 +39,10 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
 	EditorConfig::getInstance()->loadColorsDirectory( dataPath + "/data/colors/" );
 	defColors = new QsvColorDefFactory( dataPath + "/data/colors/kate.xml" );
 	
+	QSettings settings("demo4.ini",QSettings::IniFormat);
+	EditorConfig::getInstance()->loadSettings( settings );
+	QApplication::processEvents();
+
 	QTime t;
 	t.start();
 	QString loadedFile;
@@ -55,7 +60,17 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
 	textEdit->setSyntaxHighlighter( new QsvSyntaxHighlighter( defColors, langDefinition ) );
 	qDebug("Time elapsed: %d ms", t.elapsed());
 	
+	lastDir = QDir::homePath();
+	
 	setWindowTitle( tr("QtSourceView demo4 - %1").arg(loadedFile));
+}
+
+MainWindowImpl::~MainWindowImpl()
+{
+	EditorConfig::getInstance()->closeConfigDialog();
+	QSettings settings("demo4.ini",QSettings::IniFormat);
+	EditorConfig::getInstance()->saveSettings( settings );
+	settings.sync();
 }
 
 void MainWindowImpl::initGUI()
@@ -106,32 +121,8 @@ void MainWindowImpl::initGUI()
 	connect( EditorConfig::getInstance(), SIGNAL(configurationModified(QsvEditorConfigData)), textEdit, SLOT(applyConfiguration(QsvEditorConfigData)));
 }
 
-void MainWindowImpl::on_action_New_triggered()
+void MainWindowImpl::updateWindowTitle( QString s )
 {
-	textEdit->clearEditor();
-	setWindowTitle( tr("QtSourceView demo4 - no file loaded") );
-	statusBar()->showMessage( tr("New file"), 5000 );
-}
-
-void MainWindowImpl::on_action_Open_triggered()
-{
-	QString s = QFileDialog::getOpenFileName( this, tr("Open File"),
-		lastDir,
-		tr("C/C++ source files")	+ " (*.c *.cpp *.h *.hpp );;" + 
-		tr("Perl scripts")		+ " (*.pl);;" +
-		tr("Shell scripts")		+ " (*.sh);;" +
-		tr("All files")			+ " (*)"
-	);
-	
-	if (s.isEmpty())
-		return;
-	
-	textEdit->clear();	// bing
-	langDefinition = QsvLangDefFactory::getInstanse()->getHighlight( s );
-	textEdit->getSyntaxHighlighter()->setHighlight( langDefinition );
-	textEdit->removeModifications();
-	textEdit->loadFile(s);	// bing
-	
 	int i = s.lastIndexOf("/");
 	if (i==-1)
 		s = s.lastIndexOf("\\");
@@ -146,6 +137,56 @@ void MainWindowImpl::on_action_Open_triggered()
 
 	setWindowTitle( tr("QtSourceView demo4 - %1").arg(s));
 	statusBar()->showMessage( tr("File %1 loaded").arg(s), 5000 );
+}
+
+void MainWindowImpl::on_action_New_triggered()
+{
+	textEdit->clearEditor();
+	setWindowTitle( tr("QtSourceView demo4 - no file loaded") );
+	statusBar()->showMessage( tr("New file"), 5000 );
+}
+
+void MainWindowImpl::on_action_Open_triggered()
+{
+	QString s = QFileDialog::getOpenFileName( this, tr("Open File"),
+		lastDir,
+		tr("Text files")		+ " (*.txt );;" + 
+		tr("C/C++ source files")	+ " (*.c *.cpp *.h *.hpp );;" + 
+		tr("Perl scripts")		+ " (*.pl);;" +
+		tr("Shell scripts")		+ " (*.sh);;" +
+		tr("All files")			+ " (*)"
+	);
+	
+	if (s.isEmpty())
+		return;
+	
+	textEdit->clear();	// bing
+	langDefinition = QsvLangDefFactory::getInstanse()->getHighlight( s );
+	textEdit->getSyntaxHighlighter()->setHighlight( langDefinition );
+	textEdit->removeModifications();
+	textEdit->loadFile(s);	// bing
+
+	updateWindowTitle( s );
+}
+
+void MainWindowImpl::on_action_Save_triggered()
+{
+	QString s = QFileDialog::getSaveFileName( this, tr("Save this file"),
+		lastDir,
+		tr("Text files")		+ " (*.txt );;" + 
+		tr("C/C++ source files")	+ " (*.c *.cpp *.h *.hpp );;" + 
+		tr("Perl scripts")		+ " (*.pl);;" +
+		tr("Shell scripts")		+ " (*.sh);;" +
+		tr("All files")			+ " (*)"
+	);
+	
+	if (s.isEmpty())
+		return;
+	
+	langDefinition = QsvLangDefFactory::getInstanse()->getHighlight( s );
+	textEdit->getSyntaxHighlighter()->setHighlight( langDefinition );
+	textEdit->saveFile( s );
+	updateWindowTitle( s );
 }
 
 void MainWindowImpl::on_actionE_xit_triggered()

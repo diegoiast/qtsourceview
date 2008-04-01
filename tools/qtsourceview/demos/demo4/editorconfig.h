@@ -3,8 +3,8 @@
 
 #include <QObject>
 #include <QList>
+#include <QSettings>
 #include "ui_configdialog.h"
-#include "qsvcolordeffactory.h"
 #include "qsveditor.h"
 
 class QFont;
@@ -46,6 +46,9 @@ public:
 	
 	// updates the GUI to refelct the new configuration
 	void updateConfiguration();
+	
+	void loadSettings( QSettings &settings );
+	void saveSettings( QSettings &settings );
 
 public slots:
 	void on_buttonBox_clicked( QAbstractButton * button );

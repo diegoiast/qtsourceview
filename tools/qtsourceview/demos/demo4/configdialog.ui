@@ -292,6 +292,37 @@
            </item>
           </layout>
          </item>
+         <item row="4" column="0" >
+          <widget class="QLabel" name="label_5" >
+           <property name="text" >
+            <string>End of line</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1" >
+          <widget class="QComboBox" name="endOfLineComboBox" >
+           <item>
+            <property name="text" >
+             <string>Windows (CR/LF)</string>
+            </property>
+           </item>
+           <item>
+            <property name="text" >
+             <string>Unix (CR)</string>
+            </property>
+           </item>
+           <item>
+            <property name="text" >
+             <string>Mac (LF)</string>
+            </property>
+           </item>
+           <item>
+            <property name="text" >
+             <string>Keep original</string>
+            </property>
+           </item>
+          </widget>
+         </item>
         </layout>
        </item>
       </layout>

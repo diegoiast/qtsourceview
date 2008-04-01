@@ -72,6 +72,7 @@ QsvEditor::QsvEditor( QWidget *p ) : QTextEditorControl(p)
 	matchStart		= -1;
 	matchEnd		= -1;
 	matchingString		= "(){}[]\"\"''``";
+	textCodec		= NULL;
 
 	actionFind		= NULL;
 	actionFindNext		= NULL;
@@ -96,11 +97,13 @@ QsvEditor::QsvEditor( QWidget *p ) : QTextEditorControl(p)
 	syntaxHighlighter = NULL;
 
 #ifdef WIN32
+	endOfLine = DOS;
 	QFont f("Courier New", 10);
 #else
+	endOfLine = Unix;
 	QFont f("Monospace", 9);
 #endif
-	document()->setDefaultFont( f );
+	setCurrentFont( f );
 	panel->setFont( f );
 	setTabSize( 8 );
 	
@@ -174,76 +177,76 @@ QsvEditor::~QsvEditor()
 
 void QsvEditor::setupActions()
 {
-	actionFind = new QAction( "&Find...", this );
+	actionFind = new QAction( tr("&Find..."), this );
 	actionFind->setObjectName("qsvEditor::actionFind");
 	actionFind->setShortcut( QKeySequence("Ctrl+F") );
 	connect( actionFind, SIGNAL(triggered()), this, SLOT(showFindWidget()) );
 
-	actionReplace = new QAction( "&Replace...", this );
+	actionReplace = new QAction( tr("&Replace..."), this );
 	actionReplace->setObjectName("qsvEditor::actionReplace");
 	actionReplace->setShortcut( QKeySequence("Ctrl+R") );
 	connect( actionReplace, SIGNAL(triggered()), this, SLOT(showReplaceWidget()) );
 
-	actionGotoLine = new QAction( "&Goto line...", this );
+	actionGotoLine = new QAction( tr("&Goto line..."), this );
 	actionGotoLine->setObjectName("qsvEditor::actionGotoLine");
 	actionGotoLine->setShortcut( QKeySequence("Ctrl+G") );
 	connect( actionGotoLine, SIGNAL(triggered()), this, SLOT(showGotoLineWidget()) );
 
-	actionFindNext = new QAction( "Find &next", this );
+	actionFindNext = new QAction( tr("Find &next"), this );
 	actionFindNext->setObjectName("qsvEditor::actionFindNext");
 	actionFindNext->setShortcut( QKeySequence("F3") );
 	connect( actionFindNext, SIGNAL(triggered()), this, SLOT(findNext()) );
 	
-	actionFindPrev = new QAction( "Find &previous", this );
+	actionFindPrev = new QAction( tr("Find &previous"), this );
 	actionFindPrev->setObjectName("qsvEditor::actionFindPrev");
 	actionFindPrev->setShortcut( QKeySequence("Shift+F3") );
 	connect( actionFindPrev, SIGNAL(triggered()), this, SLOT(findPrev()) );
 	
-	actionClearSearchHighlight = new QAction( "Clear search &highlight", this );
+	actionClearSearchHighlight = new QAction( tr("Clear search &highlight"), this );
 	actionClearSearchHighlight->setObjectName("qsvEditor::actionClearSearchHighlight");
 	//actionClearSearchHighlight->setShortcut( QKeySequence("Shift+F3") );
 	connect( actionClearSearchHighlight, SIGNAL(triggered()), this, SLOT(clearSearchHighlight()) );
 	
-	actionCapitalize = new QAction( "Change to &capital letters", this );
+	actionCapitalize = new QAction( tr("Change to &capital letters"), this );
 	actionCapitalize->setObjectName( "qsvEditor::actionCapitalize" );
 	actionCapitalize->setShortcut( QKeySequence( Qt::CTRL | Qt::Key_U ) );
 	connect( actionCapitalize, SIGNAL(triggered()), this, SLOT(transformBlockToUpper()) );
 
-	actionLowerCase = new QAction( "Change to &lower letters", this );
+	actionLowerCase = new QAction( tr("Change to &lower letters"), this );
 	actionLowerCase->setObjectName( "qsvEditor::actionLowerCase" );
 	actionLowerCase->setShortcut( QKeySequence( Qt::CTRL | Qt::SHIFT | Qt::Key_U  ) );
 	connect( actionLowerCase, SIGNAL(triggered()), this, SLOT(transformBlockToLower()) );
 
-	actionChangeCase = new QAction( "Change ca&se", this );
+	actionChangeCase = new QAction( tr("Change ca&se"), this );
 	actionChangeCase->setObjectName( "qsvEditor::actionChangeCase" );
 	connect( actionChangeCase, SIGNAL(triggered()), this, SLOT(transformBlockCase()) );
 
-	actionToggleBookmark = new QAction( "&Toggle line bookmark", this );
+	actionToggleBookmark = new QAction( tr("&Toggle line bookmark"), this );
 	actionToggleBookmark->setObjectName( "qsvEditor::actionToggleBookmark" );
 	actionToggleBookmark->setShortcut( QKeySequence( Qt::CTRL | Qt::Key_B  ) );
 	connect( actionToggleBookmark, SIGNAL(triggered()), this, SLOT(toggleBookmark()) );
 
-	actionPrevBookmark = new QAction( "&Previous bookmark", this );
+	actionPrevBookmark = new QAction( tr("&Previous bookmark"), this );
 	actionPrevBookmark->setObjectName( "qsvEditor::actionPrevBookmark" );
 	actionPrevBookmark->setShortcut( QKeySequence( Qt::CTRL | Qt::Key_PageUp ) );
 	connect( actionPrevBookmark, SIGNAL(triggered()), this, SLOT(gotoPrevBookmark()) );
 
-	actionNextBookmark = new QAction( "&Next bookmark", this );
+	actionNextBookmark = new QAction( tr("&Next bookmark"), this );
 	actionNextBookmark->setObjectName( "qsvEditor::actionNextBookmark" );
 	actionNextBookmark->setShortcut( QKeySequence( Qt::CTRL | Qt::Key_PageDown ) );
 	connect( actionNextBookmark, SIGNAL(triggered()), this, SLOT(gotoNextBookmark()) );
 
-	actionToggleBookmark = new QAction( "Toggle line &bookmark", this );
+	actionToggleBookmark = new QAction( tr("Toggle line &bookmark"), this );
 	actionToggleBookmark->setObjectName( "qsvEditor::actionToggleBookmark" );
 	actionToggleBookmark->setShortcut( QKeySequence( Qt::CTRL | Qt::Key_B  ) );
 	connect( actionToggleBookmark, SIGNAL(triggered()), this, SLOT(toggleBookmark()) );
 
-	actionTogglebreakpoint = new QAction( "Toggle b&reakpoint", this );
+	actionTogglebreakpoint = new QAction( tr("Toggle b&reakpoint"), this );
 	actionTogglebreakpoint->setObjectName( "qsvEditor::actionTogglebreakpoint" );
 	actionTogglebreakpoint->setShortcut( QKeySequence("F9") );
 	connect( actionTogglebreakpoint, SIGNAL(triggered()), this, SLOT(toggleBreakpoint()) );
 	
-	actionFindMatchingBracket = new QAction( "Goto matching bracket", this );
+	actionFindMatchingBracket = new QAction( tr("Goto matching bracket"), this );
 	actionFindMatchingBracket->setObjectName( "qsvEditor::actionFindMatchingBracket" );
 	QList<QKeySequence> l;
 	l << QKeySequence( Qt::CTRL | Qt::Key_BracketRight );
@@ -334,14 +337,14 @@ void	QsvEditor::setInsertSpacesInsteadOfTabs(bool newVal)
 
 void	QsvEditor::setTabSize( int size )
 {
-	const QFontMetrics fm = QFontMetrics( document()->defaultFont() );
+	const QFontMetrics fm = QFontMetrics( currentFont() );
 	int j = fm.width( " " ) * size;
 	setTabStopWidth( j );
 }
 
 int	QsvEditor::getTabSize()
 {
-	const QFontMetrics fm = QFontMetrics( document()->defaultFont() );
+	const QFontMetrics fm = QFontMetrics( currentFont() );
 	return tabStopWidth()/ fm.width( " " );
 }
 
@@ -358,9 +361,6 @@ void	QsvEditor::setSyntaxHighlighter( QsvSyntaxHighlighter *newSyntaxHighlighter
 	syntaxHighlighter = newSyntaxHighlighter;
 	if (syntaxHighlighter)
 		syntaxHighlighter->setDocument( this->document() );
-	
-	// TODO should we re-highlight?
-	//syntaxHighlighter->rehighlight();
 	
 	QApplication::processEvents();
 	QApplication::restoreOverrideCursor();
@@ -427,6 +427,26 @@ void	QsvEditor::setUsingAutoBrackets( bool newValue )
 	usingAutoBrackets = newValue;
 }
 
+EndOfLineType	QsvEditor::getEndOfLine()
+{
+	return endOfLine;
+}
+
+void	QsvEditor::setEndOfLine( EndOfLineType newVal )
+{
+	endOfLine = newVal;
+}
+
+QTextCodec*	QsvEditor::getTextCodec()
+{
+	return textCodec;
+}
+
+void	QsvEditor::setTextCodec( QTextCodec* newVal)
+{
+	textCodec = newVal;
+}
+
 void	QsvEditor::setBookmark( BookmarkAction action, QTextBlock block  )
 {
 	QsvPrivateBlockData *data = getPrivateBlockData( block, true );
@@ -467,7 +487,6 @@ void	QsvEditor::setBreakpoint( BookmarkAction action, QTextBlock block )
 			data->m_isBreakpoint = false;
 			break;
 	}
-
 	updateCurrentLine();
 }
 
@@ -485,7 +504,7 @@ void	QsvEditor::adjustMarginWidgets()
 		QRect viewportRect = viewport()->geometry();
 		QRect lrect = QRect(viewportRect.topLeft(), viewportRect.bottomLeft());
 		lrect.adjust( -panel->width(), 0, 0, 0 );
-		panel->setGeometry(lrect);		
+		panel->setGeometry(lrect);
 	}
 	else
 	{
@@ -534,8 +553,7 @@ int	QsvEditor::loadFile( QString s )
 		if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
 			return -1;
 		
-		// TODO make it a member variable
-		QTextCodec *c = NULL;
+		QTextCodec *c = textCodec;
 		if (c == NULL)
 			c = QTextCodec::codecForLocale();
 
@@ -556,6 +574,59 @@ int	QsvEditor::loadFile( QString s )
 	resumeModificationsLookup();
 	removeModifications();
 
+	QApplication::restoreOverrideCursor();
+	return 0;
+}
+
+int	QsvEditor::saveFile( QString newFileName )
+{
+	pauseModificationsLookup();	
+	hideBannerMessage();
+	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+	QApplication::processEvents();
+	
+	QFile file( newFileName );
+
+	if (!file.open( QIODevice::WriteOnly ) )
+		return false;
+	
+	QTextCodec *c = textCodec;
+	if (c == NULL)
+		c = QTextCodec::codecForLocale();
+	
+	QTextStream textStream(&file);
+	textStream.setCodec( c );
+
+	QTextBlock block = document()->begin();
+	while(block.isValid())
+	{
+		if (endOfLine==KeepOldStyle)
+			textStream << block.text();
+		else
+		{
+			QString s = block.text(); 
+			int i = s.length();
+			
+			if (!s.isEmpty()) if ((s[i-1] == '\n') || (s[i-1] == '\r'))
+				s = s.left( i-1 );
+			if (!s.isEmpty()) if ((s[i-1] == '\n') || (s[i-1] == '\r'))
+				s = s.left( i-1 );
+			textStream << s;
+			switch (endOfLine)
+			{
+				case DOS:	textStream << "\r\n"; break; 
+				case Unix: 	textStream << "\n"; break;
+				case Mac:	textStream << "\r"; break;
+				default:	return 0;		// just to keep gcc happy
+			}
+		}
+		block = block.next();
+	}
+	file.close();
+
+	fileName = newFileName;
+	resumeModificationsLookup();
+	removeModifications();
 	QApplication::restoreOverrideCursor();
 	return 0;
 }
@@ -605,25 +676,29 @@ void	QsvEditor::applyConfiguration( QsvEditorConfigData c )
 	setDisplayCurrentLine( c.markCurrentLine );
 	getPanel()->setVisible( c.showLineNumbers );
 	setDisplayWhiteSpaces( c.showWhiteSpaces );
-	setDisplayMatchingBrackets( c.matchBrackes );
-	setMatchingString( c.matchBrackesList );
+	setDisplayMatchingBrackets( c.matchBrackets );
+	setMatchingString( c.matchBracketsList );
 	setUsingSmartHome( c.smartHome );
 	if (c.showMargins)
 		setMargin( c.marginsWidth );
 	else
 		setMargin( -1 );
 	
-	document()->setDefaultFont( c.currentFont );
 	setInsertSpacesInsteadOfTabs( c.insertSpacesInsteadOfTabs );
 	setTabSize( c.tabSize );
 	getPanel()->setFont( c.currentFont );
 	
-	if (	c.lineWrapping)
+	QTextCursor backup = textCursor();
+	selectAll();
+	setCurrentFont( c.currentFont );
+	setTextCursor( backup );
+	
+	if (c.lineWrapping)
 	{
 		if (c.showMargins)
 		{
-			const QFontMetrics fm = QFontMetrics( document()->defaultFont() );
 #if QT_VERSION < 0x040400
+			const QFontMetrics fm = QFontMetrics( currentFont() );
 			const int newWrapWidth = fm.width( " " ) * c.marginsWidth;
 			setLineWrapMode( QTextEditorControl::FixedPixelWidth );
 			setLineWrapColumnOrWidth( newWrapWidth );
@@ -779,7 +854,7 @@ void	QsvEditor::showReplaceWidget()
 		this->setFocus();
 		return;
 	}
-
+	
 	searchCursor = textCursor();
 	ui_replaceWidget.replaceOldText->clear();
 	ui_replaceWidget.replaceOldText->setFocus();
@@ -851,7 +926,6 @@ void	QsvEditor::gotoPrevBookmark()
 	{
 		block = block.previous();
 		data = getPrivateBlockData( block, false );
-
 		if (data)
 		{
 			if (data->m_isBookmark)
@@ -933,7 +1007,7 @@ void	QsvEditor::transformBlockCase()
 		else if (c.isUpper())
 			c = c.toLower();
 		s_after[i] = c;
-	}	
+	}
 		
 	if (s_before != s_after)
 	{
@@ -1171,7 +1245,7 @@ void	QsvEditor::on_cursorPositionChanged()
 	if (pos == -1)
 	{
 		matchStart = matchEnd = -1;
-		currentChar = matchChar = 0;
+		charStart = charEnd = 0;
 		if (highlightCurrentLine)
 			updateCurrentLine();
 		return;
@@ -1179,7 +1253,7 @@ void	QsvEditor::on_cursorPositionChanged()
 		
 	QTextBlock  block = cursor.block();
 		int i = cursor.position();
-	currentChar = block.text()[i - block.position() ];
+	QChar currentChar = block.text()[i - block.position() ];
 	matchStart = i;
 
 	int j = matchingString.indexOf( currentChar );
@@ -1187,7 +1261,7 @@ void	QsvEditor::on_cursorPositionChanged()
 	if (j == -1)
 	{
 		matchStart = matchEnd = -1;
-		currentChar = matchChar = 0;
+		charStart = charEnd = 0;
 		if (highlightCurrentLine)
 			updateCurrentLine();
 		return;
@@ -1195,11 +1269,11 @@ void	QsvEditor::on_cursorPositionChanged()
 
 	if ( matchingString[j] != matchingString[j+1] )
 		if (j %2 == 0)
-			findMatching( matchingString[j], matchChar = matchingString[j+1], true, block );
+			findMatching( charStart = matchingString[j], charEnd = matchingString[j+1], true, block );
 		else
-			findMatching( matchingString[j], matchChar = matchingString[j-1], false, block );
+			findMatching( charStart = matchingString[j], charEnd = matchingString[j-1], false, block );
 	else
-		findMatching( matchChar = matchingString[j], block );
+		findMatching( charStart = charEnd = matchingString[j], block );
 		
 	updateCurrentLine();
 }
@@ -1222,7 +1296,6 @@ void	QsvEditor::on_textDocument_contentsChange( int position, int charsRemoved, 
 		QTextCursor cursor( document() );
 		cursor.setPosition( position );
 		int oldRemaining = -1;
-		//while (remaining+1 < charsAdded)
 		while ( (remaining+1 < charsAdded) && (oldRemaining != remaining) )
 		{
 			oldRemaining = remaining;
@@ -1428,7 +1501,7 @@ void	QsvEditor::printBackgrounds( QPainter &p )
 {
 	const int contentsY = verticalScrollBar()->value();
 	const qreal pageBottom = contentsY + viewport()->height();
-	const QFontMetrics fm = QFontMetrics( document()->defaultFont() );
+	const QFontMetrics fm = QFontMetrics( currentFont() );
 	
 	for ( QTextBlock block = document()->begin(); block.isValid(); block = block.next() )
 	{
@@ -1461,11 +1534,10 @@ void	QsvEditor::printWhiteSpaces( QPainter &p, const QTextBlock &block, const QF
 	int dx = 0 + fm.leading() + fm.width( printChar ) - fm.leftBearing( printChar );
 	int dy = 0 + fm.height() - fm.descent();
 	
-	p.setFont( document()->defaultFont() );
+	p.setFont( currentFont() );
 	p.setPen( whiteSpaceColor );
 	for ( int i=0; i<len; i++ )
 	{
-		
 		if (txt[i] == ' ' )
 			printChar = 0xB7; // ?
 		else if (txt[i] == '\t' )
@@ -1502,55 +1574,83 @@ void	QsvEditor::printCurrentLines( QPainter &p, const QTextBlock &block )
 	{
 		if (data->m_isBookmark)
 			p.fillRect( r, bookmarkLineColor );
-			
+		
 		if (data->m_isBreakpoint)
 			p.fillRect( r, breakpointLineColor );
-			
+		
 		// TODO: print all other states in a generic way
 	}
 	p.restore();
 }
 
+#if 0
 void	QsvEditor::printMatchingBraces( QPainter &p )
 {
 	if (matchStart == -1)
 		return;
-		
-	QFont f = document()->defaultFont();
-	QTextCursor cursor = textCursor();
 
 #if QT_VERSION > 0x040300
-        QColor lighter = matchBracesColor.lighter();	
+	QColor lighter = matchBracesColor.lighter();
 #else
 	// STUPID QT 4.2 on etch
-        QColor lighter = matchBracesColor.light(150);
+	QColor lighter = matchBracesColor.light(150);
 #endif
-		
-	const QFontMetrics fm = QFontMetrics( document()->defaultFont() );
-	int charWidth = fm.width( 'X' );
-
-	//f.setBold( true );
+	QTextCursor cursor = textCursor();
+	QRect r;
+	int charWidth;
+	
+	p.setFont( currentFont() );
+	p.setPen( matchBracesColor );
+	
+	charWidth = p.fontMetrics().width( charStart );
+	cursor.setPosition(matchStart, QTextCursor::MoveAnchor);
+	r = cursorRect( cursor );
+	p.fillRect( r.x()+charWidth/4, r.y(), charWidth, r.height(), matchBracesColor );
+	
+	if (matchEnd==-1)
+		return;
+	charWidth = p.fontMetrics().width( charEnd );
+	cursor.setPosition(matchEnd, QTextCursor::MoveAnchor);
+	r = cursorRect( cursor );
+	p.fillRect( r.x()+charWidth/4, r.y(), charWidth, r.height(), matchBracesColor );
+}
+#else
+void	QsvEditor::printMatchingBraces( QPainter &p )
+{
+	QTextCursor cursor = textCursor();
+// 		QFont f = document()->defaultFont();
+	QFont f = currentFont();
+	QColor matchBracesColor("#FFFF00");
+	QRect r;
+	int charWidth;
+	
 	p.setFont( f );
 	p.setPen( matchBracesColor );
-	cursor.setPosition(matchStart+1, QTextCursor::MoveAnchor);
-	QRect r = cursorRect( cursor );
-	p.fillRect( r.x()-1, r.y(), charWidth, r.height(), lighter );
-	//p.drawText( r.x()-1, r.y(), r.width(), r.height(), Qt::AlignLeft | Qt::AlignVCenter, currentChar );
-
-	if (matchEnd == -1)
+	
+	if (matchStart==-1)
 		return;
-		
-	cursor.setPosition(matchEnd+1, QTextCursor::MoveAnchor);
+	charWidth = p.fontMetrics().width( charStart );
+	cursor.setPosition(matchStart, QTextCursor::MoveAnchor);
 	r = cursorRect( cursor );
-	//p.fillRect( r.x()-1, r.y(), charWidth, r.height(), matchBracesColor.darker() );
-	p.fillRect( r.x()-1, r.y(), charWidth, r.height(), matchBracesColor );
-	//p.drawText( r.x()-1, r.y(), charWidth, r.height(), Qt::AlignLeft | Qt::AlignVCenter, matchChar );
+	p.fillRect( r.x()+charWidth/4, r.y(), charWidth, r.height(), matchBracesColor );
+// 		p.fillRect( r.x()+charWidth, r.y(), charWidth, r.height(), matchBracesColor );
+		
+	
+	if (matchEnd==-1)
+		return;
+	charWidth = p.fontMetrics().width( charEnd );
+	cursor.setPosition(matchEnd, QTextCursor::MoveAnchor);
+	r = cursorRect( cursor );
+	p.fillRect( r.x()+charWidth/4, r.y(), charWidth, r.height(), matchBracesColor );
+// 		p.fillRect( r.x()+charWidth, r.y(), charWidth, r.height(), matchBracesColor );
 }
+
+#endif
 
 void	QsvEditor::printHighlightString( QPainter &p, const QTextBlock &block, const QFontMetrics &fm )
 {
 	int highlightStringLen = fm.width( highlightString );
-	const QString t = block.text();
+	 const QString t = block.text();
 	QTextCursor cursor = textCursor();
 	Qt::CaseSensitivity caseSensitive = getSearchFlags().testFlag(QTextDocument::FindCaseSensitively)?
 		Qt::CaseSensitive : Qt::CaseInsensitive;
@@ -1584,7 +1684,7 @@ void	QsvEditor::printMargins( QPainter &p )
 {
 	int lineLocation;
 
-	p.setFont( document()->defaultFont() );
+	p.setFont( currentFont() );
 	p.setPen( whiteSpaceColor );
 	lineLocation = p.fontMetrics().width( " " ) * printMarginWidth + 0;
 	p.drawLine( lineLocation, 0, lineLocation, height() );
@@ -1592,7 +1692,7 @@ void	QsvEditor::printMargins( QPainter &p )
 
 void	QsvEditor::widgetToBottom( QWidget *w )
 {
-        w->adjustSize();
+	w->adjustSize();
 	QRect r1 = viewport()->geometry();
 	QRect r2 = w->geometry();
 
@@ -1653,7 +1753,9 @@ bool	QsvEditor::handleKeyPressEvent( QKeyEvent *event )
 		cursor.deletePreviousChar();
 		cursor.deleteChar();
 		matchStart = matchEnd = -1;
-		matchChar = 0;
+		//matchChar = 0;
+		charStart = charEnd = 0;
+
 		goto FUNCTION_END;
 	}
 	
@@ -1695,8 +1797,13 @@ FUNCTION_END:
 bool	QsvEditor::handleIndentEvent( bool forward )
 {
 	QTextCursor cursor1 = textCursor();
+	bool reSelect = true;
+
 	if (!cursor1.hasSelection())
+	{
+		reSelect = false;
 		cursor1.select( QTextCursor::LineUnderCursor );
+	}
 	
 	QTextCursor cursor2 = cursor1;
 	cursor1.setPosition( cursor1.selectionStart() );
@@ -1736,7 +1843,11 @@ bool	QsvEditor::handleIndentEvent( bool forward )
 		if (!cursor1.movePosition(QTextCursor::NextBlock))
 			break;
 	} while( cursor1.blockNumber() < endBlock );
-	cursor1.setPosition( origPos, QTextCursor::KeepAnchor );
+	
+	if (reSelect)
+		cursor1.setPosition( origPos, QTextCursor::KeepAnchor );
+	else
+		cursor1.setPosition( origPos, QTextCursor::MoveAnchor );
 	cursor1.endEditBlock();
 	setTextCursor( cursor1 );
 	return true;
@@ -1826,12 +1937,11 @@ void	QsvEditor::findMatching( QChar c, QTextBlock &block )
 	// try forward
 	while (n < blockLen) 
 	{
-		if (n != matchStart - block.position())
-			if (blockString[n] == c)
-			{
-				matchEnd = block.position() + n;
-				return;
-			}
+		if ( (n != matchStart - block.position()) && (blockString[n] == c))
+		{
+			matchEnd = block.position() + n;
+			return;
+		}
 		n++;
 	}
 }

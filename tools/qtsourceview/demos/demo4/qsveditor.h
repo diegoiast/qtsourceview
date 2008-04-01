@@ -18,6 +18,7 @@
 class QsvSyntaxHighlighter;
 class QFileSystemWatcher;
 class QTextCursor;
+class QTextCodec;
 enum QTextDocument::FindFlag;
 
 class QsvEditorPanel;
@@ -27,6 +28,11 @@ class QsvColorDefFactory;
 
 bool isFullWord( QString s1, QString s2, int location );
 
+enum EndOfLineType {
+	DOS, Unix, Mac, KeepOldStyle
+};
+
+
 struct QsvEditorConfigData
 {
 	bool			autoBrackets;
@@ -34,14 +40,15 @@ struct QsvEditorConfigData
 	bool			showLineNumbers;
 	bool			showWhiteSpaces;
 	bool			showMargins;
-	bool			matchBrackes;
+	bool			matchBrackets;
 	bool			lineWrapping;
 	bool			smartHome;
 	bool			insertSpacesInsteadOfTabs;
 	int			tabSize;
 	int			marginsWidth;
-	QString			matchBrackesList;
+	QString			matchBracketsList;
 	QFont			currentFont;
+	EndOfLineType		endOfLine;
 	QsvColorDefFactory	*currentColorScheme;
 };
 
@@ -85,6 +92,11 @@ public:
 	void		setUsingSmartHome( bool );
 	bool		getUsingAutoBrackets();
 	void		setUsingAutoBrackets( bool );
+	EndOfLineType	getEndOfLine();
+	void		setEndOfLine( EndOfLineType );
+	QTextCodec*	getTextCodec();
+	void		setTextCodec( QTextCodec* );
+		
 	void		setBookmark( BookmarkAction action, QTextBlock block );
 	void		setBreakpoint( BookmarkAction action, QTextBlock block );
 	QWidget*	getPanel();
@@ -92,11 +104,11 @@ public:
 	void		hideBannerMessage();
 	void		clearEditor();
 	int		loadFile( QString );
+	int		saveFile( QString );
 	QString		getFileName();
 	void		removeModifications();
 	int		getIndentationSize( const QString s );
 	QString		updateIndentation( QString s, int indentation );
-	
 	
 public slots:
 	void		applyConfiguration( QsvEditorConfigData c );
@@ -197,12 +209,14 @@ private:
 	bool	insertSpacesInsteadOfTabs;
 	int	printMarginWidth;
 	QString	matchingString;
+	EndOfLineType	endOfLine;
+	QTextCodec	*textCodec;
 	
 	bool	ignoreFileSystemWatch;
 	int	matchStart;
 	int	matchEnd;
-	QChar	currentChar;
-	QChar	matchChar;
+	QChar	charStart;
+	QChar	charEnd;
 	QString	highlightString;
 	QString	fileName;
 	QFileSystemWatcher	*fileSystemWatcher;

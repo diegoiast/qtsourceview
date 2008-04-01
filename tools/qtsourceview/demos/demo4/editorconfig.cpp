@@ -9,6 +9,7 @@
 #include "qsvlangdef.h"
 #include "qsvcolordef.h"
 #include "qsvlangdeffactory.h"
+#include "qsvcolordeffactory.h"
 #include "qsvsyntaxhighlighter.h"
 
 #include <QDebug>
@@ -129,15 +130,20 @@ QsvEditorConfigData  EditorConfig::getDefaultConfiguration()
 	defaultConfiguration.markCurrentLine	= true;
 	defaultConfiguration.showLineNumbers	= true;
 	defaultConfiguration.showWhiteSpaces	= true;
-	defaultConfiguration.matchBrackes	= true;
+	defaultConfiguration.matchBrackets	= true;
 	defaultConfiguration.showMargins	= true;
 	defaultConfiguration.lineWrapping	= false;
 	defaultConfiguration.smartHome		= true;
 	defaultConfiguration.insertSpacesInsteadOfTabs = false;
 	defaultConfiguration.tabSize		= 8;
 	defaultConfiguration.marginsWidth	= 80;
-	defaultConfiguration.matchBrackesList	= "()[]{}\"\"''``";
+	defaultConfiguration.matchBracketsList	= "()[]{}\"\"''``";
 	defaultConfiguration.currentFont	= QFont( DEFAULT_FONT_NAME, DEFAULT_FONT_SIZE );
+#ifdef WIN32
+	defaultConfiguration.endOfLine = DOS;
+#else
+	defaultConfiguration.endOfLine = Unix;
+#endif
 	if (colorSchemes.isEmpty())
 		defaultConfiguration.currentColorScheme = NULL;
 	else
@@ -155,8 +161,8 @@ QsvEditorConfigData EditorConfig::getUserConfiguration()
 	userConfig.showLineNumbers	= ui.showLineNumbers->isChecked();
 	userConfig.showWhiteSpaces	= ui.showWhiteSpaces->isChecked();
 	userConfig.showMargins		= ui.showMargins->isChecked();
-	userConfig.matchBrackes		= ui.matchBrackets->isChecked();
-	userConfig.matchBrackesList	= ui.matchCraketsList->text();
+	userConfig.matchBrackets	= ui.matchBrackets->isChecked();
+	userConfig.matchBracketsList	= ui.matchCraketsList->text();
 	userConfig.lineWrapping		= ui.wrapLines->isChecked();
 	userConfig.insertSpacesInsteadOfTabs	= ui.insertTabs->isChecked();
 	userConfig.tabSize		= ui.tabSize->value();
@@ -165,13 +171,21 @@ QsvEditorConfigData EditorConfig::getUserConfiguration()
 	
 	userConfig.tabSize		= ui.tabSize->value();
 	userConfig.marginsWidth		= ui.marginSize->value();
-	userConfig.matchBrackesList	= ui.matchCraketsList->text();
+	userConfig.matchBracketsList	= ui.matchCraketsList->text();
 	userConfig.currentFont		= ui.labelFontPreview->font();
 
 	if (colorSchemes.isEmpty())
 		userConfig.currentColorScheme = NULL;
 	else
 		userConfig.currentColorScheme = colorSchemes[ui.colorsCombo->currentIndex()];
+		
+	switch (ui.endOfLineComboBox->currentIndex())
+	{
+		case 0: userConfig.endOfLine = DOS; break;
+		case 1: userConfig.endOfLine = Unix; break;
+		case 2: userConfig.endOfLine = Mac; break;
+		case 3: userConfig.endOfLine = KeepOldStyle; break;
+	}
 	
 	return userConfig;
 }
@@ -188,9 +202,9 @@ void EditorConfig::updateConfiguration()
 	ui.markCurrentLine->setChecked( currentConfig.markCurrentLine );
 	ui.showLineNumbers->setChecked( currentConfig.showLineNumbers );
 	ui.showWhiteSpaces->setChecked( currentConfig.showWhiteSpaces );
-	ui.matchBrackets->setChecked( currentConfig.matchBrackes );
+	ui.matchBrackets->setChecked( currentConfig.matchBrackets );
 	ui.useSmartHome->setChecked( currentConfig.smartHome );
-	ui.matchCraketsList->setText( currentConfig.matchBrackesList );
+	ui.matchCraketsList->setText( currentConfig.matchBracketsList );
 	ui.insertTabs->setChecked( currentConfig.insertSpacesInsteadOfTabs ); 
 	ui.tabSize->setValue( currentConfig.tabSize );
 	ui.labelFontPreview->setText( currentConfig.currentFont.toString() );
@@ -201,6 +215,72 @@ void EditorConfig::updateConfiguration()
 
 	// the color configuration is set by this function 	
 	ui.sampleEdit->applyConfiguration( currentConfig );
+
+	switch (currentConfig.endOfLine)
+	{
+		case DOS	:  ui.endOfLineComboBox->setCurrentIndex( 0 ); break;
+		case Unix	:  ui.endOfLineComboBox->setCurrentIndex( 1 ); break;
+		case Mac	:  ui.endOfLineComboBox->setCurrentIndex( 2 ); break;
+		case KeepOldStyle: ui.endOfLineComboBox->setCurrentIndex( 3 ); break;
+	}
+}
+
+void EditorConfig::loadSettings( QSettings &settings )
+{
+	QsvEditorConfigData loadedConfig = getDefaultConfiguration();
+	
+	settings.beginGroup( "QtSourceView" );
+	loadedConfig.autoBrackets	= settings.value( "auto-brackets"	, loadedConfig.autoBrackets ).toBool(); 
+	loadedConfig.markCurrentLine	= settings.value( "mark-curret-line"	, loadedConfig.markCurrentLine ).toBool();
+	loadedConfig.showLineNumbers	= settings.value( "show-line-numbers"	, loadedConfig.showLineNumbers ).toBool();
+	loadedConfig.showWhiteSpaces	= settings.value( "show-whitespaces"	, loadedConfig.showWhiteSpaces ).toBool();
+	loadedConfig.showMargins	= settings.value( "show-margins"	, loadedConfig.showMargins ).toBool();
+	loadedConfig.matchBrackets	= settings.value( "match-brackets"	, loadedConfig.matchBrackets ).toBool();
+	loadedConfig.lineWrapping	= settings.value( "line-wrapping"	, loadedConfig.lineWrapping ).toBool();
+	loadedConfig.smartHome		= settings.value( "smart-home"		, loadedConfig.smartHome).toBool();
+	loadedConfig.insertSpacesInsteadOfTabs	= settings.value( "insert-spaces-instead-of-tabs", loadedConfig.insertSpacesInsteadOfTabs).toBool();
+	loadedConfig.tabSize		= settings.value( "tab-size"		, loadedConfig.tabSize).toInt();
+	loadedConfig.marginsWidth	= settings.value( "margins-width"	, loadedConfig.marginsWidth).toInt();
+	loadedConfig.matchBracketsList	= settings.value( "match-brackets-list"	, loadedConfig.matchBracketsList).toString();
+	
+	QFont f;
+	f.fromString(settings.value( "font", loadedConfig.currentFont).toString());
+	loadedConfig.currentFont	= f;
+
+	// TODO finish those 2 entries
+	//EndOfLineType		endOfLine;
+	//QsvColorDefFactory	*currentColorScheme;
+	settings.endGroup();
+	
+//	applyConfiguration( loadedConfig );
+	currentConfig = loadedConfig;
+	updateConfiguration();
+	emit( configurationModified(loadedConfig) );	
+}
+
+void EditorConfig::saveSettings( QSettings &settings )
+{
+	settings.beginGroup( "QtSourceView" );
+
+	settings.setValue( "auto-brackets"	, currentConfig.autoBrackets ); 
+	settings.setValue( "mark-curret-line"	, currentConfig.markCurrentLine );
+	settings.setValue( "show-line-numbers"	, currentConfig.showLineNumbers );
+	settings.setValue( "show-whitespaces"	, currentConfig.showWhiteSpaces );
+	settings.setValue( "show-margins"	, currentConfig.showMargins );
+	settings.setValue( "match-brackets"	, currentConfig.matchBrackets );
+	settings.setValue( "line-wrapping"	, currentConfig.lineWrapping );
+	settings.setValue( "smart-home"		, currentConfig.smartHome);
+	settings.setValue( "insert-spaces-instead-of-tabs", currentConfig.insertSpacesInsteadOfTabs);
+	settings.setValue( "tab-size"		, currentConfig.tabSize);
+	settings.setValue( "margins-width"	, currentConfig.marginsWidth);
+	settings.setValue( "match-brackets-list", currentConfig.matchBracketsList);
+	settings.setValue( "font"		, currentConfig.currentFont.toString() );
+
+	// TODO finish those 2 entries
+	//EndOfLineType		endOfLine;
+	//QsvColorDefFactory	*currentColorScheme;
+	
+	settings.endGroup();
 }
 
 void EditorConfig::on_buttonBox_clicked( QAbstractButton * button )
