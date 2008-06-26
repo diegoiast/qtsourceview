@@ -1,12 +1,16 @@
 #ifndef __SAMPLEPANEL_H__
 #define __SAMPLEPANEL_H__
 
+/*
 #if QT_VERSION >= 0x040400
 #	define	QTextEditorControl	QPlainTextEdit
 #	warning	"Using QPlainTextEdit as the text editor control"
 #else
 #	define	QTextEditorControl	QTextEdit
 #endif
+*/
+
+#define	QTextEditorControl	QTextEdit
 
 #include <QWidget>
 class QTextEdit;

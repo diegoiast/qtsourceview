@@ -1,14 +1,17 @@
 #ifndef __QSV_EDITOR_H__
 #define __QSV_EDITOR_H__
 
+/*
 #if QT_VERSION >= 0x040400
-#	include <QPlainTextEdit>
 #	define	QTextEditorControl	QPlainTextEdit
 #	warning	"Using QPlainTextEdit as the text editor control"
 #else
-#	include <QTextEdit>
 #	define	QTextEditorControl	QTextEdit
 #endif
+*/
+
+#define	QTextEditorControl	QTextEdit
+#include <QTextEdit>
 
 #include "ui_findwidget.h"
 #include "ui_replacewidget.h"
@@ -19,7 +22,9 @@ class QsvSyntaxHighlighter;
 class QFileSystemWatcher;
 class QTextCursor;
 class QTextCodec;
-enum QTextDocument::FindFlag;
+
+#include <QTextDocument>
+//enum QTextDocument::FindFlag;
 
 class QsvEditorPanel;
 class QsvPrivateBlockData;
