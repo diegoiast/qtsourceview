@@ -1,15 +1,20 @@
 #include "mainwindow5.h"
 #include "qsvtextedit.h"
 #include "qsvsyntaxhighlighterbase.h"
+#include "qsvtextoperationswidget.h"
 
+#include <QTimer>
 
 MainWindow5::MainWindow5(QWidget *parent, Qt::WindowFlags flags ):
 		QMainWindow(parent,flags)
 {
 	QsvSyntaxHighlighterBase *s = new QsvSyntaxHighlighterBase;
 	QsvTextEdit *e = new QsvTextEdit(this, s);
+	QsvTextOperationsWidget *textOpetations = new QsvTextOperationsWidget(e);
+
 	e->setFont( QFont("Courier new", 10) );
 	e->setLineWrapMode( QPlainTextEdit::NoWrap );
+	QTimer::singleShot( 1500, textOpetations, SLOT(showSearch()));
 
 #if 1
 	e->setPlainText(
@@ -22,5 +27,5 @@ MainWindow5::MainWindow5(QWidget *parent, Qt::WindowFlags flags ):
 	e->setPlainText("( adsdsad )\n[aaaa]\n{ qwqew { qeweqw } qwe ( asd a) }\n'sada\"s\"da'");
 #endif
 	setCentralWidget(e);
-	//showMaximized();
+	showMaximized();
 }
