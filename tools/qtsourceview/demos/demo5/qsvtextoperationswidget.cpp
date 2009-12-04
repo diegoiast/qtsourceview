@@ -1,5 +1,6 @@
 #include "qsvtextoperationswidget.h"
 #include "ui_searchform.h"
+#include "ui_replaceform.h"
 
 #include <QLayout>
 #include <QHBoxLayout>
@@ -37,11 +38,9 @@ QsvTextOperationsWidget::QsvTextOperationsWidget( QWidget *parent )
 void QsvTextOperationsWidget::initSearchWidget()
 {
 	m_search = new QWidget( (QWidget*) parent() );
-
 	searchFormUi = new Ui::searchForm();
 	searchFormUi->setupUi(m_search);
 	searchFormUi->lineEdit->setFont( m_search->parentWidget()->font() );
-
 	// otherwise, it inherits the default font from the editor - fixed
 	m_search->setFont(QFont("sans"));
 	m_search->adjustSize();
@@ -49,6 +48,25 @@ void QsvTextOperationsWidget::initSearchWidget()
 
 	connect( searchFormUi->lineEdit,SIGNAL(textChanged(QString)), this, SLOT(on_searchText_modified(QString)));
 	connect( searchFormUi->closeButton, SIGNAL(clicked()), this, SLOT(showSearch()));
+}
+
+void QsvTextOperationsWidget::initReplaceWidget()
+{
+	m_replace = new QWidget( (QWidget*) parent() );
+	replaceFormUi = new Ui::replaceForm();
+	replaceFormUi->setupUi(m_replace);
+	replaceFormUi->optionsGroupBox->hide();
+	connect(replaceFormUi->moreButton,SIGNAL(clicked()),this,SLOT(adjustReplaceSize()));
+	m_replace->setFont(QFont("sans"));
+	m_replace->adjustSize();
+	m_replace->hide();
+
+}
+
+void QsvTextOperationsWidget::adjustReplaceSize()
+{
+	m_replace->adjustSize();
+	showBottomWidget(m_replace);
 }
 
 QFlags<QTextDocument::FindFlag> QsvTextOperationsWidget::getSearchFlags()
@@ -100,23 +118,47 @@ void QsvTextOperationsWidget::showSearch()
 {
 	if (!m_search)
 		initSearchWidget();
-
-	m_search->setVisible(!m_search->isVisible());
+	if (m_replace && m_replace->isVisible())
+		m_replace->hide();
 	QWidget *parent = qobject_cast<QWidget*>(this->parent());
-	if (!m_search->isVisible()) {
+	if (m_search->isVisible()) {
+		m_search->hide();
 		if (parent)
 			parent->setFocus();
 		return;
 	}
 
-	searchFormUi->lineEdit->setFocus();
 	m_searchCursor = getTextCursor();
+	searchFormUi->lineEdit->setFocus();
+	showBottomWidget(m_search);
+}
 
+void	QsvTextOperationsWidget::showReplace()
+{
+	if (!m_replace)
+		initReplaceWidget();
+	if (m_search && m_search->isVisible())
+		m_search->hide();
+	QWidget *parent = qobject_cast<QWidget*>(this->parent());
+	if (m_replace->isVisible()) {
+		m_replace->hide();
+		if (parent)
+			parent->setFocus();
+		return;
+	}
+
+	showBottomWidget(m_replace);
+}
+
+void	QsvTextOperationsWidget::showBottomWidget(QWidget* w)
+{
+	QWidget *parent = qobject_cast<QWidget*>(this->parent());
 	QRect r = parent->rect();
-	r.adjust( 10, 0, -10, 0 );
-	r.setHeight( m_search->height() );
-	r.moveBottom( parent->rect().height() - 10 );
-	m_search->setGeometry( r );
+	r.adjust(10, 0, -10, 0);
+	r.setHeight(w->height());
+	r.moveBottom(parent->rect().height()-10);
+	w->setGeometry(r);
+	w->show();
 }
 
 void QsvTextOperationsWidget::on_searchText_modified(QString s)

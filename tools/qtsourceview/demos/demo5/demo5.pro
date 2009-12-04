@@ -7,4 +7,5 @@ HEADERS += mainwindow5.h \
     qsvtextedit.h \
     qsvsyntaxhighlighterbase.h \
     qsvtextoperationswidget.h
-FORMS += searchform.ui
+FORMS += searchform.ui \
+    replaceform.ui

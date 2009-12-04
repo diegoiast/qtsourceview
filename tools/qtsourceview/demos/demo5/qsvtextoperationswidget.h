@@ -8,7 +8,8 @@
 
 class QTextDocument;
 namespace Ui{
-	class searchForm ;
+	class searchForm;
+	class replaceForm;
 }
 
 class QsvTextOperationsWidget : public QObject
@@ -17,6 +18,7 @@ class QsvTextOperationsWidget : public QObject
 public:
 	QsvTextOperationsWidget( QWidget *parent );
 	void initSearchWidget();
+	void initReplaceWidget();
 
 	QFlags<QTextDocument::FindFlag> getSearchFlags();
 
@@ -25,8 +27,10 @@ public:
 
 public slots:
 	void showSearch();
+	void showReplace();
+	void showBottomWidget(QWidget* w);
 	void on_searchText_modified(QString s);
-
+	void adjustReplaceSize();
 
 private:
 	bool issue_search( const QString &text, QTextCursor newCursor, QFlags<QTextDocument::FindFlag> findOptions  );
@@ -41,6 +45,7 @@ private:
 	QColor searchNotFoundColor;
 
 	Ui::searchForm *searchFormUi;
+	Ui::replaceForm *replaceFormUi;
 };
 
 #endif // QSVTEXTOPERATIONSWIDGET_H
