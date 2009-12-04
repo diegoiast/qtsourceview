@@ -40,14 +40,14 @@ void QsvTextOperationsWidget::initSearchWidget()
 	m_search = new QWidget( (QWidget*) parent() );
 	searchFormUi = new Ui::searchForm();
 	searchFormUi->setupUi(m_search);
-	searchFormUi->lineEdit->setFont( m_search->parentWidget()->font() );
+	searchFormUi->searchText->setFont( m_search->parentWidget()->font() );
 	// otherwise, it inherits the default font from the editor - fixed
 	m_search->setFont(QFont("sans"));
 	m_search->adjustSize();
 	m_search->hide();
 
-	connect( searchFormUi->lineEdit,SIGNAL(textChanged(QString)), this, SLOT(on_searchText_modified(QString)));
-	connect( searchFormUi->closeButton, SIGNAL(clicked()), this, SLOT(showSearch()));
+	connect(searchFormUi->searchText,SIGNAL(textChanged(QString)),this,SLOT(on_searchText_modified(QString)));
+	connect(searchFormUi->closeButton,SIGNAL(clicked()),this, SLOT(showSearch()));
 }
 
 void QsvTextOperationsWidget::initReplaceWidget()
@@ -61,6 +61,8 @@ void QsvTextOperationsWidget::initReplaceWidget()
 	m_replace->adjustSize();
 	m_replace->hide();
 
+	connect(replaceFormUi->findText,SIGNAL(textChanged(QString)),this,SLOT(on_replaceText_modified(QString)));
+	connect(replaceFormUi->closeButton,SIGNAL(clicked()),this, SLOT(showReplace()));
 }
 
 void QsvTextOperationsWidget::adjustReplaceSize()
@@ -75,7 +77,7 @@ QFlags<QTextDocument::FindFlag> QsvTextOperationsWidget::getSearchFlags()
 
 	// one can never be too safe
 	if (!searchFormUi){
-		qDebug("%s:%d - searchFormUi not available, memory problems?", __FILE__, __LINE__ );
+//		qDebug("%s:%d - searchFormUi not available, memory problems?", __FILE__, __LINE__ );
 		return f;
 	}
 
@@ -129,7 +131,7 @@ void QsvTextOperationsWidget::showSearch()
 	}
 
 	m_searchCursor = getTextCursor();
-	searchFormUi->lineEdit->setFocus();
+	searchFormUi->searchText->setFocus();
 	showBottomWidget(m_search);
 }
 
@@ -163,10 +165,15 @@ void	QsvTextOperationsWidget::showBottomWidget(QWidget* w)
 
 void QsvTextOperationsWidget::on_searchText_modified(QString s)
 {
-	issue_search( s, m_searchCursor, getSearchFlags() );
+	issue_search(s, m_searchCursor, getSearchFlags(), searchFormUi->searchText );
 }
 
-bool	QsvTextOperationsWidget::issue_search( const QString &text, QTextCursor newCursor, QFlags<QTextDocument::FindFlag> findOptions  )
+void	QsvTextOperationsWidget::on_replaceText_modified(QString s)
+{
+	issue_search(s, m_searchCursor, getSearchFlags(), replaceFormUi->findText);
+}
+
+bool	QsvTextOperationsWidget::issue_search( const QString &text, QTextCursor newCursor, QFlags<QTextDocument::FindFlag> findOptions, QLineEdit *l )
 {
 	QTextCursor c = m_document->find( text, newCursor, findOptions );
 	bool found = ! c.isNull();
@@ -179,7 +186,7 @@ bool	QsvTextOperationsWidget::issue_search( const QString &text, QTextCursor new
 		found = ! c.isNull();
 	}
 
-	QPalette p = searchFormUi->lineEdit->palette();
+	QPalette p = l->palette();
 	if (found) {
 		p.setColor(QPalette::Base, searchFoundColor);
 	} else {
@@ -187,11 +194,11 @@ bool	QsvTextOperationsWidget::issue_search( const QString &text, QTextCursor new
 			p.setColor(QPalette::Base, searchNotFoundColor);
 		else
 			p.setColor(QPalette::Base,
-				searchFormUi->lineEdit->style()->standardPalette().base().color()
+				l->style()->standardPalette().base().color()
 			);
 		c =  m_searchCursor;
 	}
-	searchFormUi->lineEdit->setPalette(p);
+	l->setPalette(p);
 	setTextCursor( c );
 	return found;
 }

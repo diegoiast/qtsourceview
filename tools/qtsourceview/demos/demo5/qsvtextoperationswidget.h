@@ -12,6 +12,8 @@ namespace Ui{
 	class replaceForm;
 }
 
+class QLineEdit;
+
 class QsvTextOperationsWidget : public QObject
 {
 	Q_OBJECT
@@ -30,10 +32,11 @@ public slots:
 	void showReplace();
 	void showBottomWidget(QWidget* w);
 	void on_searchText_modified(QString s);
+	void on_replaceText_modified(QString s);
 	void adjustReplaceSize();
 
 private:
-	bool issue_search( const QString &text, QTextCursor newCursor, QFlags<QTextDocument::FindFlag> findOptions  );
+	bool issue_search( const QString &text, QTextCursor newCursor, QFlags<QTextDocument::FindFlag> findOptions, QLineEdit *l );
 
 	QTextCursor m_searchCursor;
 	QTextDocument *m_document;
