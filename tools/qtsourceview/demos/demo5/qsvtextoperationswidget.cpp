@@ -1,4 +1,5 @@
 #include "qsvtextoperationswidget.h"
+#include "ui_searchform.h"
 
 #include <QLayout>
 #include <QHBoxLayout>
@@ -18,6 +19,8 @@ QsvTextOperationsWidget::QsvTextOperationsWidget( QWidget *parent )
 	m_search   = NULL;
 	m_replace  = NULL;
 	m_document = NULL;
+	searchFoundColor	= QColor( "#DDDDFF" ); //QColor::fromRgb( 220, 220, 255)
+	searchNotFoundColor	= QColor( "#FFAAAA" ); //QColor::fromRgb( 255, 102, 102) "#FF6666"
 
 	QTextEdit *t = qobject_cast<QTextEdit*>(parent);
 	if (t) {
@@ -29,53 +32,40 @@ QsvTextOperationsWidget::QsvTextOperationsWidget( QWidget *parent )
 			m_document = pt->document();
 		}
 	}
+}
 
-	m_search = new QWidget(parent);
-	QHBoxLayout *layout   = new QHBoxLayout(m_search);
-	QLabel      *label    = new QLabel(m_search);
-	QLineEdit   *lineEdit = new QLineEdit(m_search);
-	QPushButton *button   = new QPushButton(m_search);
+void QsvTextOperationsWidget::initSearchWidget()
+{
+	m_search = new QWidget( (QWidget*) parent() );
 
-	label->setObjectName("searchTextLabel");
-	label->setText(tr("Search"));
-	lineEdit->setObjectName("searchText");
-	button->setObjectName("searchButton");
-	button->setText(tr("Close"));
-	connect(lineEdit,SIGNAL(textChanged(QString)),this,SLOT(on_searchText_modified(QString)));
+	searchFormUi = new Ui::searchForm();
+	searchFormUi->setupUi(m_search);
+	searchFormUi->lineEdit->setFont( m_search->parentWidget()->font() );
 
-	layout->addWidget(label);
-	layout->addWidget(lineEdit);
-	layout->addWidget(button);
+	// otherwise, it inherits the default font from the editor - fixed
+	m_search->setFont(QFont("sans"));
+	m_search->adjustSize();
 	m_search->hide();
-	m_search->setAutoFillBackground(true);
-	m_search->setLayout(layout);
+
+	connect( searchFormUi->lineEdit,SIGNAL(textChanged(QString)), this, SLOT(on_searchText_modified(QString)));
+	connect( searchFormUi->closeButton, SIGNAL(clicked()), this, SLOT(showSearch()));
 }
 
-void QsvTextOperationsWidget::showSearch()
+QFlags<QTextDocument::FindFlag> QsvTextOperationsWidget::getSearchFlags()
 {
-	m_search->setVisible(!m_search->isVisible());
-	if (!m_search->isVisible())
-		return;
-	QWidget *parent = qobject_cast<QWidget*>(this->parent());
+	QFlags<QTextDocument::FindFlag> f;
 
-	QLineEdit *lineEdit = m_search->findChild<QLineEdit*>("searchText");
-	if (!lineEdit) {
-		// something here is fucked up, really nice
-		return;
+	// one can never be too safe
+	if (!searchFormUi){
+		qDebug("%s:%d - searchFormUi not available, memory problems?", __FILE__, __LINE__ );
+		return f;
 	}
-	lineEdit->setFocus();
-	m_searchCursor = getTextCursor();
 
-	QRect r = parent->rect();
-	r.adjust( 10, 0, -10, 0 );
-	r.setHeight( m_search->height() );
-	r.moveBottom( parent->rect().height() - 10 );
-	m_search->setGeometry( r );
-}
-
-void QsvTextOperationsWidget::on_searchText_modified(QString s)
-{
-	issue_search( s, m_searchCursor, getSearchFlags() );
+	if (searchFormUi->caseSensitiveCheckBox->isChecked())
+		f = f | QTextDocument::FindCaseSensitively;
+	if (searchFormUi->wholeWorldsCheckbox->isChecked())
+		f = f | QTextDocument::FindWholeWords;
+	return f;
 }
 
 QTextCursor	QsvTextOperationsWidget::getTextCursor()
@@ -95,7 +85,6 @@ QTextCursor	QsvTextOperationsWidget::getTextCursor()
 
 void	QsvTextOperationsWidget::setTextCursor(QTextCursor c)
 {
-	QTextCursor searchCursor;
 	QTextEdit *t = qobject_cast<QTextEdit*>(parent());
 	if (t) {
 		t->setTextCursor(c);
@@ -107,47 +96,61 @@ void	QsvTextOperationsWidget::setTextCursor(QTextCursor c)
 	}
 }
 
+void QsvTextOperationsWidget::showSearch()
+{
+	if (!m_search)
+		initSearchWidget();
+
+	m_search->setVisible(!m_search->isVisible());
+	QWidget *parent = qobject_cast<QWidget*>(this->parent());
+	if (!m_search->isVisible()) {
+		if (parent)
+			parent->setFocus();
+		return;
+	}
+
+	searchFormUi->lineEdit->setFocus();
+	m_searchCursor = getTextCursor();
+
+	QRect r = parent->rect();
+	r.adjust( 10, 0, -10, 0 );
+	r.setHeight( m_search->height() );
+	r.moveBottom( parent->rect().height() - 10 );
+	m_search->setGeometry( r );
+}
+
+void QsvTextOperationsWidget::on_searchText_modified(QString s)
+{
+	issue_search( s, m_searchCursor, getSearchFlags() );
+}
+
 bool	QsvTextOperationsWidget::issue_search( const QString &text, QTextCursor newCursor, QFlags<QTextDocument::FindFlag> findOptions  )
 {
 	QTextCursor c = m_document->find( text, newCursor, findOptions );
 	bool found = ! c.isNull();
-	QLineEdit *lineEdit = m_search->findChild<QLineEdit*>("searchText");
-	if (!lineEdit) {
-		// something here is fucked up, really nice
-		return false;
-	}
+	qDebug() << findOptions;
 
+	//lets try again, from the start
 	if (!found) {
-		//lets try again, from the start
 		c.movePosition(findOptions.testFlag(QTextDocument::FindBackward)? QTextCursor::End : QTextCursor::Start);
-		c = m_document->find( lineEdit->text(), c, findOptions );
+		c = m_document->find(text, c, findOptions);
 		found = ! c.isNull();
 	}
 
+	QPalette p = searchFormUi->lineEdit->palette();
 	if (found) {
-//		QPalette ok = this->palette();
-//		ok.setColor( QPalette::Base, searchFoundColor );
-//		ui_findWidget.searchText->setPalette( ok );
-		setTextCursor( c );
-	} else 	{
-//		QPalette bad = this->palette();
-//		bad.setColor( QPalette::Base, searchNotFoundColor );
-//		ui_findWidget.searchText->setPalette( bad );
-		setTextCursor( m_searchCursor );
+		p.setColor(QPalette::Base, searchFoundColor);
+	} else {
+		if (!text.isEmpty())
+			p.setColor(QPalette::Base, searchNotFoundColor);
+		else
+			p.setColor(QPalette::Base,
+				searchFormUi->lineEdit->style()->standardPalette().base().color()
+			);
+		c =  m_searchCursor;
 	}
+	searchFormUi->lineEdit->setPalette(p);
+	setTextCursor( c );
 	return found;
 }
 
-
-QFlags<QTextDocument::FindFlag> QsvTextOperationsWidget::getSearchFlags()
-{
-	QFlags<QTextDocument::FindFlag> f;
-
-	/*if (ui_findWidget.caseSensitive->isChecked())
-		f = f | QTextDocument::FindCaseSensitively;
-
-	if (ui_findWidget.wholeWords->isChecked())
-		f = f | QTextDocument::FindWholeWords;
-*/
-	return f;
-}

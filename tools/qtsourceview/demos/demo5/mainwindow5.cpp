@@ -3,6 +3,8 @@
 #include "qsvsyntaxhighlighterbase.h"
 #include "qsvtextoperationswidget.h"
 
+#include <QAction>
+#include <QToolBar>
 #include <QTimer>
 
 MainWindow5::MainWindow5(QWidget *parent, Qt::WindowFlags flags ):
@@ -15,6 +17,10 @@ MainWindow5::MainWindow5(QWidget *parent, Qt::WindowFlags flags ):
 	e->setFont( QFont("Courier new", 10) );
 	e->setLineWrapMode( QPlainTextEdit::NoWrap );
 	QTimer::singleShot( 1500, textOpetations, SLOT(showSearch()));
+
+	QToolBar *b = this->addToolBar( "" );
+	b->addAction( tr("Find"), textOpetations, SLOT(showSearch()));
+	b->setMovable(false);
 
 #if 1
 	e->setPlainText(
