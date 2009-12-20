@@ -18,8 +18,10 @@ MainWindow5::MainWindow5(QWidget *parent, Qt::WindowFlags flags ):
 	e->setLineWrapMode( QPlainTextEdit::NoWrap );
 
 	QToolBar *b = this->addToolBar( "" );
-	b->addAction( tr("Find"), textOpetations, SLOT(showSearch()));
-	b->addAction( tr("Replace"), textOpetations, SLOT(showReplace()));
+	b->addAction( tr("Find"), textOpetations, SLOT(showSearch()))
+	 ->setShortcut(QKeySequence("Ctrl+F"));
+	b->addAction( tr("Replace"), textOpetations, SLOT(showReplace()))
+	 ->setShortcut(QKeySequence("Ctrl+R"));
 	b->setMovable(false);
 
 #if 1
