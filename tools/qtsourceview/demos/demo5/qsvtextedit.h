@@ -15,7 +15,15 @@ public:
 	const QString getMatchBracketList();
 public slots:
 	void cursorMoved();
+
+signals:
+	void widgetResized();
+
 protected:
+	void paintEvent(QPaintEvent *e);
+	void resizeEvent(QResizeEvent *e);
+	void keyPressEvent(QKeyEvent *e);
+
 	int findMatchingChar( QChar c1, QChar c2, bool forward, QTextBlock &block, int from );
 	QString m_matchBracketsList;
 	QsvSyntaxHighlighterBase *m_highlighter;

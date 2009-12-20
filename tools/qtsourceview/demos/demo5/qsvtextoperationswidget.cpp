@@ -16,6 +16,7 @@
 QsvTextOperationsWidget::QsvTextOperationsWidget( QWidget *parent )
 	: QObject(parent)
 {
+	setObjectName("QsvTextOperationWidget");
 	m_gotoLine = NULL;
 	m_search   = NULL;
 	m_replace  = NULL;
@@ -33,11 +34,13 @@ QsvTextOperationsWidget::QsvTextOperationsWidget( QWidget *parent )
 			m_document = pt->document();
 		}
 	}
+	connect(parent,SIGNAL(widgetResized()),this,SLOT(adjustBottomWidget()));
 }
 
 void QsvTextOperationsWidget::initSearchWidget()
 {
 	m_search = new QWidget( (QWidget*) parent() );
+	m_search->setObjectName("m_search");
 	searchFormUi = new Ui::searchForm();
 	searchFormUi->setupUi(m_search);
 	searchFormUi->searchText->setFont( m_search->parentWidget()->font() );
@@ -53,22 +56,25 @@ void QsvTextOperationsWidget::initSearchWidget()
 void QsvTextOperationsWidget::initReplaceWidget()
 {
 	m_replace = new QWidget( (QWidget*) parent() );
+	m_replace->setObjectName("m_replace");
 	replaceFormUi = new Ui::replaceForm();
 	replaceFormUi->setupUi(m_replace);
 	replaceFormUi->optionsGroupBox->hide();
-	connect(replaceFormUi->moreButton,SIGNAL(clicked()),this,SLOT(adjustReplaceSize()));
+	replaceFormUi->findText->setFont( m_replace->parentWidget()->font() );
+	replaceFormUi->replaceText->setFont( m_replace->parentWidget()->font() );
+	// otherwise, it inherits the default font from the editor - fixed
 	m_replace->setFont(QFont("sans"));
 	m_replace->adjustSize();
 	m_replace->hide();
 
+	connect(replaceFormUi->moreButton,SIGNAL(clicked()),this,SLOT(adjustBottomWidget()));
 	connect(replaceFormUi->findText,SIGNAL(textChanged(QString)),this,SLOT(on_replaceText_modified(QString)));
 	connect(replaceFormUi->closeButton,SIGNAL(clicked()),this, SLOT(showReplace()));
 }
 
-void QsvTextOperationsWidget::adjustReplaceSize()
+void QsvTextOperationsWidget::adjustBottomWidget()
 {
-	m_replace->adjustSize();
-	showBottomWidget(m_replace);
+	showBottomWidget(NULL);
 }
 
 QFlags<QTextDocument::FindFlag> QsvTextOperationsWidget::getSearchFlags()
@@ -149,13 +155,27 @@ void	QsvTextOperationsWidget::showReplace()
 		return;
 	}
 
+	replaceFormUi->findText->setFocus();
 	showBottomWidget(m_replace);
 }
 
 void	QsvTextOperationsWidget::showBottomWidget(QWidget* w)
 {
+	if (!w) {
+		if (m_replace && m_replace->isVisible())
+			w = m_replace;
+		else if (m_search && m_search->isVisible())
+			w = m_search;
+		else if (m_gotoLine && m_gotoLine->isVisible())
+			w = m_gotoLine;
+	}
+
+	if (!w)
+		return;
+
 	QWidget *parent = qobject_cast<QWidget*>(this->parent());
 	QRect r = parent->rect();
+	w->adjustSize();
 	r.adjust(10, 0, -10, 0);
 	r.setHeight(w->height());
 	r.moveBottom(parent->rect().height()-10);
