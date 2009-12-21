@@ -32,13 +32,8 @@ void appendExtraSelection( QList<QTextEdit::ExtraSelection> &selections,
 		return;
 
 	QTextEdit::ExtraSelection selection;
-//	QTextCharFormat format = selection.format;
-//	format.setBackground(Qt::green);
-//	selection.format = format;
-
-	selection.format = matchesFormat;
-
 	QTextCursor cursor = self->textCursor();
+	selection.format = matchesFormat;
 	cursor.setPosition(position);
 	cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor);
 	selection.cursor = cursor;
@@ -107,115 +102,74 @@ void	QsvTextEdit::resizeEvent(QResizeEvent *e)
 
 void	QsvTextEdit::keyPressEvent(QKeyEvent *e)
 {
-	static QObject *textOperationsWidget = NULL;
-
-	if (!textOperationsWidget)
-		textOperationsWidget = findChild<QObject*>("QsvTextOperationWidget");
-
+	QTextCursor c = textCursor();
 	switch (e->key()) {
 		case Qt::Key_Escape:
-/*
-			if (s ->isVisible())
-				showFindWidget();
-			else if (replaceWidget->isVisible())
-				showReplaceWidget();
-			else if (gotoLineWidget->isVisible())
-				showGotoLineWidget();
-			else
-			{	// clear selection
-				QTextCursor c = textCursor();
-				if (c.hasSelection()) {
-					c.clearSelection();
-					setTextCursor(c);
-				}
-			}*/
+			if (c.hasSelection()) {
+				c.clearSelection();
+				setTextCursor(c);
+				e->accept();
+			}
 			break;
-#if 0
-		case Qt::Key_Home:
-			if (!usingSmartHome || QApplication::keyboardModifiers().testFlag(Qt::ControlModifier) )
-				break;
-			smartHome();
-			event->accept();
-			return;
-		case Qt::Key_End:
-			if (!usingSmartHome || QApplication::keyboardModifiers().testFlag(Qt::ControlModifier) )
-				break;
-			smartEnd();
-			event->accept();
-			return;
-#endif
-
 		case Qt::Key_Down:
 			if (!QApplication::keyboardModifiers().testFlag(Qt::ControlModifier))
 				break;
 			verticalScrollBar()->triggerAction( QAbstractSlider::SliderSingleStepAdd );
 			e->accept();
 			break;
-
 		case Qt::Key_Up:
 			if (!QApplication::keyboardModifiers().testFlag(Qt::ControlModifier))
 				break;
 			verticalScrollBar()->triggerAction( QAbstractSlider::SliderSingleStepSub );
 			e->accept();
 			break;
-
 		case Qt::Key_PageDown:
 			if (!QApplication::keyboardModifiers().testFlag(Qt::ControlModifier))
 				break;
 			verticalScrollBar()->triggerAction( QAbstractSlider::SliderPageStepAdd);
 			e->accept();
 			break;
-
 		case Qt::Key_PageUp:
 			if (!QApplication::keyboardModifiers().testFlag(Qt::ControlModifier))
 				break;
 			verticalScrollBar()->triggerAction( QAbstractSlider::SliderPageStepSub );
 			e->accept();
 			break;
-
-/*		case Qt::Key_Enter:
-		case Qt::Key_Return:
-			if (findWidget->isVisible() || replaceWidget->isVisible() || gotoLineWidget->isVisible()) {
-				e->ignore();
-				return;
-			}
-			break;
-*/
+#ifdef TAB_INDENTS
 		case Qt::Key_Tab:
-			if (textOperationsWidget) {
-				QWidget *replaceWidget = findChild<QWidget*>("m_replace");
-				if (replaceWidget && replaceWidget->isVisible()) {
-					// since the replace widget has many subwidgets
-					// tab should cycle between them
-					e->ignore();
-					return;
-				}
-			}
-#if 0
 			if (tabIndents) {
 				if (handleIndentEvent( !(event->modifiers() & Qt::ShiftModifier) ))
 					// do not call original hanlder, if this was handled by that function
 					return;
 			}
-#endif
 			break;
 		case Qt::Key_Backtab:
-//			if (replaceWidget->isVisible()) {
-//				e->ignore();
-				return;
-//			}
-#if 0
 			if (tabIndents)
 				if (handleIndentEvent(false))
 					return;
 #endif
-#if 0
+
+#ifdef SMARTHOME
+		case Qt::Key_Home:
+			if (!usingSmartHome || QApplication::keyboardModifiers().testFlag(Qt::ControlModifier) )
+				break;
+			smartHome();
+			e->accept();
+			return;
+		case Qt::Key_End:
+			if (!usingSmartHome || QApplication::keyboardModifiers().testFlag(Qt::ControlModifier) )
+				break;
+			smartEnd();
+			e->accept();
+			return;
+#endif
+
+#ifdef AUTO_BRAKETS
 		default:
 			if (usingAutoBrackets && handleKeyPressEvent(event))
 				return;
 #endif
 	} // end case
-
 	QPlainTextEdit::keyPressEvent(e);
 }
 

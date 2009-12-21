@@ -132,6 +132,9 @@
    </item>
    <item>
     <widget class="QGroupBox" name="optionsGroupBox">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="title">
       <string>Options</string>
      </property>
@@ -203,6 +206,22 @@
     <hint type="destinationlabel">
      <x>532</x>
      <y>146</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>moreButton</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>optionsGroupBox</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>508</x>
+     <y>86</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>501</x>
+     <y>120</y>
     </hint>
    </hints>
   </connection>

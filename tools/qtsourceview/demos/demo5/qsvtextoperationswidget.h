@@ -47,6 +47,9 @@ public slots:
 	void on_replaceText_modified(QString s);
 	void adjustBottomWidget();
 
+protected:
+	bool eventFilter(QObject *obj, QEvent *event);
+
 private:
 	bool issue_search( const QString &text, QTextCursor newCursor, QFlags<QTextDocument::FindFlag> findOptions, QLineEdit *l );
 

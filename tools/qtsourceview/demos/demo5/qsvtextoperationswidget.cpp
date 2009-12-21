@@ -35,6 +35,7 @@ QsvTextOperationsWidget::QsvTextOperationsWidget( QWidget *parent )
 		}
 	}
 	connect(parent,SIGNAL(widgetResized()),this,SLOT(adjustBottomWidget()));
+	parent->installEventFilter(this);
 }
 
 void QsvTextOperationsWidget::initSearchWidget()
@@ -76,6 +77,48 @@ void QsvTextOperationsWidget::adjustBottomWidget()
 {
 	showBottomWidget(NULL);
 }
+
+bool	 QsvTextOperationsWidget::eventFilter(QObject *obj, QEvent *event)
+{
+	if (obj != parent())
+		return false;
+	if (event->type() != QEvent::KeyPress)
+		return false;
+
+	QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
+	switch (keyEvent->key()){
+		case Qt::Key_Escape:
+			if (m_search && m_search->isVisible()){
+				showSearch();
+				return true;
+			} else if (m_replace && m_replace->isVisible()){
+				showReplace();
+				return m_replace->isVisible();
+			}/* else if (m_gotoLine && m_gotoLine->isVisible()) {
+				showGotoLine();
+				return true;
+			}*/
+			break;
+		case Qt::Key_Enter:
+		case Qt::Key_Return:
+			break;
+
+		case Qt::Key_Tab:
+		case Qt::Key_Backtab:
+			if (m_replace && m_replace->isVisible()){
+				// TODO - no cycle yet.
+				if (Qt::Key_Tab == keyEvent->key())
+					m_replace->focusWidget()->nextInFocusChain()->setFocus();
+				else
+					m_replace->focusWidget()->previousInFocusChain()->setFocus();
+				return true;
+			}
+			break;
+	}
+
+	return false;
+}
+
 
 QFlags<QTextDocument::FindFlag> QsvTextOperationsWidget::getSearchFlags()
 {
@@ -197,7 +240,7 @@ bool	QsvTextOperationsWidget::issue_search( const QString &text, QTextCursor new
 {
 	QTextCursor c = m_document->find( text, newCursor, findOptions );
 	bool found = ! c.isNull();
-	qDebug() << findOptions;
+	//qDebug() << findOptions;
 
 	//lets try again, from the start
 	if (!found) {
