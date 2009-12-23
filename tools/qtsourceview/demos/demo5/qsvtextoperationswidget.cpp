@@ -24,6 +24,7 @@ QsvTextOperationsWidget::QsvTextOperationsWidget( QWidget *parent )
 	searchFoundColor	= QColor( "#DDDDFF" ); //QColor::fromRgb( 220, 220, 255)
 	searchNotFoundColor	= QColor( "#FFAAAA" ); //QColor::fromRgb( 255, 102, 102) "#FF6666"
 
+	// TODO clean this up, this is too ugly to be in a constructor
 	QTextEdit *t = qobject_cast<QTextEdit*>(parent);
 	if (t) {
 		m_document = t->document();
@@ -45,7 +46,7 @@ void QsvTextOperationsWidget::initSearchWidget()
 	searchFormUi = new Ui::searchForm();
 	searchFormUi->setupUi(m_search);
 	searchFormUi->searchText->setFont( m_search->parentWidget()->font() );
-	// otherwise, it inherits the default font from the editor - fixed
+	// otherwise it inherits the default font from the editor - fixed
 	m_search->setFont(QFont("sans"));
 	m_search->adjustSize();
 	m_search->hide();
@@ -63,7 +64,7 @@ void QsvTextOperationsWidget::initReplaceWidget()
 	replaceFormUi->optionsGroupBox->hide();
 	replaceFormUi->findText->setFont( m_replace->parentWidget()->font() );
 	replaceFormUi->replaceText->setFont( m_replace->parentWidget()->font() );
-	// otherwise, it inherits the default font from the editor - fixed
+	// otherwise it inherits the default font from the editor - fixed
 	m_replace->setFont(QFont("sans"));
 	m_replace->adjustSize();
 	m_replace->hide();
@@ -106,11 +107,18 @@ bool	 QsvTextOperationsWidget::eventFilter(QObject *obj, QEvent *event)
 		case Qt::Key_Tab:
 		case Qt::Key_Backtab:
 			if (m_replace && m_replace->isVisible()){
+				/*
 				// TODO - no cycle yet.
 				if (Qt::Key_Tab == keyEvent->key())
 					m_replace->focusWidget()->nextInFocusChain()->setFocus();
 				else
 					m_replace->focusWidget()->previousInFocusChain()->setFocus();
+				*/
+				// Instead - cycle between those two input lines. IMHO good enough
+				if (replaceFormUi->replaceText->hasFocus())
+					replaceFormUi->findText->setFocus();
+				else
+					replaceFormUi->replaceText->setFocus();
 				return true;
 			}
 			break;
@@ -126,7 +134,7 @@ QFlags<QTextDocument::FindFlag> QsvTextOperationsWidget::getSearchFlags()
 
 	// one can never be too safe
 	if (!searchFormUi){
-//		qDebug("%s:%d - searchFormUi not available, memory problems?", __FILE__, __LINE__ );
+		qDebug("%s:%d - searchFormUi not available, memory problems?", __FILE__, __LINE__ );
 		return f;
 	}
 
@@ -171,6 +179,7 @@ void QsvTextOperationsWidget::showSearch()
 		initSearchWidget();
 	if (m_replace && m_replace->isVisible())
 		m_replace->hide();
+
 	QWidget *parent = qobject_cast<QWidget*>(this->parent());
 	if (m_search->isVisible()) {
 		m_search->hide();
@@ -190,6 +199,7 @@ void	QsvTextOperationsWidget::showReplace()
 		initReplaceWidget();
 	if (m_search && m_search->isVisible())
 		m_search->hide();
+
 	QWidget *parent = qobject_cast<QWidget*>(this->parent());
 	if (m_replace->isVisible()) {
 		m_replace->hide();
@@ -265,4 +275,3 @@ bool	QsvTextOperationsWidget::issue_search( const QString &text, QTextCursor new
 	setTextCursor( c );
 	return found;
 }
-
