@@ -2,9 +2,11 @@
 #include <QScrollBar>
 #include <QAbstractSlider>
 #include <QList>
+#include <QPainter>
 
 #include "qsvtextedit.h"
 #include "qsvsyntaxhighlighterbase.h"
+#include "qsveditorpanel.h"
 
 QsvTextEdit::QsvTextEdit( QWidget *parent, QsvSyntaxHighlighterBase *s ):
 	QPlainTextEdit(parent)
@@ -21,6 +23,8 @@ QsvTextEdit::QsvTextEdit( QWidget *parent, QsvSyntaxHighlighterBase *s ):
 	matchesFormat.setBackground( QBrush(QColor(0xff,0xff,0x00,0xff) ));
 	matchesFormat.setForeground( QBrush(QColor(0x00,0x80,0x00,0xff) ));
 	matchesFormat.setFont(f);
+
+	m_panel = new QsvEditorPanel(this);
 }
 
 // helper function, in Pascal it would have been an internal
@@ -43,14 +47,16 @@ void appendExtraSelection( QList<QTextEdit::ExtraSelection> &selections,
 
 void QsvTextEdit::cursorMoved()
 {
+	// does this line have any brakcets?
+	QsvBlockData *data = static_cast<QsvBlockData*>(textCursor().block().userData());
+	if (!data){
+		m_panel->update();
+		return;
+	}
+
 	// clear out previous matches
 	QList<QTextEdit::ExtraSelection> selections;
 	setExtraSelections(selections);
-
-	// does this line have any brakcets?
-	QsvBlockData *data = static_cast<QsvBlockData*>(textCursor().block().userData());
-	if (!data)
-		return;
 
 	QTextCursor cursor         = textCursor();
 	QTextBlock  block          = cursor.block();
@@ -98,6 +104,12 @@ void	QsvTextEdit::resizeEvent(QResizeEvent *e)
 
 	// this get connected in QsvTextOperationsWidget
 	emit(widgetResized());
+
+	setViewportMargins( m_panel->width()-1, 0, 0, 0 );
+	QRect viewportRect = viewport()->geometry();
+	QRect lrect = QRect(viewportRect.topLeft(), viewportRect.bottomLeft());
+	lrect.adjust( -m_panel->width(), 0, 0, 0 );
+	m_panel->setGeometry(lrect);
 }
 
 void	QsvTextEdit::keyPressEvent(QKeyEvent *e)
@@ -216,4 +228,35 @@ void QsvTextEdit::setMatchBracketList( const QString &m )
 const QString QsvTextEdit::getMatchBracketList()
 {
 	return m_matchBracketsList;
+}
+
+void QsvTextEdit::paintPanel(QPaintEvent*e)
+{
+	QPainter p(m_panel);
+	QRect r = geometry();
+	QTextBlock block = firstVisibleBlock();
+	int y = blockBoundingRect(block).translated(contentOffset()).top();
+	int l = block.blockNumber();
+	QString s;
+
+	p.setFont(font());
+
+	p.fillRect( e->rect(), m_panel->m_panelColor );
+	while (block.isValid() && block.isVisible()){
+		s = s.number(l);
+		p.drawText( 0, y, m_panel->width() - 5, fontMetrics().height(), Qt::AlignRight, s );
+
+		y += blockBoundingRect(block).height();
+		block = block.next();
+		l ++;
+	}
+
+#if 0
+		if (data) {
+			if (data->m_isBookmark)
+				p.drawPixmap( 2, qRound(position.y() - contentsY + ascent - m_bookMarkImage.height()), m_bookMarkImage );
+			if (data->m_isModified)
+				p.fillRect( width()- 3, qRound(position.y()-contentsY), 2, qRound(boundingRect.height()), m_modifiedColor );
+		}
+#endif
 }
