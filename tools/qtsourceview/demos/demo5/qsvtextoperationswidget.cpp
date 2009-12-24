@@ -94,7 +94,7 @@ bool	 QsvTextOperationsWidget::eventFilter(QObject *obj, QEvent *event)
 				return true;
 			} else if (m_replace && m_replace->isVisible()){
 				showReplace();
-				return m_replace->isVisible();
+				return true;
 			}/* else if (m_gotoLine && m_gotoLine->isVisible()) {
 				showGotoLine();
 				return true;
@@ -126,7 +126,6 @@ bool	 QsvTextOperationsWidget::eventFilter(QObject *obj, QEvent *event)
 
 	return false;
 }
-
 
 QFlags<QTextDocument::FindFlag> QsvTextOperationsWidget::getSearchFlags()
 {
@@ -222,7 +221,6 @@ void	QsvTextOperationsWidget::showBottomWidget(QWidget* w)
 		else if (m_gotoLine && m_gotoLine->isVisible())
 			w = m_gotoLine;
 	}
-
 	if (!w)
 		return;
 
