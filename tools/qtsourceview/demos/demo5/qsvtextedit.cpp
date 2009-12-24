@@ -19,17 +19,19 @@ QsvTextEdit::QsvTextEdit( QWidget *parent, QsvSyntaxHighlighterBase *s ):
 
 	QFont f;
 	f.setBold(true);
-	matchesFormat = QTextCharFormat();
-	matchesFormat.setBackground( QBrush(QColor(0xff,0xff,0x00,0xff) ));
-	matchesFormat.setForeground( QBrush(QColor(0x00,0x80,0x00,0xff) ));
-	matchesFormat.setFont(f);
+	m_matchesFormat = QTextCharFormat();
+	m_matchesFormat.setBackground( QBrush(QColor(0xff,0xff,0x00,0xff) ));
+	m_matchesFormat.setForeground( QBrush(QColor(0x00,0x80,0x00,0xff) ));
+	m_matchesFormat.setFont(f);
+
+	m_currentLineBackground = QColor(0xc0,0xff,0xc0,0xff);
 
 	m_panel = new QsvEditorPanel(this);
 }
 
 // helper function, in Pascal it would have been an internal
 // procedure inside cursorMove()
-void appendExtraSelection( QList<QTextEdit::ExtraSelection> &selections,
+inline void appendExtraSelection( QList<QTextEdit::ExtraSelection> &selections,
 	int position, QPlainTextEdit *self, QTextCharFormat matchesFormat )
 {
 	if (position==-1)
@@ -47,23 +49,36 @@ void appendExtraSelection( QList<QTextEdit::ExtraSelection> &selections,
 
 void QsvTextEdit::cursorMoved()
 {
-	// does this line have any brakcets?
-	QsvBlockData *data = static_cast<QsvBlockData*>(textCursor().block().userData());
-	if (!data){
-		m_panel->update();
-		return;
-	}
-
 	// clear out previous matches
 	QList<QTextEdit::ExtraSelection> selections;
-	setExtraSelections(selections);
+	QTextCursor cursor = textCursor();
+	QTextBlock  block;
+	int blockPosition;
+	int cursorPosition;
+	int relativePosition;
+	QChar currentChar;
 
-	QTextCursor cursor         = textCursor();
-	QTextBlock  block          = cursor.block();
-	int blockPosition          = block.position();
-	int cursorPosition         = cursor.position();
-	int relativePosition       = cursorPosition - blockPosition;
-	QChar currentChar          = block.text()[relativePosition];
+//	setExtraSelections(selections);
+//	if (d->m_highlightCurrentLine)
+	{
+		QTextEdit::ExtraSelection sel;
+		sel.format.setBackground( m_currentLineBackground );
+		sel.format.setProperty(QTextFormat::FullWidthSelection, true);
+		sel.cursor = cursor;
+		sel.cursor.clearSelection();
+		selections.append(sel);
+	}
+
+	// does this line have any brakcets?
+	QsvBlockData *data = static_cast<QsvBlockData*>(textCursor().block().userData());
+	if (!data)
+		goto NO_MATCHES;
+
+	block             = cursor.block();
+	blockPosition     = block.position();
+	cursorPosition    = cursor.position();
+	relativePosition  = cursorPosition - blockPosition;
+	currentChar       = block.text()[relativePosition];
 
 	for( int k=0; k<data->matches.length(); k++)
 	{
@@ -71,7 +86,7 @@ void QsvTextEdit::cursorMoved()
 		if (m.position != relativePosition)
 			continue;
 
-		appendExtraSelection(selections, cursorPosition, this, matchesFormat);
+		appendExtraSelection(selections, cursorPosition, this, m_matchesFormat);
 
 		// lets find it's partner
 		// in theory, no errors shuold not happen, but one can never be too sure
@@ -86,9 +101,12 @@ void QsvTextEdit::cursorMoved()
 				j = findMatchingChar( m_matchBracketsList[j], m_matchBracketsList[j-1], false, block, cursorPosition  );
 		else
 			j = findMatchingChar( m_matchBracketsList[j], m_matchBracketsList[j+1], true , block, cursorPosition );
-		appendExtraSelection(selections, j, this,matchesFormat);
+		appendExtraSelection(selections, j, this,m_matchesFormat);
 	}
+
+NO_MATCHES:
 	setExtraSelections(selections);
+	m_panel->update();
 }
 
 void	QsvTextEdit::paintEvent(QPaintEvent *e)

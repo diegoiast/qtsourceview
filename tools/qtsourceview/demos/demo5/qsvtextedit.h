@@ -3,6 +3,7 @@
 
 #include <QPlainTextEdit>
 #include <QTextCharFormat>
+#include <QColor>
 
 class QsvSyntaxHighlighterBase;
 class QsvEditorPanel;
@@ -32,8 +33,9 @@ protected:
 	QsvSyntaxHighlighterBase *m_highlighter;
 	QsvEditorPanel *m_panel;
 
-	QString m_matchBracketsList;
-	QTextCharFormat matchesFormat;
+	QString         m_matchBracketsList;
+	QTextCharFormat m_matchesFormat;
+	QColor          m_currentLineBackground;
 };
 
 #endif // QSVTEXTEDIT_H
