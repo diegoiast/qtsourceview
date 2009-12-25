@@ -325,27 +325,25 @@ void	QsvTextEdit::keyPressEvent(QKeyEvent *e)
 			}
 			break;
 		case Qt::Key_Down:
-			if (!QApplication::keyboardModifiers().testFlag(Qt::ControlModifier))
-				break;
-			verticalScrollBar()->triggerAction( QAbstractSlider::SliderSingleStepAdd );
-			e->accept();
-			break;
 		case Qt::Key_Up:
 			if (!QApplication::keyboardModifiers().testFlag(Qt::ControlModifier))
 				break;
-			verticalScrollBar()->triggerAction( QAbstractSlider::SliderSingleStepSub );
+			verticalScrollBar()->triggerAction( 
+				e->key() == Qt::Key_Down?
+				QAbstractSlider::SliderSingleStepAdd:
+				QAbstractSlider::SliderSingleStepSub
+			);
 			e->accept();
 			break;
 		case Qt::Key_PageDown:
-			if (!QApplication::keyboardModifiers().testFlag(Qt::ControlModifier))
-				break;
-			verticalScrollBar()->triggerAction( QAbstractSlider::SliderPageStepAdd);
-			e->accept();
-			break;
 		case Qt::Key_PageUp:
 			if (!QApplication::keyboardModifiers().testFlag(Qt::ControlModifier))
 				break;
-			verticalScrollBar()->triggerAction( QAbstractSlider::SliderPageStepSub );
+			verticalScrollBar()->triggerAction(
+				e->key() == Qt::Key_PageDown?
+				QAbstractSlider::SliderPageStepAdd:
+				QAbstractSlider::SliderPageStepSub
+			);
 			e->accept();
 			break;
 #ifdef TAB_INDENTS
