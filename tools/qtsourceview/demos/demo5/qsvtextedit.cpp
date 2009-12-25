@@ -26,6 +26,8 @@ QsvTextEdit::QsvTextEdit( QWidget *parent, QsvSyntaxHighlighterBase *s ):
 
 	m_currentLineBackground = QColor(0xc0,0xff,0xc0,0xff);
 
+	m_smartHome = true;
+
 	m_panel = new QsvEditorPanel(this);
 }
 
@@ -109,6 +111,59 @@ NO_MATCHES:
 	m_panel->update();
 }
 
+void	QsvTextEdit::smartHome()
+{
+	QTextCursor c = textCursor();
+	int blockLen = c.block().text().length();
+	if (blockLen == 0 )
+		return;
+
+	int originalPosition = c.position();
+	QTextCursor::MoveMode moveAnchor = QApplication::keyboardModifiers().testFlag(Qt::ShiftModifier)?
+		 QTextCursor::KeepAnchor:QTextCursor::MoveAnchor;
+	c.movePosition(QTextCursor::StartOfLine, moveAnchor);
+	int startOfLine = c.position();
+	int i = 0;
+	while ( c.block().text()[i].isSpace()) {
+		i ++;
+		if (i==blockLen) {
+			i = 0;
+			break;
+		}
+	}
+	if ((originalPosition == startOfLine) || (startOfLine + i != originalPosition ))
+		c.setPosition( startOfLine + i, moveAnchor );
+	setTextCursor( c );
+}
+
+void	QsvTextEdit::smartEnd()
+{
+	QTextCursor c = textCursor();
+	int blockLen = c.block().text().length();
+	if (blockLen == 0)
+		return;
+
+	int originalPosition = c.position();
+	QTextCursor::MoveMode moveAnchor = QApplication::keyboardModifiers().testFlag(Qt::ShiftModifier)?
+		 QTextCursor::KeepAnchor:QTextCursor::MoveAnchor;
+	c.movePosition(QTextCursor::StartOfLine,moveAnchor);
+	int startOfLine = c.position();
+	c.movePosition(QTextCursor::EndOfLine,moveAnchor);
+	int i = blockLen;
+	while (c.block().text()[i-1].isSpace())	{
+		i --;
+		if (i==1)		{
+			i = blockLen;
+			break;
+		}
+	}
+	if ((originalPosition == startOfLine) || (startOfLine + i != originalPosition ))
+		c.setPosition( startOfLine + i, moveAnchor );
+
+	setTextCursor( c );
+}
+
+
 void	QsvTextEdit::paintEvent(QPaintEvent *e)
 {
 	QPlainTextEdit::paintEvent(e);
@@ -179,20 +234,18 @@ void	QsvTextEdit::keyPressEvent(QKeyEvent *e)
 					return;
 #endif
 
-#ifdef SMARTHOME
 		case Qt::Key_Home:
-			if (!usingSmartHome || QApplication::keyboardModifiers().testFlag(Qt::ControlModifier) )
+			if (!m_smartHome || QApplication::keyboardModifiers().testFlag(Qt::ControlModifier) )
 				break;
 			smartHome();
 			e->accept();
 			return;
 		case Qt::Key_End:
-			if (!usingSmartHome || QApplication::keyboardModifiers().testFlag(Qt::ControlModifier) )
+			if (!m_smartHome || QApplication::keyboardModifiers().testFlag(Qt::ControlModifier) )
 				break;
 			smartEnd();
 			e->accept();
 			return;
-#endif
 
 #ifdef AUTO_BRAKETS
 		default:

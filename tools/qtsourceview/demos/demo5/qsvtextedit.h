@@ -19,6 +19,8 @@ public:
 
 public slots:
 	void cursorMoved();
+	void smartHome();
+	void smartEnd();
 
 signals:
 	void widgetResized();
@@ -36,6 +38,7 @@ protected:
 	QString         m_matchBracketsList;
 	QTextCharFormat m_matchesFormat;
 	QColor          m_currentLineBackground;
+	bool            m_smartHome;
 };
 
 #endif // QSVTEXTEDIT_H

@@ -27,10 +27,10 @@ MainWindow5::MainWindow5(QWidget *parent, Qt::WindowFlags flags ):
 #if 1
 	e->setPlainText(
 "#include <stdio.h>\n\n"
-"int main()\n"
-"{\n"
-"	{ printf(\"Hello world!\\n\"); } \n"
-"}\n" );
+"int main()       \n"
+"{       \n"
+"	{ printf(\"Hello world!\\n\"); }           \n"
+"		}\n" );
 #else
 	e->setPlainText("( adsdsad )\n[aaaa]\n{ qwqew { qeweqw } qwe ( asd a) }\n'sada\"s\"da'");
 #endif
