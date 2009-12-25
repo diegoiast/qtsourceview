@@ -21,8 +21,8 @@ struct QsvEditorConfigData {
 	QFont			currentFont;
 	bool			lineWrapping;
 	bool			modificationsLookupEnabled;
-
-//	bool			autoBrackets;
+	bool			autoBrackets;
+	
 //	bool			showLineNumbers;
 //	bool			showWhiteSpaces;
 //	bool			showMargins;
@@ -69,6 +69,7 @@ protected:
 	void paintEvent(QPaintEvent *e);
 	void resizeEvent(QResizeEvent *e);
 	void keyPressEvent(QKeyEvent *e);
+	bool handleKeyPressEvent(QKeyEvent *e);
 
 	int findMatchingChar( QChar c1, QChar c2, bool forward, QTextBlock &block, int from );
 	QsvBlockData *getPrivateBlockData( QTextBlock block, bool createIfNotExisting );

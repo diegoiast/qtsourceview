@@ -33,6 +33,7 @@ QsvTextEdit::QsvTextEdit( QWidget *parent, QsvSyntaxHighlighterBase *s ):
 	m_config.lineWrapping       = false;
 	m_config.matchBracketsList  = "()[]{}\"\"''";
 	m_config.modificationsLookupEnabled = true;
+	m_config.autoBrackets       = true;
 
 	setMatchBracketList(m_config.matchBracketsList);
 	setFont(m_config.currentFont);
@@ -361,25 +362,79 @@ void	QsvTextEdit::keyPressEvent(QKeyEvent *e)
 #endif
 
 		case Qt::Key_Home:
-			if (!m_config.smartHome || QApplication::keyboardModifiers().testFlag(Qt::ControlModifier) )
-				break;
-			smartHome();
-			e->accept();
-			return;
 		case Qt::Key_End:
 			if (!m_config.smartHome || QApplication::keyboardModifiers().testFlag(Qt::ControlModifier) )
 				break;
-			smartEnd();
+			if (e->key() == Qt::Key_Home)
+				smartHome();
+			else
+				smartEnd();
 			e->accept();
 			return;
-
-#ifdef AUTO_BRAKETS
+		
 		default:
-			if (m_config.usingAutoBrackets && handleKeyPressEvent(event))
+			if (m_config.autoBrackets && handleKeyPressEvent(e))
 				return;
-#endif
 	} // end case
 	QPlainTextEdit::keyPressEvent(e);
+}
+
+bool	QsvTextEdit::handleKeyPressEvent(QKeyEvent *e)
+{
+	QTextCursor cursor = textCursor();
+	int i,j;
+	QString s;
+	
+	// handle automatic deletcion of mathcing brackets
+	if ((e->key() == Qt::Key_Delete) || (e->key() == Qt::Key_Backspace)) {
+		if (cursor.hasSelection())
+			return false;
+		i = cursor.position() - cursor.block().position();
+		QChar c1 = cursor.block().text()[ i ];
+		j =  m_config.matchBracketsList.indexOf( c1 );
+		if (j == -1)
+			return false;
+		if (i == 0)
+			return false;
+		if (m_config.matchBracketsList[j+1] == m_config.matchBracketsList[j])
+			j++;
+		QChar c2 = cursor.block().text()[ i-1 ];
+		if (c2 != m_config.matchBracketsList[j-1])
+			return false;
+		cursor.deletePreviousChar();
+		cursor.deleteChar();
+		goto FUNCTION_END;
+	}
+	
+	// handle only normal key presses
+	s = e->text();
+	if (s.isEmpty())
+		return false;
+	
+	// don't handle if not in the matching list
+	j = m_config.matchBracketsList.indexOf(s[0]);
+	if ((j == -1) || (j%2 == 1))
+		return false;
+	
+	// handle automatic insert of matching brackets
+	i = cursor.position();
+	if (!cursor.hasSelection()) {
+		cursor.insertText( QString(m_config.matchBracketsList[j]) );
+		cursor.insertText( QString(m_config.matchBracketsList[j+1]) );
+	} else {
+		QString s = cursor.selectedText();
+		cursor.beginEditBlock();
+		cursor.deleteChar();
+		s = m_config.matchBracketsList[j] + s + m_config.matchBracketsList[j+1];
+		cursor.insertText(s);
+		cursor.endEditBlock();
+	}
+	cursor.setPosition(i+1);
+	setTextCursor(cursor);
+	
+FUNCTION_END:
+	e->accept();
+	return true;
 }
 
 int	QsvTextEdit::findMatchingChar( QChar c1, QChar c2, bool forward, QTextBlock &block, int from )
