@@ -12,6 +12,17 @@ public:
 class QsvBlockData : public QTextBlockUserData {
 public:
 	QList<MatchData> matches;
+	bool m_isCurrentDebugLine;
+	bool m_isBookmark;
+	bool m_isBreakpoint;
+	bool m_isModified;
+
+	QsvBlockData(){
+		m_isCurrentDebugLine = false;
+		m_isBookmark = false;
+		m_isBreakpoint = false;
+		m_isModified = false;
+	}
 };
 
 class QsvSyntaxHighlighterBase : public QSyntaxHighlighter

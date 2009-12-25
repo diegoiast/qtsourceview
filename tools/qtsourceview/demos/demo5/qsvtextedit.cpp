@@ -12,10 +12,10 @@ QsvTextEdit::QsvTextEdit( QWidget *parent, QsvSyntaxHighlighterBase *s ):
 	QPlainTextEdit(parent)
 {
 	m_highlighter = s;
-	connect( this, SIGNAL(cursorPositionChanged()), this, SLOT(cursorMoved()));
 	m_highlighter->setDocument( document() );
-
-	setMatchBracketList( "()[]{}\"\"''" );
+	m_panel = new QsvEditorPanel(this);
+	connect( this, SIGNAL(cursorPositionChanged()), this, SLOT(cursorMoved()));
+	connect( document(), SIGNAL(contentsChange(int,int,int)), this, SLOT(on_textDocument_contentsChange(int,int,int)));
 
 	QFont f;
 	f.setBold(true);
@@ -23,13 +23,89 @@ QsvTextEdit::QsvTextEdit( QWidget *parent, QsvSyntaxHighlighterBase *s ):
 	m_matchesFormat.setBackground( QBrush(QColor(0xff,0xff,0x00,0xff) ));
 	m_matchesFormat.setForeground( QBrush(QColor(0x00,0x80,0x00,0xff) ));
 	m_matchesFormat.setFont(f);
-
 	m_currentLineBackground = QColor(0xc0,0xff,0xc0,0xff);
 
-	m_smartHome = true;
+	m_config.currentFont        = QFont("Courier new", 10);
+//	m_config.showLineNumbers    = true;
+	m_config.smartHome          = true;
+	m_config.markCurrentLine    = true;
+	m_config.matchBrackets      = true;
+	m_config.lineWrapping       = false;
+	m_config.matchBracketsList  = "()[]{}\"\"''";
+	m_config.modificationsLookupEnabled = true;
 
-	m_panel = new QsvEditorPanel(this);
+	setMatchBracketList(m_config.matchBracketsList);
+	setFont(m_config.currentFont);
+	setLineWrapMode(QPlainTextEdit::NoWrap);
 }
+
+void	QsvTextEdit::setMarkCurrentLine( bool on )
+{
+	m_config.markCurrentLine = on;
+	cursorMoved();
+}
+
+bool	QsvTextEdit::getmarkCurrentLine() const
+{
+	return m_config.markCurrentLine;
+}
+
+void	QsvTextEdit::setStartHome( bool on )
+{
+	m_config.smartHome = on;
+}
+
+bool	QsvTextEdit::getStartHome() const
+{
+	return m_config.smartHome;
+}
+
+void	QsvTextEdit::setMatchBracketList( const QString &m )
+{
+	m_config.matchBracketsList = m;
+	if (m_highlighter)
+		m_highlighter->setMatchBracketList( m );
+}
+
+const QString QsvTextEdit::getMatchBracketList() const
+{
+	return m_config.matchBracketsList;
+}
+
+void	QsvTextEdit::setMatchBracket( bool on )
+{
+	m_config.matchBrackets = on;
+	cursorMoved();
+}
+
+bool	QsvTextEdit::getMatchBracket() const
+{
+	return m_config.matchBrackets;
+}
+
+void	QsvTextEdit::setLineWrapping( bool on )
+{
+	m_config.lineWrapping = on;
+	setLineWrapMode(on?QPlainTextEdit::NoWrap:QPlainTextEdit::WidgetWidth);
+}
+
+bool	QsvTextEdit::getLineWrapping() const
+{
+	return m_config.lineWrapping;
+}
+
+void	QsvTextEdit::modificationsLookupEnabled( bool on )
+{
+	m_config.modificationsLookupEnabled = on;
+	if (m_panel)
+		m_panel->update();
+}
+
+bool	QsvTextEdit::getModificationsLookupEnabled() const
+{
+	return m_config.modificationsLookupEnabled;
+}
+
 
 // helper function, in Pascal it would have been an internal
 // procedure inside cursorMove()
@@ -59,9 +135,10 @@ void QsvTextEdit::cursorMoved()
 	int cursorPosition;
 	int relativePosition;
 	QChar currentChar;
+	QsvBlockData *data;
 
 //	setExtraSelections(selections);
-//	if (d->m_highlightCurrentLine)
+	if (m_config.markCurrentLine)
 	{
 		QTextEdit::ExtraSelection sel;
 		sel.format.setBackground( m_currentLineBackground );
@@ -71,8 +148,11 @@ void QsvTextEdit::cursorMoved()
 		selections.append(sel);
 	}
 
+	if (!m_config.matchBrackets)
+		goto NO_MATCHES;
+
 	// does this line have any brakcets?
-	QsvBlockData *data = static_cast<QsvBlockData*>(textCursor().block().userData());
+	data = static_cast<QsvBlockData*>(textCursor().block().userData());
 	if (!data)
 		goto NO_MATCHES;
 
@@ -82,8 +162,7 @@ void QsvTextEdit::cursorMoved()
 	relativePosition  = cursorPosition - blockPosition;
 	currentChar       = block.text()[relativePosition];
 
-	for( int k=0; k<data->matches.length(); k++)
-	{
+	for( int k=0; k<data->matches.length(); k++) {
 		MatchData m = data->matches.at(k);
 		if (m.position != relativePosition)
 			continue;
@@ -92,23 +171,24 @@ void QsvTextEdit::cursorMoved()
 
 		// lets find it's partner
 		// in theory, no errors shuold not happen, but one can never be too sure
-		int j = m_matchBracketsList.indexOf( currentChar );
+		int j = m_config.matchBracketsList.indexOf(currentChar);
 		if (j==-1)
 			continue;
 
-		if ( m_matchBracketsList[j] != m_matchBracketsList[j+1] )
+		if (m_config.matchBracketsList[j] != m_config.matchBracketsList[j+1])
 			if (j %2 == 0)
-				j = findMatchingChar( m_matchBracketsList[j], m_matchBracketsList[j+1], true , block, cursorPosition );
+				j = findMatchingChar( m_config.matchBracketsList[j], m_config.matchBracketsList[j+1], true , block, cursorPosition );
 			else
-				j = findMatchingChar( m_matchBracketsList[j], m_matchBracketsList[j-1], false, block, cursorPosition  );
+				j = findMatchingChar( m_config.matchBracketsList[j], m_config.matchBracketsList[j-1], false, block, cursorPosition  );
 		else
-			j = findMatchingChar( m_matchBracketsList[j], m_matchBracketsList[j+1], true , block, cursorPosition );
+			j = findMatchingChar( m_config.matchBracketsList[j], m_config.matchBracketsList[j+1], true , block, cursorPosition );
 		appendExtraSelection(selections, j, this,m_matchesFormat);
 	}
 
 NO_MATCHES:
 	setExtraSelections(selections);
-	m_panel->update();
+	if (m_panel)
+		m_panel->update();
 }
 
 void	QsvTextEdit::smartHome()
@@ -163,11 +243,52 @@ void	QsvTextEdit::smartEnd()
 	setTextCursor( c );
 }
 
+void	QsvTextEdit::removeModifications()
+{
+	int i = 1;
+	for ( QTextBlock block = document()->begin(); block.isValid(); block = block.next() ) {
+		QsvBlockData *data = dynamic_cast<QsvBlockData*>( block.userData() );
+		if (!data)
+			continue;
+		data->m_isModified = false;
+		i ++;
+	}
+	m_panel->update();
+}
+
+void	QsvTextEdit::on_textDocument_contentsChange( int position, int charsRemoved, int charsAdded )
+{
+	if (!m_config.modificationsLookupEnabled)
+		return;
+
+	if (charsAdded < 2) {
+		QsvBlockData* data = getPrivateBlockData( textCursor().block(), true );
+		if (!data)		return;
+		if (data->m_isModified)	return;
+		data->m_isModified = true;
+	}
+	else {
+		int remaining = 0;
+		QTextCursor cursor( document() );
+		cursor.setPosition( position );
+		int oldRemaining = -1;
+		while ( (remaining+1 < charsAdded) && (oldRemaining != remaining) ){
+			oldRemaining = remaining;
+			QsvBlockData* data = getPrivateBlockData( cursor.block(), true );
+			// should not happen, but can't be too safe
+			if (data)
+				data->m_isModified = true;
+			cursor.movePosition( QTextCursor::NextBlock );
+			remaining = cursor.position() - position;
+		}
+	}
+	m_panel->update();
+	Q_UNUSED( charsRemoved );
+}
 
 void	QsvTextEdit::paintEvent(QPaintEvent *e)
 {
 	QPlainTextEdit::paintEvent(e);
-
 	// TODO - paint the line number
 }
 
@@ -178,10 +299,17 @@ void	QsvTextEdit::resizeEvent(QResizeEvent *e)
 	// this get connected in QsvTextOperationsWidget
 	emit(widgetResized());
 
-	setViewportMargins( m_panel->width()-1, 0, 0, 0 );
+	if (!m_panel) {
+		setViewportMargins( 0, 0, 0, 0 );
+		return;
+	}
+
 	QRect viewportRect = viewport()->geometry();
 	QRect lrect = QRect(viewportRect.topLeft(), viewportRect.bottomLeft());
-	lrect.adjust( -m_panel->width(), 0, 0, 0 );
+	int panelWidth = m_panel->width();
+	lrect.adjust( -panelWidth, 0, 0, 0 );
+
+	setViewportMargins( panelWidth-1, 0, 0, 0 );
 	m_panel->setGeometry(lrect);
 }
 
@@ -235,13 +363,13 @@ void	QsvTextEdit::keyPressEvent(QKeyEvent *e)
 #endif
 
 		case Qt::Key_Home:
-			if (!m_smartHome || QApplication::keyboardModifiers().testFlag(Qt::ControlModifier) )
+			if (!m_config.smartHome || QApplication::keyboardModifiers().testFlag(Qt::ControlModifier) )
 				break;
 			smartHome();
 			e->accept();
 			return;
 		case Qt::Key_End:
-			if (!m_smartHome || QApplication::keyboardModifiers().testFlag(Qt::ControlModifier) )
+			if (!m_config.smartHome || QApplication::keyboardModifiers().testFlag(Qt::ControlModifier) )
 				break;
 			smartEnd();
 			e->accept();
@@ -249,7 +377,7 @@ void	QsvTextEdit::keyPressEvent(QKeyEvent *e)
 
 #ifdef AUTO_BRAKETS
 		default:
-			if (usingAutoBrackets && handleKeyPressEvent(event))
+			if (m_config.usingAutoBrackets && handleKeyPressEvent(event))
 				return;
 #endif
 	} // end case
@@ -289,45 +417,51 @@ int	QsvTextEdit::findMatchingChar( QChar c1, QChar c2, bool forward, QTextBlock 
 	return -1;
 }
 
-void QsvTextEdit::setMatchBracketList( const QString &m )
+QsvBlockData* QsvTextEdit::getPrivateBlockData( QTextBlock block, bool createIfNotExisting )
 {
-	m_matchBracketsList = m;
-	if (m_highlighter)
-		m_highlighter->setMatchBracketList( m );
+	QTextBlockUserData  *d1   = block.userData();
+	QsvBlockData *data = dynamic_cast<QsvBlockData*>(d1);
+
+	// a user data has been defined, and it's not our structure
+	if (d1 && !data)
+		return NULL;
+
+	if (!data && createIfNotExisting) {
+		data = new QsvBlockData;
+		block.setUserData(data);
+	}
+	return data;
 }
 
-const QString QsvTextEdit::getMatchBracketList()
-{
-	return m_matchBracketsList;
-}
 
-void QsvTextEdit::paintPanel(QPaintEvent*e)
+void	QsvTextEdit::paintPanel(QPaintEvent*e)
 {
+	if (!m_panel)
+		return;
+
 	QPainter p(m_panel);
-	QRect r = geometry();
 	QTextBlock block = firstVisibleBlock();
 	int y = blockBoundingRect(block).translated(contentOffset()).top();
 	int l = block.blockNumber();
+	int h = fontMetrics().height();
+	int w = m_panel->width();
 	QString s;
 
 	p.setFont(font());
-
 	p.fillRect( e->rect(), m_panel->m_panelColor );
 	while (block.isValid() && block.isVisible()){
 		s = s.number(l);
-		p.drawText( 0, y, m_panel->width() - 5, fontMetrics().height(), Qt::AlignRight, s );
+		p.drawText( 0, y, w-5, h, Qt::AlignRight, s );
 
+		QsvBlockData *data = dynamic_cast<QsvBlockData*>(block.userData());
+		if (data) {
+//			if (data->m_isBookmark)
+//				p.drawPixmap( 2, y, m_panel->m_bookMarkImage );
+			if (data->m_isModified)
+				p.fillRect( w-3, y, 2, h, m_panel->m_modifiedColor );
+		}
 		y += blockBoundingRect(block).height();
 		block = block.next();
 		l ++;
 	}
-
-#if 0
-		if (data) {
-			if (data->m_isBookmark)
-				p.drawPixmap( 2, qRound(position.y() - contentsY + ascent - m_bookMarkImage.height()), m_bookMarkImage );
-			if (data->m_isModified)
-				p.fillRect( width()- 3, qRound(position.y()-contentsY), 2, qRound(boundingRect.height()), m_modifiedColor );
-		}
-#endif
 }

@@ -6,7 +6,6 @@
 #include <QTextLayout>
 #include <QScrollBar>
 
-#include "qsvprivateblockdata.h"
 #include "qsveditorpanel.h"
 #include "qsvtextedit.h"
 
@@ -14,7 +13,7 @@ QsvEditorPanel::QsvEditorPanel(QsvTextEdit *a): QWidget(a)//, m_area(a)
 {
 	m_edit = a;
 	m_modifiedColor = Qt::green;
-	m_panelColor = QColor("#FFFFD0");
+	m_panelColor    = QColor("#FFFFD0");
 	m_bookMarkImage = QPixmap(":/images/emblem-important.png");
 
 	setFixedWidth(50);

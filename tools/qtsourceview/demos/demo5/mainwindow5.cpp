@@ -14,9 +14,6 @@ MainWindow5::MainWindow5(QWidget *parent, Qt::WindowFlags flags ):
 	QsvTextEdit *e = new QsvTextEdit(this, s);
 	QsvTextOperationsWidget *textOpetations = new QsvTextOperationsWidget(e);
 
-	e->setFont( QFont("Courier new", 10) );
-	e->setLineWrapMode( QPlainTextEdit::NoWrap );
-
 	QToolBar *b = this->addToolBar( "" );
 	b->addAction( tr("Find"), textOpetations, SLOT(showSearch()))
 	 ->setShortcut(QKeySequence("Ctrl+F"));
@@ -34,6 +31,7 @@ MainWindow5::MainWindow5(QWidget *parent, Qt::WindowFlags flags ):
 #else
 	e->setPlainText("( adsdsad )\n[aaaa]\n{ qwqew { qeweqw } qwe ( asd a) }\n'sada\"s\"da'");
 #endif
+	e->removeModifications();
 	setCentralWidget(e);
 	showMaximized();
 }

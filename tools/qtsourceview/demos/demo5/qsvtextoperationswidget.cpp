@@ -224,12 +224,19 @@ void	QsvTextOperationsWidget::showBottomWidget(QWidget* w)
 	if (!w)
 		return;
 
+	QRect r;
 	QWidget *parent = qobject_cast<QWidget*>(this->parent());
-	QRect r = parent->rect();
+
+	// I must admit this line looks ugly, but I am open to suggestions
+	if (parent->inherits("QAbstractScrollArea"))
+		parent = ((QAbstractScrollArea*) (parent))->viewport();
+
+	r = parent->rect();
 	w->adjustSize();
 	r.adjust(10, 0, -10, 0);
 	r.setHeight(w->height());
 	r.moveBottom(parent->rect().height()-10);
+	r.moveRight(parent->rect().right()+10);
 	w->setGeometry(r);
 	w->show();
 }
