@@ -116,7 +116,7 @@ bool	QsvTextEdit::getLineWrapping() const
 	return m_config.lineWrapping;
 }
 
-void	QsvTextEdit::modificationsLookupEnabled( bool on )
+void	QsvTextEdit::setModificationsLookupEnabled( bool on )
 {
 	m_config.modificationsLookupEnabled = on;
 	if (m_panel)
@@ -128,22 +128,33 @@ bool	QsvTextEdit::getModificationsLookupEnabled() const
 	return m_config.modificationsLookupEnabled;
 }
 
+void	QsvTextEdit::setShowLineNumbers( bool on )
+{
+	m_config.showLineNumbers = on;
+	m_panel->setVisible(on);
+	updateMargins();
+}
+
+bool	QsvTextEdit::getShowLineNumbers() const
+{
+	return m_config.showLineNumbers;
+}
 
 // helper function, in Pascal it would have been an internal
 // procedure inside cursorMove()
+// TODO move it to the class, as a helper method by adding extra selections
+// to the class
 inline void appendExtraSelection( QList<QTextEdit::ExtraSelection> &selections,
 	int position, QPlainTextEdit *self, QTextCharFormat matchesFormat )
 {
 	if (position==-1)
 		return;
-
 	QTextEdit::ExtraSelection selection;
 	QTextCursor cursor = self->textCursor();
 	selection.format = matchesFormat;
 	cursor.setPosition(position);
 	cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor);
 	selection.cursor = cursor;
-
 	selections.append(selection);
 }
 
@@ -159,9 +170,7 @@ void QsvTextEdit::cursorMoved()
 	QChar currentChar;
 	QsvBlockData *data;
 
-//	setExtraSelections(selections);
-	if (m_config.markCurrentLine)
-	{
+	if (m_config.markCurrentLine) {
 		QTextEdit::ExtraSelection sel;
 		sel.format.setBackground( m_currentLineBackground );
 		sel.format.setProperty(QTextFormat::FullWidthSelection, true);
@@ -184,7 +193,7 @@ void QsvTextEdit::cursorMoved()
 	relativePosition  = cursorPosition - blockPosition;
 	currentChar       = block.text()[relativePosition];
 
-	for( int k=0; k<data->matches.length(); k++) {
+	for ( int k=0; k<data->matches.length(); k++) {
 		MatchData m = data->matches.at(k);
 		if (m.position != relativePosition)
 			continue;
@@ -320,19 +329,7 @@ void	QsvTextEdit::resizeEvent(QResizeEvent *e)
 
 	// this get connected in QsvTextOperationsWidget
 	emit(widgetResized());
-
-	if (!m_panel) {
-		setViewportMargins( 0, 0, 0, 0 );
-		return;
-	}
-
-	QRect viewportRect = viewport()->geometry();
-	QRect lrect = QRect(viewportRect.topLeft(), viewportRect.bottomLeft());
-	int panelWidth = m_panel->width();
-	lrect.adjust( -panelWidth, 0, 0, 0 );
-
-	setViewportMargins( panelWidth-1, 0, 0, 0 );
-	m_panel->setGeometry(lrect);
+	updateMargins();
 }
 
 void	QsvTextEdit::keyPressEvent(QKeyEvent *e)
@@ -456,6 +453,22 @@ bool	QsvTextEdit::handleKeyPressEvent(QKeyEvent *e)
 FUNCTION_END:
 	e->accept();
 	return true;
+}
+
+void	QsvTextEdit::updateMargins()
+{
+	if (!m_panel || !m_config.showLineNumbers) {
+		setViewportMargins( 0, 0, 0, 0 );
+		return;
+	}
+	
+	QRect viewportRect = viewport()->geometry();
+	QRect lrect = QRect(viewportRect.topLeft(), viewportRect.bottomLeft());
+	int panelWidth = m_panel->width();
+	lrect.adjust( -panelWidth, 0, 0, 0 );
+	
+	setViewportMargins( panelWidth-1, 0, 0, 0 );
+	m_panel->setGeometry(lrect);
 }
 
 int	QsvTextEdit::findMatchingChar( QChar c1, QChar c2, bool forward, QTextBlock &block, int from )

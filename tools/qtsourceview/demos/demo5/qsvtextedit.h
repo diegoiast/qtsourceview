@@ -22,8 +22,8 @@ struct QsvEditorConfigData {
 	bool			lineWrapping;
 	bool			modificationsLookupEnabled;
 	bool			autoBrackets;
+	bool			showLineNumbers;
 	
-//	bool			showLineNumbers;
 //	bool			showWhiteSpaces;
 //	bool			showMargins;
 //	bool			insertSpacesInsteadOfTabs;
@@ -50,8 +50,11 @@ public:
 	bool getMatchBracket() const;
 	void setLineWrapping( bool on );
 	bool getLineWrapping() const;
-	void modificationsLookupEnabled( bool on );
+	void setModificationsLookupEnabled( bool on );
 	bool getModificationsLookupEnabled() const;
+	void setShowLineNumbers( bool on );
+	bool getShowLineNumbers() const;
+	
 
 	void paintPanel(QPaintEvent *e);
 
@@ -70,6 +73,7 @@ protected:
 	void resizeEvent(QResizeEvent *e);
 	void keyPressEvent(QKeyEvent *e);
 	bool handleKeyPressEvent(QKeyEvent *e);
+	virtual void updateMargins();
 
 	int findMatchingChar( QChar c1, QChar c2, bool forward, QTextBlock &block, int from );
 	QsvBlockData *getPrivateBlockData( QTextBlock block, bool createIfNotExisting );
