@@ -3,7 +3,6 @@
 #include <QAbstractSlider>
 #include <QList>
 #include <QPainter>
-
 #include "qsvtextedit.h"
 #include "qsvsyntaxhighlighterbase.h"
 
@@ -42,7 +41,7 @@ QsvTextEdit::QsvTextEdit( QWidget *parent, QsvSyntaxHighlighterBase *s ):
 	m_matchesFormat.setBackground( QBrush(QColor(0xff,0xff,0x00,0xff) ));
 	m_matchesFormat.setForeground( QBrush(QColor(0x00,0x80,0x00,0xff) ));
 	m_matchesFormat.setFont(f);
-	m_currentLineBackground = QColor(0xc0,0xff,0xc0,0xff);
+	m_currentLineBackground = QColor(0xc0,0xff,0xc0,0x80);
 	m_modifiedColor         = QColor(0x00,0xff,0x00,0xff);
 	m_panelColor            = QColor(0xff,0xff,0xd0,0xff);
 
@@ -55,6 +54,8 @@ QsvTextEdit::QsvTextEdit( QWidget *parent, QsvSyntaxHighlighterBase *s ):
 	m_config.matchBracketsList  = "()[]{}\"\"''";
 	m_config.modificationsLookupEnabled = true;
 	m_config.autoBrackets       = true;
+	m_config.showMargins        = true;
+	m_config.marginsWidth       = 80;
 
 	setMatchBracketList(m_config.matchBracketsList);
 	setFont(m_config.currentFont);
@@ -319,8 +320,12 @@ void	QsvTextEdit::on_textDocument_contentsChange( int position, int charsRemoved
 
 void	QsvTextEdit::paintEvent(QPaintEvent *e)
 {
+	if (m_config.showMargins) {
+		uint position = fontMetrics().width(' ') * m_config.marginsWidth;
+		QPainter p(viewport());
+		p.drawLine(position,0,position,viewport()->height());
+	}
 	QPlainTextEdit::paintEvent(e);
-	// TODO - paint the line number
 }
 
 void	QsvTextEdit::resizeEvent(QResizeEvent *e)
@@ -520,6 +525,32 @@ QsvBlockData* QsvTextEdit::getPrivateBlockData( QTextBlock block, bool createIfN
 	return data;
 }
 
+void	QsvTextEdit::setShowMargins( bool on )
+{
+	if (m_config.showMargins == on)
+		return;
+	m_config.showMargins = on;
+	viewport()->update();
+}
+
+bool	QsvTextEdit::getShowMargins() const
+{
+	return m_config.showMargins;
+}
+
+void	QsvTextEdit::setMarginsWidth( uint i )
+{
+	if (m_config.marginsWidth == i)
+		return;
+	m_config.marginsWidth = i;
+	if (m_config.showMargins)
+		viewport()->update();
+}
+
+uint	QsvTextEdit::getMarginsWidth() const
+{
+	return m_config.marginsWidth;
+}
 
 void	QsvTextEdit::paintPanel(QPaintEvent*e)
 {

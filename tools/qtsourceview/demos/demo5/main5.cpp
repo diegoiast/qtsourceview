@@ -32,6 +32,7 @@ int main(int argc, char *argv[])
 "		}\n" );
 	e->removeModifications();
 	e->setShowLineNumbers(true);
+	e->setShowMargins(true);
 	
 	w.setCentralWidget(e);
 	w.showMaximized();

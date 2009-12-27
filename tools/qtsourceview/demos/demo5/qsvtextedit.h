@@ -23,12 +23,12 @@ struct QsvEditorConfigData {
 	bool			modificationsLookupEnabled;
 	bool			autoBrackets;
 	bool			showLineNumbers;
+	bool			showMargins;
+	uint			marginsWidth;
 	
 //	bool			showWhiteSpaces;
-//	bool			showMargins;
 //	bool			insertSpacesInsteadOfTabs;
 //	int			tabSize;
-//	int			marginsWidth;
 //	EndOfLineType		endOfLine;
 //	QsvColorDefFactory	*currentColorScheme;
 };
@@ -54,8 +54,11 @@ public:
 	bool getModificationsLookupEnabled() const;
 	void setShowLineNumbers( bool on );
 	bool getShowLineNumbers() const;
+	void setShowMargins( bool on );
+	bool getShowMargins() const;
+	void setMarginsWidth( uint i );
+	uint getMarginsWidth() const;
 	
-
 	void paintPanel(QPaintEvent *e);
 
 public slots:
