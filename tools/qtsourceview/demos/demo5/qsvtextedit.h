@@ -25,10 +25,10 @@ struct QsvEditorConfigData {
 	bool			showLineNumbers;
 	bool			showMargins;
 	uint			marginsWidth;
+	int			tabSize;
 	
 //	bool			showWhiteSpaces;
 //	bool			insertSpacesInsteadOfTabs;
-//	int			tabSize;
 //	EndOfLineType		endOfLine;
 //	QsvColorDefFactory	*currentColorScheme;
 };
@@ -58,7 +58,9 @@ public:
 	bool getShowMargins() const;
 	void setMarginsWidth( uint i );
 	uint getMarginsWidth() const;
-	
+	void setTabSize( int size );
+	int  getTabSize();
+
 	void paintPanel(QPaintEvent *e);
 
 public slots:

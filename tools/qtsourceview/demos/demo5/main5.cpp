@@ -31,8 +31,11 @@ int main(int argc, char *argv[])
 "	{ printf(\"Hello world!\\n\"); }           \n"
 "		}\n" );
 	e->removeModifications();
+	
+	// tests for defaults
 	e->setShowLineNumbers(true);
 	e->setShowMargins(true);
+	e->setTabSize(8);
 	
 	w.setCentralWidget(e);
 	w.showMaximized();

@@ -552,6 +552,17 @@ uint	QsvTextEdit::getMarginsWidth() const
 	return m_config.marginsWidth;
 }
 
+void	QsvTextEdit::setTabSize( int size )
+{
+	m_config.tabSize = fontMetrics().width(" ")*size;
+	setTabStopWidth(m_config.tabSize);
+}
+
+int	QsvTextEdit::getTabSize()
+{
+	return m_config.tabSize;
+}
+
 void	QsvTextEdit::paintPanel(QPaintEvent*e)
 {
 	if (!m_panel)
