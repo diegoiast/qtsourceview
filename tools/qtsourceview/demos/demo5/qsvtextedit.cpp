@@ -6,7 +6,25 @@
 
 #include "qsvtextedit.h"
 #include "qsvsyntaxhighlighterbase.h"
-#include "qsveditorpanel.h"
+
+// private class
+class QsvEditorPanel : public QWidget
+{
+public:
+	QsvEditorPanel(QsvTextEdit *editor)
+	 :QWidget(editor)
+	{
+		setFixedWidth(50);
+	}
+
+private:
+	void paintEvent(QPaintEvent*e)
+	{
+		((QsvTextEdit*)parent())->paintPanel(e);
+	}
+friend class QsvTextEdit;
+};
+
 
 QsvTextEdit::QsvTextEdit( QWidget *parent, QsvSyntaxHighlighterBase *s ):
 	QPlainTextEdit(parent)
@@ -14,8 +32,9 @@ QsvTextEdit::QsvTextEdit( QWidget *parent, QsvSyntaxHighlighterBase *s ):
 	m_highlighter = s;
 	m_highlighter->setDocument( document() );
 	m_panel = new QsvEditorPanel(this);
-	connect( this, SIGNAL(cursorPositionChanged()), this, SLOT(cursorMoved()));
-	connect( document(), SIGNAL(contentsChange(int,int,int)), this, SLOT(on_textDocument_contentsChange(int,int,int)));
+	connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(cursorMoved()));
+	connect(document(), SIGNAL(contentsChange(int,int,int)), this, SLOT(on_textDocument_contentsChange(int,int,int)));
+	connect(verticalScrollBar(), SIGNAL(valueChanged(int)), m_panel, SLOT(update()));
 
 	QFont f;
 	f.setBold(true);
@@ -24,6 +43,8 @@ QsvTextEdit::QsvTextEdit( QWidget *parent, QsvSyntaxHighlighterBase *s ):
 	m_matchesFormat.setForeground( QBrush(QColor(0x00,0x80,0x00,0xff) ));
 	m_matchesFormat.setFont(f);
 	m_currentLineBackground = QColor(0xc0,0xff,0xc0,0xff);
+	m_modifiedColor         = QColor(0x00,0xff,0x00,0xff);
+	m_panelColor            = QColor(0xff,0xff,0xd0,0xff);
 
 	m_config.currentFont        = QFont("Courier new", 10);
 //	m_config.showLineNumbers    = true;
@@ -501,7 +522,7 @@ void	QsvTextEdit::paintPanel(QPaintEvent*e)
 	QString s;
 
 	p.setFont(font());
-	p.fillRect( e->rect(), m_panel->m_panelColor );
+	p.fillRect( e->rect(), m_panelColor );
 	while (block.isValid() && block.isVisible()){
 		s = s.number(l);
 		p.drawText( 0, y, w-5, h, Qt::AlignRight, s );
@@ -511,7 +532,7 @@ void	QsvTextEdit::paintPanel(QPaintEvent*e)
 //			if (data->m_isBookmark)
 //				p.drawPixmap( 2, y, m_panel->m_bookMarkImage );
 			if (data->m_isModified)
-				p.fillRect( w-3, y, 2, h, m_panel->m_modifiedColor );
+				p.fillRect( w-3, y, 2, h, m_modifiedColor );
 		}
 		y += blockBoundingRect(block).height();
 		block = block.next();
