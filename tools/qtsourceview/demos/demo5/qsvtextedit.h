@@ -26,9 +26,10 @@ struct QsvEditorConfigData {
 	bool			showMargins;
 	uint			marginsWidth;
 	int			tabSize;
+	bool			insertSpacesInsteadOfTabs;
+	bool			tabIndents;
 	
 //	bool			showWhiteSpaces;
-//	bool			insertSpacesInsteadOfTabs;
 //	EndOfLineType		endOfLine;
 //	QsvColorDefFactory	*currentColorScheme;
 };
@@ -59,7 +60,15 @@ public:
 	void setMarginsWidth( uint i );
 	uint getMarginsWidth() const;
 	void setTabSize( int size );
-	int  getTabSize();
+	int  getTabSize() const;
+	void setInsertSpacesInsteadOfTabs( bool on );
+	bool getInsertSpacesInsteadOfTabs() const;
+	void setTabIndents( bool on );
+	bool getTabIndents() const;
+	
+	void setDefaultConfig();
+	static void setDefaultConfig( QsvEditorConfigData *config );
+	
 
 	void paintPanel(QPaintEvent *e);
 
@@ -80,6 +89,9 @@ protected:
 	bool handleKeyPressEvent(QKeyEvent *e);
 	virtual void updateMargins();
 
+	bool handleIndentEvent( bool forward );
+	int getIndentationSize( const QString s );
+	QString updateIndentation( QString s, int indentation );
 	int findMatchingChar( QChar c1, QChar c2, bool forward, QTextBlock &block, int from );
 	QsvBlockData *getPrivateBlockData( QTextBlock block, bool createIfNotExisting );
 

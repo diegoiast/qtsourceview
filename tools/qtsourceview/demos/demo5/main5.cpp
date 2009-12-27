@@ -36,6 +36,8 @@ int main(int argc, char *argv[])
 	e->setShowLineNumbers(true);
 	e->setShowMargins(true);
 	e->setTabSize(8);
+	e->setTabIndents(true);
+	e->setInsertSpacesInsteadOfTabs(true);
 	
 	w.setCentralWidget(e);
 	w.showMaximized();
