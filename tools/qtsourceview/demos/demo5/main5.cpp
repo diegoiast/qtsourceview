@@ -39,6 +39,11 @@ int main(int argc, char *argv[])
 	e->setTabIndents(true);
 	e->setInsertSpacesInsteadOfTabs(true);
 	
+	// in real applications, this would be part of a menu, or toolbar
+	w.addAction(e->actionChangeCase);
+	w.addAction(e->actionCapitalize);
+	w.addAction(e->actionLowerCase);
+	
 	w.setCentralWidget(e);
 	w.showMaximized();
 	a.connect(&a, SIGNAL(lastWindowClosed()), &a, SLOT(quit()));

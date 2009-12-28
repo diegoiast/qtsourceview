@@ -3,6 +3,7 @@
 #include <QAbstractSlider>
 #include <QList>
 #include <QPainter>
+#include <QAction>
 #include "qsvtextedit.h"
 #include "qsvsyntaxhighlighterbase.h"
 
@@ -31,7 +32,7 @@ QsvTextEdit::QsvTextEdit( QWidget *parent, QsvSyntaxHighlighterBase *s ):
 	m_highlighter = s;
 	m_highlighter->setDocument( document() );
 	m_panel = new QsvEditorPanel(this);
-	connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(cursorMoved()));
+	connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(on_cursor_positionChanged()));
 	connect(document(), SIGNAL(contentsChange(int,int,int)), this, SLOT(on_textDocument_contentsChange(int,int,int)));
 	connect(verticalScrollBar(), SIGNAL(valueChanged(int)), m_panel, SLOT(update()));
 
@@ -44,17 +45,41 @@ QsvTextEdit::QsvTextEdit( QWidget *parent, QsvSyntaxHighlighterBase *s ):
 	m_currentLineBackground = QColor(0xc0,0xff,0xc0,0x80);
 	m_modifiedColor         = QColor(0x00,0xff,0x00,0xff);
 	m_panelColor            = QColor(0xff,0xff,0xd0,0xff);
+	actionCapitalize        = NULL;
+	actionLowerCase         = NULL;
+	actionChangeCase        = NULL;
 
 	setDefaultConfig();
+	setupActions();
 	setMatchBracketList(m_config.matchBracketsList);
 	setFont(m_config.currentFont);
 	setLineWrapMode(QPlainTextEdit::NoWrap);
 }
 
+void	QsvTextEdit::setupActions()
+{
+	if (actionCapitalize) delete actionCapitalize;
+	actionCapitalize = new QAction( tr("Change to &capital letters"), this );
+	actionCapitalize->setObjectName( "qsvEditor::actionCapitalize" );
+	actionCapitalize->setShortcut( QKeySequence( Qt::CTRL | Qt::Key_U ) );
+	connect( actionCapitalize, SIGNAL(triggered()), this, SLOT(transformBlockToUpper()) );
+
+	if (actionLowerCase) delete actionLowerCase;
+	actionLowerCase = new QAction( tr("Change to &lower letters"), this );
+	actionLowerCase->setObjectName( "qsvEditor::actionLowerCase" );
+	actionLowerCase->setShortcut( QKeySequence( Qt::CTRL | Qt::SHIFT | Qt::Key_U  ) );
+	connect( actionLowerCase, SIGNAL(triggered()), this, SLOT(transformBlockToLower()) );
+
+	if (actionChangeCase) delete actionChangeCase;
+	actionChangeCase = new QAction( tr("Change ca&se"), this );
+	actionChangeCase->setObjectName( "qsvEditor::actionChangeCase" );
+	connect( actionChangeCase, SIGNAL(triggered()), this, SLOT(transformBlockCase()) );	
+}
+
 void	QsvTextEdit::setMarkCurrentLine( bool on )
 {
 	m_config.markCurrentLine = on;
-	cursorMoved();
+	on_cursor_positionChanged();
 }
 
 bool	QsvTextEdit::getmarkCurrentLine() const
@@ -87,7 +112,7 @@ const QString QsvTextEdit::getMatchBracketList() const
 void	QsvTextEdit::setMatchBracket( bool on )
 {
 	m_config.matchBrackets = on;
-	cursorMoved();
+	on_cursor_positionChanged();
 }
 
 bool	QsvTextEdit::getMatchBracket() const
@@ -131,7 +156,7 @@ bool	QsvTextEdit::getShowLineNumbers() const
 }
 
 // helper function, in Pascal it would have been an internal
-// procedure inside cursorMove()
+// procedure inside on_cursor_moved();
 // TODO move it to the class, as a helper method by adding extra selections
 // to the class
 inline void appendExtraSelection( QList<QTextEdit::ExtraSelection> &selections,
@@ -148,7 +173,7 @@ inline void appendExtraSelection( QList<QTextEdit::ExtraSelection> &selections,
 	selections.append(selection);
 }
 
-void QsvTextEdit::cursorMoved()
+void QsvTextEdit::on_cursor_positionChanged()
 {
 	// clear out previous matches
 	QList<QTextEdit::ExtraSelection> selections;
@@ -262,6 +287,61 @@ void	QsvTextEdit::smartEnd()
 		c.setPosition( startOfLine + i, moveAnchor );
 
 	setTextCursor( c );
+}
+
+void	QsvTextEdit::transformBlockToUpper()
+{
+	QTextCursor cursor = getCurrentTextCursor();
+	QString s_before   = cursor.selectedText();
+	QString s_after    = s_before.toUpper();
+	
+	if (s_before != s_after) {
+		cursor.beginEditBlock();
+		cursor.deleteChar();
+		cursor.insertText( s_after );
+		cursor.endEditBlock();
+		setTextCursor( cursor );
+	}
+}
+
+void	QsvTextEdit::transformBlockToLower()
+{
+	QTextCursor cursor = getCurrentTextCursor();
+	QString s_before   = cursor.selectedText();
+	QString s_after    = s_before.toLower();
+	
+	if (s_before != s_after) {
+		cursor.beginEditBlock();
+		cursor.deleteChar();
+		cursor.insertText( s_after );
+		cursor.endEditBlock();
+		setTextCursor( cursor );
+	}
+}
+
+void	QsvTextEdit::transformBlockCase()
+{
+	QTextCursor cursor = getCurrentTextCursor();
+	QString s_before   = cursor.selectedText();
+	QString s_after    = s_before;
+	uint s_len = s_before.length();
+	
+	for( uint i=0; i< s_len; i++ ) {
+		QChar c = s_after[i];
+		if (c.isLower())
+			c = c.toUpper();
+		else if (c.isUpper())
+			c = c.toLower();
+		s_after[i] = c;
+	}
+		
+	if (s_before != s_after) {
+		cursor.beginEditBlock();
+		cursor.deleteChar();
+		cursor.insertText( s_after );
+		cursor.endEditBlock();
+		setTextCursor( cursor );
+	}
 }
 
 void	QsvTextEdit::removeModifications()
@@ -696,6 +776,14 @@ void QsvTextEdit::setDefaultConfig( QsvEditorConfigData *config ) // static
 	config->tabSize            = 8;
 	config->insertSpacesInsteadOfTabs = false;
 	config->tabIndents         = false;
+}
+
+QTextCursor	QsvTextEdit::getCurrentTextCursor()
+{
+	QTextCursor cursor = textCursor();
+	if (!cursor.hasSelection())
+		cursor.select(QTextCursor::WordUnderCursor);
+	return cursor;
 }
 
 void	QsvTextEdit::paintPanel(QPaintEvent*e)

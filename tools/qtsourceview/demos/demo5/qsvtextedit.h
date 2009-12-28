@@ -40,6 +40,7 @@ class QsvTextEdit : public QPlainTextEdit
 	Q_OBJECT
 public:
 	QsvTextEdit( QWidget *parent = 0, QsvSyntaxHighlighterBase *s = 0 );
+	void setupActions();
 
 	void setMarkCurrentLine( bool on );
 	bool getmarkCurrentLine() const;
@@ -69,19 +70,28 @@ public:
 	void setDefaultConfig();
 	static void setDefaultConfig( QsvEditorConfigData *config );
 	
-
+	QTextCursor getCurrentTextCursor();
 	void paintPanel(QPaintEvent *e);
 
 public slots:
-	void cursorMoved();
 	void smartHome();
 	void smartEnd();
+	void transformBlockToUpper();
+	void transformBlockToLower();
+	void transformBlockCase();
+	
 	void removeModifications();
+	void on_cursor_positionChanged();
 	void on_textDocument_contentsChange( int position, int charsRemoved, int charsAdded );
 
 signals:
 	void widgetResized();
 
+public:
+	QAction *actionCapitalize;
+	QAction *actionLowerCase;
+	QAction *actionChangeCase;
+	
 protected:
 	void paintEvent(QPaintEvent *e);
 	void resizeEvent(QResizeEvent *e);
