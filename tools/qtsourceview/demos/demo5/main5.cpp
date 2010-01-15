@@ -38,6 +38,7 @@ int main(int argc, char *argv[])
 	e->setTabSize(8);
 	e->setTabIndents(true);
 	e->setInsertSpacesInsteadOfTabs(true);
+	e->setShowWhiteSpace(true);
 	
 	// in real applications, this would be part of a menu, or toolbar
 	w.addAction(e->actionChangeCase);

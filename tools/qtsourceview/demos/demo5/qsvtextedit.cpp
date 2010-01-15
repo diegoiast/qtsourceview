@@ -760,6 +760,25 @@ void QsvTextEdit::setDefaultConfig()
 	setDefaultConfig(&m_config);
 }
 
+void QsvTextEdit::setShowWhiteSpace( bool on )
+{
+	m_config.showWhiteSpaces = on;
+	
+	QTextOption option =  document()->defaultTextOption();
+	if (on)
+		option.setFlags(option.flags() | QTextOption::ShowTabsAndSpaces);
+	else
+		option.setFlags(option.flags() & ~QTextOption::ShowTabsAndSpaces);
+	option.setFlags(option.flags() | QTextOption::AddSpaceForLineAndParagraphSeparators);
+	document()->setDefaultTextOption(option);
+}
+
+bool QsvTextEdit::getShowWhiteSpace() const
+{
+	return m_config.showWhiteSpaces;
+}
+
+
 void QsvTextEdit::setDefaultConfig( QsvEditorConfigData *config ) // static
 {
 	config->currentFont        = QFont("Courier new", 10);
@@ -776,6 +795,7 @@ void QsvTextEdit::setDefaultConfig( QsvEditorConfigData *config ) // static
 	config->tabSize            = 8;
 	config->insertSpacesInsteadOfTabs = false;
 	config->tabIndents         = false;
+	config->showWhiteSpaces    = false;
 }
 
 QTextCursor	QsvTextEdit::getCurrentTextCursor()

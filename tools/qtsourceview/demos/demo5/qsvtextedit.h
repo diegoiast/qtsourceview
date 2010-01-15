@@ -28,8 +28,8 @@ struct QsvEditorConfigData {
 	int			tabSize;
 	bool			insertSpacesInsteadOfTabs;
 	bool			tabIndents;
+	bool			showWhiteSpaces;
 	
-//	bool			showWhiteSpaces;
 //	EndOfLineType		endOfLine;
 //	QsvColorDefFactory	*currentColorScheme;
 };
@@ -66,6 +66,8 @@ public:
 	bool getInsertSpacesInsteadOfTabs() const;
 	void setTabIndents( bool on );
 	bool getTabIndents() const;
+	void setShowWhiteSpace( bool on );
+	bool getShowWhiteSpace() const;
 	
 	void setDefaultConfig();
 	static void setDefaultConfig( QsvEditorConfigData *config );
