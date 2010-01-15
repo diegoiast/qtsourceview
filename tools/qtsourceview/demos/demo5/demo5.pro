@@ -1,3 +1,4 @@
+CONFIG+=silent
 SOURCES = main5.cpp \
     qsvtextedit.cpp \
     qsvsyntaxhighlighterbase.cpp \
