@@ -74,6 +74,9 @@ public:
 	
 	QTextCursor getCurrentTextCursor();
 	void paintPanel(QPaintEvent *e);
+	
+	void newDocument();
+	int loadFile(QString s);
 
 public slots:
 	void smartHome();

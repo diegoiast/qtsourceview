@@ -24,6 +24,7 @@ int main(int argc, char *argv[])
 	 ->setShortcut(QKeySequence("Ctrl+R"));
 	b->setMovable(false);
 
+#if 0
 	e->setPlainText(
 "#include <stdio.h>\n\n"
 "int main()       \n"
@@ -31,6 +32,10 @@ int main(int argc, char *argv[])
 "	{ printf(\"Hello world!\\n\"); }           \n"
 "		}\n" );
 	e->removeModifications();
+#else
+	e->loadFile("qsvtextedit.cpp");
+//	e->newDocument();
+#endif
 	
 	// tests for defaults
 	e->setShowLineNumbers(true);

@@ -4,6 +4,10 @@
 #include <QList>
 #include <QPainter>
 #include <QAction>
+#include <QFile>
+#include <QFileInfo>
+#include <QTextCodec>
+#include <QTextStream>
 #include "qsvtextedit.h"
 #include "qsvsyntaxhighlighterbase.h"
 
@@ -235,6 +239,60 @@ NO_MATCHES:
 	setExtraSelections(selections);
 	if (m_panel)
 		m_panel->update();
+}
+
+void	QsvTextEdit::newDocument()
+{
+	loadFile("");
+}
+
+int	QsvTextEdit::loadFile(QString s)
+{
+/*
+	// clear older watches, and add a new one
+	QStringList sl = fileSystemWatcher->directories();
+	if (!sl.isEmpty())
+		fileSystemWatcher->removePaths( sl );
+*/
+	bool m = m_config.modificationsLookupEnabled;
+	setModificationsLookupEnabled(false);
+//	hideBannerMessage();
+	this->setReadOnly(false);
+	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+	QApplication::processEvents();
+	if (!s.isEmpty()) {
+		QFile file(s);
+		QFileInfo fileInfo(file);
+		
+		if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+			return -1;
+		
+//		QTextCodec *c = m_config.textCodec;
+		QTextCodec *c = NULL;
+		if (c == NULL)
+			c = QTextCodec::codecForLocale();
+
+		QTextStream textStream(&file);
+		textStream.setCodec( c );
+		setPlainText( textStream.readAll() );
+		file.close();
+	
+//		fileName = fileInfo.absoluteFilePath();
+//		fileSystemWatcher->addPath( fileName );
+		if (!fileInfo.isWritable()) {
+			this->setReadOnly( true);
+//			displayBannerMessage( tr("The file is readonly. Click <a href=':forcerw' title='Click here to try and change the file attributes for write access'>here to force write access.</a>") );
+		}
+	} else {
+//		fileName.clear();
+		setPlainText("");
+	}
+	
+	setModificationsLookupEnabled(m);
+	removeModifications();
+
+	QApplication::restoreOverrideCursor();
+	return 0;
 }
 
 void	QsvTextEdit::smartHome()
