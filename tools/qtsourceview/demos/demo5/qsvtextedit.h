@@ -117,7 +117,7 @@ protected:
 	QColor          m_currentLineBackground;
 	QColor          m_panelColor;
 	QColor          m_modifiedColor;
-	QPixmap m_bookMarkImage;
+	QPixmap         m_bookMarkImage;
 
 	QsvEditorConfigData m_config;
 };
