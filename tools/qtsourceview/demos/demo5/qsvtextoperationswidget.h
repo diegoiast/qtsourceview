@@ -45,6 +45,9 @@ public slots:
 	void showBottomWidget(QWidget* w=NULL);
 	void on_searchText_modified(QString s);
 	void on_replaceText_modified(QString s);
+	void searchNext();
+	void searchPrevious();
+	void searchPrev(){ searchPrevious(); };
 	void adjustBottomWidget();
 
 protected:

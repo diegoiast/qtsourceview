@@ -22,6 +22,11 @@ int main(int argc, char *argv[])
 	 ->setShortcut(QKeySequence("Ctrl+F"));
 	b->addAction( w.tr("Replace"), textOpetations, SLOT(showReplace()))
 	 ->setShortcut(QKeySequence("Ctrl+R"));
+	b->addAction( w.tr("Fing next"), textOpetations, SLOT(searchNext()))
+	 ->setShortcut(QKeySequence("F3"));
+	b->setMovable(false);
+	b->addAction( w.tr("Fing prev"), textOpetations, SLOT(searchPrev()))
+			->setShortcut(QKeySequence("Shift+F3"));
 	b->setMovable(false);
 
 #if 0
@@ -44,12 +49,7 @@ int main(int argc, char *argv[])
 	e->setTabIndents(true);
 	e->setInsertSpacesInsteadOfTabs(true);
 	e->setShowWhiteSpace(true);
-	
-	// in real applications, this would be part of a menu, or toolbar
-	w.addAction(e->actionChangeCase);
-	w.addAction(e->actionCapitalize);
-	w.addAction(e->actionLowerCase);
-	
+		
 	w.setCentralWidget(e);
 	w.showMaximized();
 	a.connect(&a, SIGNAL(lastWindowClosed()), &a, SLOT(quit()));

@@ -52,6 +52,8 @@ void QsvTextOperationsWidget::initSearchWidget()
 	m_search->hide();
 
 	connect(searchFormUi->searchText,SIGNAL(textChanged(QString)),this,SLOT(on_searchText_modified(QString)));
+	connect(searchFormUi->nextButton,SIGNAL(clicked()),this,SLOT(searchNext()));
+	connect(searchFormUi->previousButton,SIGNAL(clicked()),this,SLOT(searchPrev()));
 	connect(searchFormUi->closeButton,SIGNAL(clicked()),this, SLOT(showSearch()));
 }
 
@@ -74,7 +76,25 @@ void QsvTextOperationsWidget::initReplaceWidget()
 	connect(replaceFormUi->closeButton,SIGNAL(clicked()),this, SLOT(showReplace()));
 }
 
-void QsvTextOperationsWidget::adjustBottomWidget()
+void	QsvTextOperationsWidget::searchNext()
+{
+	issue_search( searchFormUi->searchText->text(), 
+		getTextCursor(), 
+		getSearchFlags() & !QTextDocument::FindBackward, 
+		searchFormUi->searchText 
+	);
+}
+
+void	QsvTextOperationsWidget::searchPrevious()
+{
+	issue_search( searchFormUi->searchText->text(), 
+		getTextCursor(), 
+		getSearchFlags() | QTextDocument::FindBackward, 
+		searchFormUi->searchText 
+	);
+}
+
+void	QsvTextOperationsWidget::adjustBottomWidget()
 {
 	showBottomWidget(NULL);
 }

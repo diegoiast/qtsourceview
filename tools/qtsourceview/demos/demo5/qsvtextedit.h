@@ -68,7 +68,6 @@ public:
 	bool getTabIndents() const;
 	void setShowWhiteSpace( bool on );
 	bool getShowWhiteSpace() const;
-	
 	void setDefaultConfig();
 	static void setDefaultConfig( QsvEditorConfigData *config );
 	
@@ -77,6 +76,8 @@ public:
 	
 	void newDocument();
 	int loadFile(QString s);
+	void displayBannerMessage( QString );
+	void hideBannerMessage();
 
 public slots:
 	void smartHome();
@@ -84,6 +85,7 @@ public slots:
 	void transformBlockToUpper();
 	void transformBlockToLower();
 	void transformBlockCase();
+	void gotoMatchingBracket();
 	
 	void removeModifications();
 	void on_cursor_positionChanged();
@@ -96,6 +98,7 @@ public:
 	QAction *actionCapitalize;
 	QAction *actionLowerCase;
 	QAction *actionChangeCase;
+	QAction *actionFindMatchingBracket;
 	
 protected:
 	void paintEvent(QPaintEvent *e);
@@ -103,6 +106,8 @@ protected:
 	void keyPressEvent(QKeyEvent *e);
 	bool handleKeyPressEvent(QKeyEvent *e);
 	virtual void updateMargins();
+	void showUpperWidget(QWidget* w);
+	void showBottomWidget(QWidget* w);
 
 	bool handleIndentEvent( bool forward );
 	int getIndentationSize( const QString s );

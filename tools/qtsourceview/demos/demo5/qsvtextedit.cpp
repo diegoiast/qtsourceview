@@ -52,6 +52,7 @@ QsvTextEdit::QsvTextEdit( QWidget *parent, QsvSyntaxHighlighterBase *s ):
 	actionCapitalize        = NULL;
 	actionLowerCase         = NULL;
 	actionChangeCase        = NULL;
+	actionFindMatchingBracket = NULL;
 
 	setDefaultConfig();
 	setupActions();
@@ -67,17 +68,32 @@ void	QsvTextEdit::setupActions()
 	actionCapitalize->setObjectName( "qsvEditor::actionCapitalize" );
 	actionCapitalize->setShortcut( QKeySequence( Qt::CTRL | Qt::Key_U ) );
 	connect( actionCapitalize, SIGNAL(triggered()), this, SLOT(transformBlockToUpper()) );
+	addAction(actionCapitalize);
 
 	if (actionLowerCase) delete actionLowerCase;
 	actionLowerCase = new QAction( tr("Change to &lower letters"), this );
 	actionLowerCase->setObjectName( "qsvEditor::actionLowerCase" );
 	actionLowerCase->setShortcut( QKeySequence( Qt::CTRL | Qt::SHIFT | Qt::Key_U  ) );
 	connect( actionLowerCase, SIGNAL(triggered()), this, SLOT(transformBlockToLower()) );
+	addAction(actionLowerCase);
 
 	if (actionChangeCase) delete actionChangeCase;
 	actionChangeCase = new QAction( tr("Change ca&se"), this );
 	actionChangeCase->setObjectName( "qsvEditor::actionChangeCase" );
-	connect( actionChangeCase, SIGNAL(triggered()), this, SLOT(transformBlockCase()) );	
+	connect( actionChangeCase, SIGNAL(triggered()), this, SLOT(transformBlockCase()) );
+	addAction(actionChangeCase);
+	
+	if (actionFindMatchingBracket) delete actionFindMatchingBracket;
+	actionFindMatchingBracket = new QAction(tr("Find matching bracket"), this);
+	actionFindMatchingBracket->setObjectName("qsvEditor::ctionFindMatchingBracket");
+	actionFindMatchingBracket->setShortcuts( 
+		QList<QKeySequence>() 
+		 << QKeySequence(Qt::CTRL | Qt::Key_6)
+		 << QKeySequence(Qt::CTRL | Qt::Key_BracketLeft)
+		 << QKeySequence(Qt::CTRL | Qt::Key_BracketRight)
+	);
+	connect( actionFindMatchingBracket, SIGNAL(triggered()), this, SLOT(gotoMatchingBracket()) );
+	addAction(actionFindMatchingBracket);
 }
 
 void	QsvTextEdit::setMarkCurrentLine( bool on )
@@ -188,7 +204,7 @@ void QsvTextEdit::on_cursor_positionChanged()
 	int relativePosition;
 	QChar currentChar;
 	QsvBlockData *data;
-
+	
 	if (m_config.markCurrentLine) {
 		QTextEdit::ExtraSelection sel;
 		sel.format.setBackground( m_currentLineBackground );
@@ -197,7 +213,13 @@ void QsvTextEdit::on_cursor_positionChanged()
 		sel.cursor.clearSelection();
 		selections.append(sel);
 	}
-
+	
+	/*
+	  WARNING:
+	  code duplication between this method and gotoMatchingBracket();
+	  this needs to be refactored
+	 */
+	
 	if (!m_config.matchBrackets)
 		goto NO_MATCHES;
 
@@ -293,6 +315,15 @@ int	QsvTextEdit::loadFile(QString s)
 
 	QApplication::restoreOverrideCursor();
 	return 0;
+}
+
+void	QsvTextEdit::displayBannerMessage( QString )
+{
+	
+}
+
+void	QsvTextEdit::hideBannerMessage()
+{
 }
 
 void	QsvTextEdit::smartHome()
@@ -400,6 +431,44 @@ void	QsvTextEdit::transformBlockCase()
 		cursor.endEditBlock();
 		setTextCursor( cursor );
 	}
+}
+
+void	QsvTextEdit::gotoMatchingBracket()
+{
+	/*
+	  WARNING:
+	  code duplication between this method and on_cursor_positionChanged();
+	  this needs to be refactored
+	 */
+	
+	QTextCursor cursor = textCursor();
+	// does this line have any brakcets?
+	QsvBlockData *data = static_cast<QsvBlockData*>(cursor.block().userData());
+	if (!data)
+		return;
+
+	QTextBlock  block     = cursor.block();
+	int blockPosition     = block.position();
+	int cursorPosition    = cursor.position();
+	int relativePosition  = cursorPosition - blockPosition;
+	QChar currentChar     = block.text()[relativePosition];
+	
+	// lets find it's partner
+	// in theory, no errors shuold not happen, but one can never be too sure
+	int j = m_config.matchBracketsList.indexOf(currentChar);
+	if (j==-1)
+		return;
+
+	if (m_config.matchBracketsList[j] != m_config.matchBracketsList[j+1])
+		if (j %2 == 0)
+			j = findMatchingChar( m_config.matchBracketsList[j], m_config.matchBracketsList[j+1], true , block, cursorPosition );
+		else
+			j = findMatchingChar( m_config.matchBracketsList[j], m_config.matchBracketsList[j-1], false, block, cursorPosition  );
+	else
+		j = findMatchingChar( m_config.matchBracketsList[j], m_config.matchBracketsList[j+1], true , block, cursorPosition );
+	
+	cursor.setPosition(j);
+	setTextCursor(cursor);
 }
 
 void	QsvTextEdit::removeModifications()
@@ -601,6 +670,32 @@ void	QsvTextEdit::updateMargins()
 	
 	setViewportMargins( panelWidth-1, 0, 0, 0 );
 	m_panel->setGeometry(lrect);
+}
+
+void	QsvTextEdit::showUpperWidget(QWidget* w)
+{
+	QWidget *parent = viewport();
+	QRect r = parent->rect();
+	w->adjustSize();
+	r.adjust(10, 0, -10, 0);
+	r.setHeight(w->height());
+	r.moveTop(parent->rect().height()+10);
+	r.moveRight(parent->rect().right()+10);
+	w->setGeometry(r);
+	w->show();
+}
+
+void	QsvTextEdit::showBottomWidget(QWidget* w)
+{
+	QWidget *parent = viewport();
+	QRect r = parent->rect();
+	w->adjustSize();
+	r.adjust(10, 0, -10, 0);
+	r.setHeight(w->height());
+	r.moveBottom(parent->rect().height()-10);
+	r.moveRight(parent->rect().right()+10);
+	w->setGeometry(r);
+	w->show();
 }
 
 bool	QsvTextEdit::handleIndentEvent( bool forward )
