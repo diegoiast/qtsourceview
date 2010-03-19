@@ -8,6 +8,7 @@
 #include <QFileInfo>
 #include <QTextCodec>
 #include <QTextStream>
+
 #include "qsvtextedit.h"
 #include "qsvsyntaxhighlighterbase.h"
 
@@ -46,13 +47,14 @@ QsvTextEdit::QsvTextEdit( QWidget *parent, QsvSyntaxHighlighterBase *s ):
 	m_matchesFormat.setBackground( QBrush(QColor(0xff,0xff,0x00,0xff) ));
 	m_matchesFormat.setForeground( QBrush(QColor(0x00,0x80,0x00,0xff) ));
 	m_matchesFormat.setFont(f);
-	m_currentLineBackground = QColor(0xc0,0xff,0xc0,0x80);
-	m_modifiedColor         = QColor(0x00,0xff,0x00,0xff);
-	m_panelColor            = QColor(0xff,0xff,0xd0,0xff);
-	actionCapitalize        = NULL;
-	actionLowerCase         = NULL;
-	actionChangeCase        = NULL;
+	m_currentLineBackground   = QColor(0xc0,0xff,0xc0,0x80);
+	m_modifiedColor           = QColor(0x00,0xff,0x00,0xff);
+	m_panelColor              = QColor(0xff,0xff,0xd0,0xff);
+	actionCapitalize          = NULL;
+	actionLowerCase           = NULL;
+	actionChangeCase          = NULL;
 	actionFindMatchingBracket = NULL;
+	actionToggleBookmark      = NULL;
 
 	setDefaultConfig();
 	setupActions();
@@ -65,7 +67,7 @@ void	QsvTextEdit::setupActions()
 {
 	if (actionCapitalize) delete actionCapitalize;
 	actionCapitalize = new QAction( tr("Change to &capital letters"), this );
-	actionCapitalize->setObjectName( "qsvEditor::actionCapitalize" );
+	actionCapitalize->setObjectName("qsvEditor::actionCapitalize");
 	actionCapitalize->setShortcut( QKeySequence( Qt::CTRL | Qt::Key_U ) );
 	connect( actionCapitalize, SIGNAL(triggered()), this, SLOT(transformBlockToUpper()) );
 	addAction(actionCapitalize);
@@ -73,7 +75,7 @@ void	QsvTextEdit::setupActions()
 	if (actionLowerCase) delete actionLowerCase;
 	actionLowerCase = new QAction( tr("Change to &lower letters"), this );
 	actionLowerCase->setObjectName( "qsvEditor::actionLowerCase" );
-	actionLowerCase->setShortcut( QKeySequence( Qt::CTRL | Qt::SHIFT | Qt::Key_U  ) );
+	actionLowerCase->setShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_U));
 	connect( actionLowerCase, SIGNAL(triggered()), this, SLOT(transformBlockToLower()) );
 	addAction(actionLowerCase);
 
@@ -94,6 +96,14 @@ void	QsvTextEdit::setupActions()
 	);
 	connect( actionFindMatchingBracket, SIGNAL(triggered()), this, SLOT(gotoMatchingBracket()) );
 	addAction(actionFindMatchingBracket);
+	
+	if (actionToggleBookmark) delete actionToggleBookmark;
+	actionToggleBookmark = new QAction( tr("Change ca&se"), this );
+	actionToggleBookmark->setObjectName("qsvEditor::actionToggleBookmark");
+	actionToggleBookmark->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_B));
+	connect(actionToggleBookmark, SIGNAL(triggered()), this, SLOT(toggleBookmark()));
+	addAction(actionToggleBookmark);
+	
 }
 
 void	QsvTextEdit::setMarkCurrentLine( bool on )
@@ -227,6 +237,17 @@ void QsvTextEdit::on_cursor_positionChanged()
 	data = static_cast<QsvBlockData*>(textCursor().block().userData());
 	if (!data)
 		goto NO_MATCHES;
+	
+	// handle extra statuses of each line
+	if (data->m_flags.testFlag(QsvBlockData::Bookmark)) {
+		QTextEdit::ExtraSelection sel;
+		sel.format.setBackground(Qt::red);
+		sel.format.setProperty(QTextFormat::FullWidthSelection, true);
+		sel.cursor = cursor;
+		sel.cursor.clearSelection();
+		selections.append(sel);
+	}
+	qDebug() << "Flags for this line:" << int(data->m_flags);
 
 	block             = cursor.block();
 	blockPosition     = block.position();
@@ -469,6 +490,13 @@ void	QsvTextEdit::gotoMatchingBracket()
 	
 	cursor.setPosition(j);
 	setTextCursor(cursor);
+}
+
+void 	QsvTextEdit::toggleBookmark()
+{
+	QsvBlockData *data = getPrivateBlockData(textCursor().block(),true);
+	data->toggleBookmark();
+	qDebug("toggleBookmark");
 }
 
 void	QsvTextEdit::removeModifications()

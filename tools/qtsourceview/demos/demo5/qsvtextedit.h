@@ -9,6 +9,7 @@ class QsvSyntaxHighlighterBase;
 class QsvEditorPanel;
 class QsvBlockData;
 
+// Unused yet
 enum EndOfLineType {
 	DOS, Unix, Mac, KeepOldStyle
 };
@@ -78,7 +79,7 @@ public:
 	int loadFile(QString s);
 	void displayBannerMessage( QString );
 	void hideBannerMessage();
-
+	
 public slots:
 	void smartHome();
 	void smartEnd();
@@ -86,6 +87,7 @@ public slots:
 	void transformBlockToLower();
 	void transformBlockCase();
 	void gotoMatchingBracket();
+	void toggleBookmark();
 	
 	void removeModifications();
 	void on_cursor_positionChanged();
@@ -99,6 +101,7 @@ public:
 	QAction *actionLowerCase;
 	QAction *actionChangeCase;
 	QAction *actionFindMatchingBracket;
+	QAction *actionToggleBookmark;
 	
 protected:
 	void paintEvent(QPaintEvent *e);
