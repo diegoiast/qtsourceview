@@ -8,6 +8,7 @@
 #include <QFileInfo>
 #include <QTextCodec>
 #include <QTextStream>
+#include <QDebug>
 
 #include "qsvtextedit.h"
 #include "qsvsyntaxhighlighterbase.h"
@@ -37,10 +38,14 @@ QsvTextEdit::QsvTextEdit( QWidget *parent, QsvSyntaxHighlighterBase *s ):
 	m_highlighter = s;
 	m_highlighter->setDocument( document() );
 	m_panel = new QsvEditorPanel(this);
+	
+	m_selectionTimer.setSingleShot(true);
+	m_selectionTimer.setInterval(200);
+	connect(&m_selectionTimer,SIGNAL(timeout()),this,SLOT(updateExtraSelections()));
 	connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(on_cursor_positionChanged()));
 	connect(document(), SIGNAL(contentsChange(int,int,int)), this, SLOT(on_textDocument_contentsChange(int,int,int)));
 	connect(verticalScrollBar(), SIGNAL(valueChanged(int)), m_panel, SLOT(update()));
-
+	
 	QFont f;
 	f.setBold(true);
 	m_matchesFormat = QTextCharFormat();
@@ -48,6 +53,7 @@ QsvTextEdit::QsvTextEdit( QWidget *parent, QsvSyntaxHighlighterBase *s ):
 	m_matchesFormat.setForeground( QBrush(QColor(0x00,0x80,0x00,0xff) ));
 	m_matchesFormat.setFont(f);
 	m_currentLineBackground   = QColor(0xc0,0xff,0xc0,0x80);
+	m_bookmarkColor           = QColor(0x80,0x80,0xc0,0x80);
 	m_modifiedColor           = QColor(0x00,0xff,0x00,0xff);
 	m_panelColor              = QColor(0xff,0xff,0xd0,0xff);
 	
@@ -61,7 +67,7 @@ QsvTextEdit::QsvTextEdit( QWidget *parent, QsvSyntaxHighlighterBase *s ):
 	setupActions();
 	setMatchBracketList(m_config.matchBracketsList);
 	setFont(m_config.currentFont);
-	setLineWrapMode(QPlainTextEdit::NoWrap);
+	setLineWrapMode(QPlainTextEdit::NoWrap);	
 }
 
 void	QsvTextEdit::setupActions()
@@ -206,69 +212,23 @@ inline void appendExtraSelection( QList<QTextEdit::ExtraSelection> &selections,
 
 void QsvTextEdit::on_cursor_positionChanged()
 {
-	// clear out previous matches
+	// update the extra selections only 5 times per second
+	if (m_selectionTimer.isActive())
+		m_selectionTimer.stop();
+	//m_selectionTimer.singleShot(1000,this,SLOT(updateExtraSelections()));
+	m_selectionTimer.start();
+
+	// but, do mark the current line all times:
 	QList<QTextEdit::ExtraSelection> selections;
-	QTextCursor cursor = textCursor();
-	QTextBlock  block;
-	int blockPosition;
-	int cursorPosition;
-	int relativePosition;
-	QChar currentChar;
-	QsvBlockData *data;
-	
 	selections = m_selections;
-	
 	if (m_config.markCurrentLine) {
+		QTextCursor cursor = textCursor();
 		QTextCharFormat format;
 		format.setBackground(m_currentLineBackground);
-		m_selections.append(getSelectionForBlock(cursor,format));
+		selections.append(getSelectionForBlock(cursor,format));
 	}
-	
-	/*
-	  WARNING:
-	  code duplication between this method and gotoMatchingBracket();
-	  this needs to be refactored
-	 */
-	
-	if (!m_config.matchBrackets)
-		goto NO_MATCHES;
-
-	// does this line have any brakcets?
-	data = static_cast<QsvBlockData*>(textCursor().block().userData());
-	if (!data)
-		goto NO_MATCHES;
-	
-	block             = cursor.block();
-	blockPosition     = block.position();
-	cursorPosition    = cursor.position();
-	relativePosition  = cursorPosition - blockPosition;
-	currentChar       = block.text()[relativePosition];
-
-	for ( int k=0; k<data->matches.length(); k++) {
-		MatchData m = data->matches.at(k);
-		if (m.position != relativePosition)
-			continue;
-
-		appendExtraSelection(selections, cursorPosition, this, m_matchesFormat);
-
-		// lets find it's partner
-		// in theory, no errors shuold not happen, but one can never be too sure
-		int j = m_config.matchBracketsList.indexOf(currentChar);
-		if (j==-1)
-			continue;
-
-		if (m_config.matchBracketsList[j] != m_config.matchBracketsList[j+1])
-			if (j %2 == 0)
-				j = findMatchingChar( m_config.matchBracketsList[j], m_config.matchBracketsList[j+1], true , block, cursorPosition );
-			else
-				j = findMatchingChar( m_config.matchBracketsList[j], m_config.matchBracketsList[j-1], false, block, cursorPosition  );
-		else
-			j = findMatchingChar( m_config.matchBracketsList[j], m_config.matchBracketsList[j+1], true , block, cursorPosition );
-		appendExtraSelection(selections, j, this,m_matchesFormat);
-	}
-
-NO_MATCHES:
 	setExtraSelections(selections);
+	
 	if (m_panel)
 		m_panel->update();
 }
@@ -487,6 +447,72 @@ void 	QsvTextEdit::toggleBookmark()
 	QsvBlockData *data = getPrivateBlockData(cursor.block(),true);
 	data->toggleBookmark();
 	resetExtraSelections();
+}
+
+void	QsvTextEdit::updateExtraSelections()
+{
+	QList<QTextEdit::ExtraSelection> selections;
+	QTextCursor cursor = textCursor();
+	QTextBlock  block;
+	int blockPosition;
+	int cursorPosition;
+	int relativePosition;
+	QChar currentChar;
+	QsvBlockData *data;
+	
+	selections = m_selections;
+	
+	if (m_config.markCurrentLine) {
+		QTextCharFormat format;
+		format.setBackground(m_currentLineBackground);
+		selections.append(getSelectionForBlock(cursor,format));
+	}
+	
+	/*
+	  WARNING:
+	  code duplication between this method and gotoMatchingBracket();
+	  this needs to be refactored
+	 */
+	
+	if (!m_config.matchBrackets)
+		goto NO_MATCHES;
+
+	// does this line have any brakcets?
+	data = static_cast<QsvBlockData*>(textCursor().block().userData());
+	if (!data)
+		goto NO_MATCHES;
+	
+	block             = cursor.block();
+	blockPosition     = block.position();
+	cursorPosition    = cursor.position();
+	relativePosition  = cursorPosition - blockPosition;
+	currentChar       = block.text()[relativePosition];
+
+	for ( int k=0; k<data->matches.length(); k++) {
+		MatchData m = data->matches.at(k);
+		if (m.position != relativePosition)
+			continue;
+
+		appendExtraSelection(selections, cursorPosition, this, m_matchesFormat);
+
+		// lets find it's partner
+		// in theory, no errors shuold not happen, but one can never be too sure
+		int j = m_config.matchBracketsList.indexOf(currentChar);
+		if (j==-1)
+			continue;
+
+		if (m_config.matchBracketsList[j] != m_config.matchBracketsList[j+1])
+			if (j %2 == 0)
+				j = findMatchingChar( m_config.matchBracketsList[j], m_config.matchBracketsList[j+1], true , block, cursorPosition );
+			else
+				j = findMatchingChar( m_config.matchBracketsList[j], m_config.matchBracketsList[j-1], false, block, cursorPosition  );
+		else
+			j = findMatchingChar( m_config.matchBracketsList[j], m_config.matchBracketsList[j+1], true , block, cursorPosition );
+		appendExtraSelection(selections, j, this,m_matchesFormat);
+	}
+
+NO_MATCHES:
+	setExtraSelections(selections);
 }
 
 void	QsvTextEdit::removeModifications()
@@ -879,10 +905,6 @@ QTextEdit::ExtraSelection QsvTextEdit::getSelectionForBlock( QTextCursor &cursor
 	return selection;
 }
 
-void	QsvTextEdit::updateExtraSelections()
-{
-	
-}
 
 void	QsvTextEdit::resetExtraSelections()
 {
@@ -901,7 +923,7 @@ void	QsvTextEdit::resetExtraSelections()
 		if (data->m_flags.testFlag(QsvBlockData::Bookmark)){
 			QTextCursor cursor = textCursor();
 			QTextCharFormat format;
-			format.setBackground(Qt::red);
+			format.setBackground(m_bookmarkColor);
 			cursor.setPosition(block.position());
 			cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor);
 			m_selections.append(getSelectionForBlock(cursor,format));
@@ -910,7 +932,7 @@ void	QsvTextEdit::resetExtraSelections()
 		i++;
 	}
 	
-	on_cursor_positionChanged();
+	updateExtraSelections();
 }
 
 void	QsvTextEdit::setShowMargins( bool on )

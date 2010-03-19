@@ -5,6 +5,7 @@
 #include <QTextCharFormat>
 #include <QColor>
 #include <QList>
+#include <QTimer>
 
 class QsvSyntaxHighlighterBase;
 class QsvEditorPanel;
@@ -89,11 +90,12 @@ public slots:
 	void transformBlockCase();
 	void gotoMatchingBracket();
 	void toggleBookmark();
+	void updateExtraSelections();
 	
 	void removeModifications();
 	void on_cursor_positionChanged();
 	void on_textDocument_contentsChange( int position, int charsRemoved, int charsAdded );
-
+	
 signals:
 	void widgetResized();
 
@@ -119,7 +121,6 @@ protected:
 	int findMatchingChar( QChar c1, QChar c2, bool forward, QTextBlock &block, int from );
 	QsvBlockData *getPrivateBlockData( QTextBlock block, bool createIfNotExisting );
 	QTextEdit::ExtraSelection getSelectionForBlock( QTextCursor &cursor, QTextCharFormat &format );
-	void updateExtraSelections();
 	void resetExtraSelections();
 
 	QsvSyntaxHighlighterBase *m_highlighter;
@@ -128,9 +129,12 @@ protected:
 	QList<QTextEdit::ExtraSelection> m_selections;
 	QTextCharFormat m_matchesFormat;
 	QColor          m_currentLineBackground;
+	QColor          m_bookmarkColor;
 	QColor          m_panelColor;
 	QColor          m_modifiedColor;
 	QPixmap         m_bookMarkImage;
+	
+	QTimer m_selectionTimer;
 
 	QsvEditorConfigData m_config;
 };
