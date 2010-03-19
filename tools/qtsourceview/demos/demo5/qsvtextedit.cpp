@@ -50,6 +50,7 @@ QsvTextEdit::QsvTextEdit( QWidget *parent, QsvSyntaxHighlighterBase *s ):
 	m_currentLineBackground   = QColor(0xc0,0xff,0xc0,0x80);
 	m_modifiedColor           = QColor(0x00,0xff,0x00,0xff);
 	m_panelColor              = QColor(0xff,0xff,0xd0,0xff);
+	
 	actionCapitalize          = NULL;
 	actionLowerCase           = NULL;
 	actionChangeCase          = NULL;
@@ -215,13 +216,12 @@ void QsvTextEdit::on_cursor_positionChanged()
 	QChar currentChar;
 	QsvBlockData *data;
 	
+	selections = m_selections;
+	
 	if (m_config.markCurrentLine) {
-		QTextEdit::ExtraSelection sel;
-		sel.format.setBackground( m_currentLineBackground );
-		sel.format.setProperty(QTextFormat::FullWidthSelection, true);
-		sel.cursor = cursor;
-		sel.cursor.clearSelection();
-		selections.append(sel);
+		QTextCharFormat format;
+		format.setBackground(m_currentLineBackground);
+		m_selections.append(getSelectionForBlock(cursor,format));
 	}
 	
 	/*
@@ -238,17 +238,6 @@ void QsvTextEdit::on_cursor_positionChanged()
 	if (!data)
 		goto NO_MATCHES;
 	
-	// handle extra statuses of each line
-	if (data->m_flags.testFlag(QsvBlockData::Bookmark)) {
-		QTextEdit::ExtraSelection sel;
-		sel.format.setBackground(Qt::red);
-		sel.format.setProperty(QTextFormat::FullWidthSelection, true);
-		sel.cursor = cursor;
-		sel.cursor.clearSelection();
-		selections.append(sel);
-	}
-	qDebug() << "Flags for this line:" << int(data->m_flags);
-
 	block             = cursor.block();
 	blockPosition     = block.position();
 	cursorPosition    = cursor.position();
@@ -494,9 +483,10 @@ void	QsvTextEdit::gotoMatchingBracket()
 
 void 	QsvTextEdit::toggleBookmark()
 {
-	QsvBlockData *data = getPrivateBlockData(textCursor().block(),true);
+	QTextCursor cursor = textCursor();
+	QsvBlockData *data = getPrivateBlockData(cursor.block(),true);
 	data->toggleBookmark();
-	qDebug("toggleBookmark");
+	resetExtraSelections();
 }
 
 void	QsvTextEdit::removeModifications()
@@ -876,6 +866,51 @@ QsvBlockData* QsvTextEdit::getPrivateBlockData( QTextBlock block, bool createIfN
 		block.setUserData(data);
 	}
 	return data;
+}
+
+QTextEdit::ExtraSelection QsvTextEdit::getSelectionForBlock( QTextCursor &cursor, QTextCharFormat &format )
+{
+	QTextEdit::ExtraSelection selection;
+	selection.format = format;
+	selection.format.setProperty(QTextFormat::FullWidthSelection, true);
+	selection.cursor = cursor;
+	selection.cursor.clearSelection();
+	
+	return selection;
+}
+
+void	QsvTextEdit::updateExtraSelections()
+{
+	
+}
+
+void	QsvTextEdit::resetExtraSelections()
+{
+	QTextBlock  block = document()->firstBlock();
+	int i = 0;
+	
+	m_selections.clear();
+	while (block.isValid()){
+		QsvBlockData *data = getPrivateBlockData(block,false);
+		if (!data){
+			block = block.next();
+			i++;
+			continue;
+		}
+		
+		if (data->m_flags.testFlag(QsvBlockData::Bookmark)){
+			QTextCursor cursor = textCursor();
+			QTextCharFormat format;
+			format.setBackground(Qt::red);
+			cursor.setPosition(block.position());
+			cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor);
+			m_selections.append(getSelectionForBlock(cursor,format));
+		}
+		block = block.next();
+		i++;
+	}
+	
+	on_cursor_positionChanged();
 }
 
 void	QsvTextEdit::setShowMargins( bool on )

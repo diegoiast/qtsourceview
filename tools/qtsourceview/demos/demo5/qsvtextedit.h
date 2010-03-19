@@ -4,6 +4,7 @@
 #include <QPlainTextEdit>
 #include <QTextCharFormat>
 #include <QColor>
+#include <QList>
 
 class QsvSyntaxHighlighterBase;
 class QsvEditorPanel;
@@ -117,10 +118,14 @@ protected:
 	QString updateIndentation( QString s, int indentation );
 	int findMatchingChar( QChar c1, QChar c2, bool forward, QTextBlock &block, int from );
 	QsvBlockData *getPrivateBlockData( QTextBlock block, bool createIfNotExisting );
+	QTextEdit::ExtraSelection getSelectionForBlock( QTextCursor &cursor, QTextCharFormat &format );
+	void updateExtraSelections();
+	void resetExtraSelections();
 
 	QsvSyntaxHighlighterBase *m_highlighter;
 	QsvEditorPanel *m_panel;
 
+	QList<QTextEdit::ExtraSelection> m_selections;
 	QTextCharFormat m_matchesFormat;
 	QColor          m_currentLineBackground;
 	QColor          m_panelColor;
