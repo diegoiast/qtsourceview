@@ -53,7 +53,7 @@ QsvTextEdit::QsvTextEdit( QWidget *parent, QsvSyntaxHighlighterBase *s ):
 	m_matchesFormat.setForeground( QBrush(QColor(0x00,0x80,0x00,0xff) ));
 	m_matchesFormat.setFont(f);
 	m_currentLineBackground   = QColor(0xc0,0xff,0xc0,0x80);
-	m_bookmarkColor           = QColor(0x80,0x80,0xc0,0x80);
+	m_bookmarkColor           = QColor(0xa0,0xa0,0xff,0x80);
 	m_modifiedColor           = QColor(0x00,0xff,0x00,0xff);
 	m_panelColor              = QColor(0xff,0xff,0xd0,0xff);
 	
@@ -62,12 +62,14 @@ QsvTextEdit::QsvTextEdit( QWidget *parent, QsvSyntaxHighlighterBase *s ):
 	actionChangeCase          = NULL;
 	actionFindMatchingBracket = NULL;
 	actionToggleBookmark      = NULL;
+	actionNextBookmark        = NULL;
+	actionPrevBookmark        = NULL;
 
 	setDefaultConfig();
 	setupActions();
 	setMatchBracketList(m_config.matchBracketsList);
 	setFont(m_config.currentFont);
-	setLineWrapMode(QPlainTextEdit::NoWrap);	
+	setLineWrapMode(QPlainTextEdit::NoWrap);
 }
 
 void	QsvTextEdit::setupActions()
@@ -111,6 +113,19 @@ void	QsvTextEdit::setupActions()
 	connect(actionToggleBookmark, SIGNAL(triggered()), this, SLOT(toggleBookmark()));
 	addAction(actionToggleBookmark);
 	
+	if (actionNextBookmark) delete actionNextBookmark;
+	actionNextBookmark = new QAction( tr("Goto Next bookmark"), this );
+	actionNextBookmark->setObjectName("qsvEditor::actionNextBookmark");
+	actionNextBookmark->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_PageDown));
+	connect(actionNextBookmark, SIGNAL(triggered()), this, SLOT(gotoNextBookmark()));
+	addAction(actionNextBookmark);
+	
+	if (actionPrevBookmark) delete actionPrevBookmark;
+	actionPrevBookmark = new QAction( tr("Goto Previous bookmark"), this );
+	actionPrevBookmark->setObjectName("qsvEditor::actionPrevBookmark");
+	actionPrevBookmark->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_PageUp));
+	connect(actionPrevBookmark, SIGNAL(triggered()), this, SLOT(gotoPrevBookmark()));
+	addAction(actionPrevBookmark);
 }
 
 void	QsvTextEdit::setMarkCurrentLine( bool on )
@@ -215,9 +230,8 @@ void QsvTextEdit::on_cursor_positionChanged()
 	// update the extra selections only 5 times per second
 	if (m_selectionTimer.isActive())
 		m_selectionTimer.stop();
-	//m_selectionTimer.singleShot(1000,this,SLOT(updateExtraSelections()));
 	m_selectionTimer.start();
-
+	
 	// but, do mark the current line all times:
 	QList<QTextEdit::ExtraSelection> selections;
 	selections = m_selections;
@@ -1034,6 +1048,52 @@ void QsvTextEdit::setDefaultConfig( QsvEditorConfigData *config ) // static
 	config->insertSpacesInsteadOfTabs = false;
 	config->tabIndents         = false;
 	config->showWhiteSpaces    = false;
+}
+
+void	QsvTextEdit::gotoNextBookmark()
+{
+	QTextCursor c = textCursor();
+	QTextBlock  b = c.block().next();
+	int i;
+	
+	while(b.isValid()){
+		QsvBlockData *data = getPrivateBlockData(b,false);
+		i = b.blockNumber();
+		if (!data)
+			goto SKIP;
+		if (!data->m_flags.testFlag(QsvBlockData::Bookmark))
+			goto SKIP;
+		
+		// fount it
+		c.setPosition(b.position());
+		setTextCursor(c);
+		return;
+	SKIP:
+		b = b.next();
+		continue;
+	}
+}
+
+void	QsvTextEdit::gotoPrevBookmark()
+{
+	QTextCursor c = textCursor();
+	QTextBlock  b = c.block().previous();
+	
+	while(b.isValid()){
+		QsvBlockData *data = getPrivateBlockData(b,false);
+		if (!data)
+			goto SKIP;
+		if (!data->m_flags.testFlag(QsvBlockData::Bookmark))
+			goto SKIP;
+		
+		// fount it
+		c.setPosition(b.position());
+		setTextCursor(c);
+		return;
+	SKIP:
+		b = b.previous();
+		continue;
+	}
 }
 
 QTextCursor	QsvTextEdit::getCurrentTextCursor()

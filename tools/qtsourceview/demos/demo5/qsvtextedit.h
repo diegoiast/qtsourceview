@@ -74,6 +74,7 @@ public:
 	void setDefaultConfig();
 	static void setDefaultConfig( QsvEditorConfigData *config );
 	
+	
 	QTextCursor getCurrentTextCursor();
 	void paintPanel(QPaintEvent *e);
 	
@@ -90,6 +91,8 @@ public slots:
 	void transformBlockCase();
 	void gotoMatchingBracket();
 	void toggleBookmark();
+	void gotoNextBookmark();
+	void gotoPrevBookmark();
 	void updateExtraSelections();
 	
 	void removeModifications();
@@ -105,6 +108,8 @@ public:
 	QAction *actionChangeCase;
 	QAction *actionFindMatchingBracket;
 	QAction *actionToggleBookmark;
+	QAction *actionNextBookmark;
+	QAction *actionPrevBookmark;
 	
 protected:
 	void paintEvent(QPaintEvent *e);
