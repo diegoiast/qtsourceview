@@ -13,6 +13,7 @@ class QTextCursor;
 #include <QTextCursor>
 #include <QTextDocument>
 #include <QColor>
+#include <QTimer>
 
 class QWidget;
 class QTextDocument;
@@ -49,6 +50,10 @@ public slots:
 	void searchPrevious();
 	void searchPrev(){ searchPrevious(); };
 	void adjustBottomWidget();
+	
+	void updateSearchInput();
+	void updateReplaceInput();
+	
 
 protected:
 	bool eventFilter(QObject *obj, QEvent *event);
@@ -64,6 +69,9 @@ private:
 
 	QColor searchFoundColor;
 	QColor searchNotFoundColor;
+	
+	QTimer m_replaceTimer;
+	QTimer m_searchTimer;
 
 	Ui::searchForm *searchFormUi;
 	Ui::replaceForm *replaceFormUi;

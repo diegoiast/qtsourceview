@@ -23,7 +23,17 @@ QsvTextOperationsWidget::QsvTextOperationsWidget( QWidget *parent )
 	m_document = NULL;
 	searchFoundColor	= QColor( "#DDDDFF" ); //QColor::fromRgb( 220, 220, 255)
 	searchNotFoundColor	= QColor( "#FFAAAA" ); //QColor::fromRgb( 255, 102, 102) "#FF6666"
+	
+	m_replaceTimer.setInterval(100);
+	m_replaceTimer.setSingleShot(true);
+	connect(&m_replaceTimer,SIGNAL(timeout()),this,SLOT(updateReplaceInput()));
 
+	// this one is slower, to let the user think about his action
+	// this is a modifying command, unlike a passive search
+	m_searchTimer.setInterval(250);
+	m_searchTimer.setSingleShot(true);
+	connect(&m_searchTimer,SIGNAL(timeout()),this,SLOT(updateSearchInput()));
+	
 	// TODO clean this up, this is too ugly to be in a constructor
 	QTextEdit *t = qobject_cast<QTextEdit*>(parent);
 	if (t) {
@@ -97,6 +107,16 @@ void	QsvTextOperationsWidget::searchPrevious()
 void	QsvTextOperationsWidget::adjustBottomWidget()
 {
 	showBottomWidget(NULL);
+}
+
+void	 QsvTextOperationsWidget::updateSearchInput()
+{
+	issue_search(searchFormUi->searchText->text(), m_searchCursor, getSearchFlags(), searchFormUi->searchText);
+}
+
+void	 QsvTextOperationsWidget::updateReplaceInput()
+{
+	issue_search(replaceFormUi->findText->text(), m_searchCursor, getSearchFlags(), replaceFormUi->findText);
 }
 
 bool	 QsvTextOperationsWidget::eventFilter(QObject *obj, QEvent *event)
@@ -263,12 +283,20 @@ void	QsvTextOperationsWidget::showBottomWidget(QWidget* w)
 
 void QsvTextOperationsWidget::on_searchText_modified(QString s)
 {
-	issue_search(s, m_searchCursor, getSearchFlags(), searchFormUi->searchText );
+	if (m_searchTimer.isActive())
+		m_searchTimer.stop();
+	m_searchTimer.start();
+//	updateSearchInput();
+	Q_UNUSED(s);
 }
 
 void	QsvTextOperationsWidget::on_replaceText_modified(QString s)
 {
-	issue_search(s, m_searchCursor, getSearchFlags(), replaceFormUi->findText);
+	if (m_replaceTimer.isActive())
+		m_replaceTimer.stop();
+	m_replaceTimer.start();
+//	updateReplaceInput();
+	Q_UNUSED(s);
 }
 
 bool	QsvTextOperationsWidget::issue_search( const QString &text, QTextCursor newCursor, QFlags<QTextDocument::FindFlag> findOptions, QLineEdit *l )
