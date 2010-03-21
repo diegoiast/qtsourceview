@@ -33,11 +33,13 @@ public:
 				->setShortcut(QKeySequence("Shift+F3"));
 		b->setMovable(false);
 		
-		qDebug("Loading file %s", qPrintable(file) );
-		e->loadFile(file);
-		
 		setCentralWidget(e);
 		showMaximized();
+		
+		if (!file.isEmpty())
+			loadFile(file);
+		else
+			setWindowTitle("QtSourceView demo5");
 
 #if 0
 		// tests for defaults
@@ -51,15 +53,26 @@ public:
 	}
 	
 public slots:
-	void loadFile()
+	void loadFile( QString filename ="" )
 	{
-		QString s = QFileDialog::getOpenFileName(this,tr("Load file"));
-		if (s.isEmpty())
-			return;
+		if (filename.isEmpty()) {
+			filename = QFileDialog::getOpenFileName(this,tr("Load file"));
+			if (filename.isEmpty())
+				return;
+		}
 		QsvTextEdit *e = findChild<QsvTextEdit*>();
 		if (!e)
 			return;
-		e->loadFile(s);
+		
+//		TODO
+//		if (e->isModified){
+//			e->save();
+//		}
+		
+		e->displayBannerMessage( tr("Loaded file %1").arg(filename));
+		e->loadFile(filename);
+		e->removeModifications();
+		setWindowTitle(filename);
 	}
 
 private:

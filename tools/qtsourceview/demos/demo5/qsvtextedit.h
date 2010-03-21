@@ -10,6 +10,7 @@
 class QsvSyntaxHighlighterBase;
 class QsvEditorPanel;
 class QsvBlockData;
+class QLabel;
 
 // Unused yet
 enum EndOfLineType {
@@ -37,6 +38,9 @@ struct QsvEditorConfigData {
 //	QsvColorDefFactory	*currentColorScheme;
 };
 
+namespace Ui{
+	class BannerMessage;
+};
 
 class QsvTextEdit : public QPlainTextEdit
 {
@@ -111,14 +115,14 @@ public:
 	QAction *actionNextBookmark;
 	QAction *actionPrevBookmark;
 	
+	void showUpperWidget(QWidget* w);
+	void showBottomWidget(QWidget* w);
 protected:
 	void paintEvent(QPaintEvent *e);
 	void resizeEvent(QResizeEvent *e);
 	void keyPressEvent(QKeyEvent *e);
 	bool handleKeyPressEvent(QKeyEvent *e);
 	virtual void updateMargins();
-	void showUpperWidget(QWidget* w);
-	void showBottomWidget(QWidget* w);
 
 	bool handleIndentEvent( bool forward );
 	int getIndentationSize( const QString s );
@@ -130,6 +134,8 @@ protected:
 
 	QsvSyntaxHighlighterBase *m_highlighter;
 	QsvEditorPanel *m_panel;
+	QWidget *m_banner;
+	Ui::BannerMessage *ui_banner;
 
 	QList<QTextEdit::ExtraSelection> m_selections;
 	QTextCharFormat m_matchesFormat;

@@ -9,9 +9,11 @@
 #include <QTextCodec>
 #include <QTextStream>
 #include <QDebug>
+#include <QLabel>
 
 #include "qsvtextedit.h"
 #include "qsvsyntaxhighlighterbase.h"
+#include "ui_bannermessage.h"
 
 // private class
 class QsvEditorPanel : public QWidget
@@ -38,6 +40,11 @@ QsvTextEdit::QsvTextEdit( QWidget *parent, QsvSyntaxHighlighterBase *s ):
 	m_highlighter = s;
 	m_highlighter->setDocument( document() );
 	m_panel = new QsvEditorPanel(this);
+	m_banner = new QWidget(this);
+	m_banner->setFont(QApplication::font());
+	m_banner->hide();
+	ui_banner = new Ui::BannerMessage;
+	ui_banner->setupUi(m_banner);
 	
 	m_selectionTimer.setSingleShot(true);
 	m_selectionTimer.setInterval(200);
@@ -262,7 +269,7 @@ int	QsvTextEdit::loadFile(QString s)
 */
 	bool m = m_config.modificationsLookupEnabled;
 	setModificationsLookupEnabled(false);
-//	hideBannerMessage();
+	hideBannerMessage();
 	this->setReadOnly(false);
 	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 	QApplication::processEvents();
@@ -287,7 +294,7 @@ int	QsvTextEdit::loadFile(QString s)
 //		fileSystemWatcher->addPath( fileName );
 		if (!fileInfo.isWritable()) {
 			this->setReadOnly( true);
-//			displayBannerMessage( tr("The file is readonly. Click <a href=':forcerw' title='Click here to try and change the file attributes for write access'>here to force write access.</a>") );
+			displayBannerMessage( tr("The file is readonly. Click <a href=':forcerw' title='Click here to try and change the file attributes for write access'>here to force write access.</a>") );
 		}
 	} else {
 //		fileName.clear();
@@ -301,9 +308,11 @@ int	QsvTextEdit::loadFile(QString s)
 	return 0;
 }
 
-void	QsvTextEdit::displayBannerMessage( QString )
+void	QsvTextEdit::displayBannerMessage( QString message)
 {
-	
+	ui_banner->label->setText(message);
+	showUpperWidget(m_banner);
+	QTimer::singleShot(15000,m_banner,SLOT(hide()));
 }
 
 void	QsvTextEdit::hideBannerMessage()
@@ -737,7 +746,7 @@ void	QsvTextEdit::showUpperWidget(QWidget* w)
 	w->adjustSize();
 	r.adjust(10, 0, -10, 0);
 	r.setHeight(w->height());
-	r.moveTop(parent->rect().height()+10);
+	r.moveTop(10);
 	r.moveRight(parent->rect().right()+10);
 	w->setGeometry(r);
 	w->show();
