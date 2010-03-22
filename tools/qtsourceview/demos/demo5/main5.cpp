@@ -20,21 +20,22 @@ public:
 		QsvTextOperationsWidget *textOpetations = new QsvTextOperationsWidget(e);
 	
 		QToolBar *b = addToolBar( "" );
-		b->addAction( tr("Open"), this, SLOT(loadFile()))
+		b->addAction( tr("&Open"), this, SLOT(loadFile()))
 		 ->setShortcut(QKeySequence("Ctrl+O"));
-		b->addAction( tr("Find"), textOpetations, SLOT(showSearch()))
+		b->addAction( tr("&Find"), textOpetations, SLOT(showSearch()))
 		 ->setShortcut(QKeySequence("Ctrl+F"));
-		b->addAction( tr("Replace"), textOpetations, SLOT(showReplace()))
+		b->addAction( tr("&Replace"), textOpetations, SLOT(showReplace()))
 		 ->setShortcut(QKeySequence("Ctrl+R"));
-		b->addAction( tr("Fing next"), textOpetations, SLOT(searchNext()))
+		b->addAction( tr("Find &next"), textOpetations, SLOT(searchNext()))
 		 ->setShortcut(QKeySequence("F3"));
 		b->setMovable(false);
-		b->addAction( tr("Fing prev"), textOpetations, SLOT(searchPrev()))
+		b->addAction( tr("Find &prev"), textOpetations, SLOT(searchPrev()))
 				->setShortcut(QKeySequence("Shift+F3"));
 		b->setMovable(false);
 		
 		setCentralWidget(e);
 		showMaximized();
+		e->displayBannerMessage(tr("Click \"Open\" if you dare"));
 		
 		if (!file.isEmpty())
 			loadFile(file);
@@ -69,7 +70,6 @@ public slots:
 //			e->save();
 //		}
 		
-		e->displayBannerMessage( tr("Loaded file %1").arg(filename));
 		e->loadFile(filename);
 		e->removeModifications();
 		setWindowTitle(filename);

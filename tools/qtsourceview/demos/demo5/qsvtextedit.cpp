@@ -45,11 +45,14 @@ QsvTextEdit::QsvTextEdit( QWidget *parent, QsvSyntaxHighlighterBase *s ):
 	m_banner->hide();
 	ui_banner = new Ui::BannerMessage;
 	ui_banner->setupUi(m_banner);
+	m_topWidget = NULL;
+	m_bottomWidget = NULL;
 	
 	m_selectionTimer.setSingleShot(true);
 	m_selectionTimer.setInterval(200);
 	connect(&m_selectionTimer,SIGNAL(timeout()),this,SLOT(updateExtraSelections()));
 	connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(on_cursor_positionChanged()));
+	connect(this, SIGNAL(widgetResized()),this,SLOT(adjustBottomAndTopWidget()));
 	connect(document(), SIGNAL(contentsChange(int,int,int)), this, SLOT(on_textDocument_contentsChange(int,int,int)));
 	connect(verticalScrollBar(), SIGNAL(valueChanged(int)), m_panel, SLOT(update()));
 	
@@ -308,15 +311,24 @@ int	QsvTextEdit::loadFile(QString s)
 	return 0;
 }
 
-void	QsvTextEdit::displayBannerMessage( QString message)
+void	QsvTextEdit::displayBannerMessage(QString message,int time)
 {
-	ui_banner->label->setText(message);
 	showUpperWidget(m_banner);
-	QTimer::singleShot(15000,m_banner,SLOT(hide()));
+	ui_banner->label->setText(message);
+	m_timerHideout = time;
+	QTimer::singleShot(1000,this,SLOT(on_hideTimer_timeout()));
 }
 
 void	QsvTextEdit::hideBannerMessage()
 {
+	m_timerHideout = 0;
+	ui_banner->label->clear();
+	m_banner->hide();
+	
+	// sometimes the top widget is displayed, lets workaround this
+	// TODO: find WTF this is happening
+	if (m_topWidget == m_banner)
+		m_topWidget = NULL;
 }
 
 void	QsvTextEdit::smartHome()
@@ -581,6 +593,47 @@ void	QsvTextEdit::on_textDocument_contentsChange( int position, int charsRemoved
 	Q_UNUSED( charsRemoved );
 }
 
+void	QsvTextEdit::on_hideTimer_timeout()
+{
+	if (m_timerHideout != 0 ){
+		QString s;
+		s.setNum(m_timerHideout);
+		m_timerHideout--;
+		ui_banner->timer->setText(s);
+		QTimer::singleShot(1000, this, SLOT(on_hideTimer_timeout()));
+	}
+	else {
+		ui_banner->timer->clear();
+		m_banner->hide();
+	}
+}
+
+void	QsvTextEdit::adjustBottomAndTopWidget()
+{
+	if (m_topWidget){
+		QWidget *parent = viewport();
+		QRect r = parent->rect();
+		m_topWidget->adjustSize();
+		r.adjust(10, 0, -10, 0);
+		r.setHeight(m_topWidget->height());
+		r.moveTop(10);
+		r.moveRight(parent->rect().right()+10);
+		m_topWidget->setGeometry(r);
+		m_topWidget->show();
+	}	
+	if (m_bottomWidget){
+		QWidget *parent = viewport();
+		QRect r = parent->rect();
+		m_bottomWidget->adjustSize();
+		r.adjust(10, 0, -10, 0);
+		r.setHeight(m_bottomWidget->height());
+		r.moveBottom(parent->rect().height()-10);
+		r.moveRight(parent->rect().right()+10);
+		m_bottomWidget->setGeometry(r);
+		m_bottomWidget->show();
+	}
+}
+
 void	QsvTextEdit::paintEvent(QPaintEvent *e)
 {
 	if (m_config.showMargins) {
@@ -741,28 +794,18 @@ void	QsvTextEdit::updateMargins()
 
 void	QsvTextEdit::showUpperWidget(QWidget* w)
 {
-	QWidget *parent = viewport();
-	QRect r = parent->rect();
-	w->adjustSize();
-	r.adjust(10, 0, -10, 0);
-	r.setHeight(w->height());
-	r.moveTop(10);
-	r.moveRight(parent->rect().right()+10);
-	w->setGeometry(r);
-	w->show();
+	// TODO handle dangling pointers
+	m_topWidget = w;
+	
+	adjustBottomAndTopWidget();
 }
 
 void	QsvTextEdit::showBottomWidget(QWidget* w)
 {
-	QWidget *parent = viewport();
-	QRect r = parent->rect();
-	w->adjustSize();
-	r.adjust(10, 0, -10, 0);
-	r.setHeight(w->height());
-	r.moveBottom(parent->rect().height()-10);
-	r.moveRight(parent->rect().right()+10);
-	w->setGeometry(r);
-	w->show();
+	// TODO handle dangling pointers
+	m_bottomWidget = w;
+	
+	adjustBottomAndTopWidget();
 }
 
 bool	QsvTextEdit::handleIndentEvent( bool forward )

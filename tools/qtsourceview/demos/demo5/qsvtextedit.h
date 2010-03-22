@@ -84,7 +84,7 @@ public:
 	
 	void newDocument();
 	int loadFile(QString s);
-	void displayBannerMessage( QString );
+	void displayBannerMessage(QString message,int time=15);
 	void hideBannerMessage();
 	
 public slots:
@@ -102,6 +102,8 @@ public slots:
 	void removeModifications();
 	void on_cursor_positionChanged();
 	void on_textDocument_contentsChange( int position, int charsRemoved, int charsAdded );
+	void on_hideTimer_timeout();
+	void adjustBottomAndTopWidget();
 	
 signals:
 	void widgetResized();
@@ -136,6 +138,9 @@ protected:
 	QsvEditorPanel *m_panel;
 	QWidget *m_banner;
 	Ui::BannerMessage *ui_banner;
+	
+	QWidget         *m_topWidget;
+	QWidget         *m_bottomWidget;
 
 	QList<QTextEdit::ExtraSelection> m_selections;
 	QTextCharFormat m_matchesFormat;
@@ -144,6 +149,7 @@ protected:
 	QColor          m_panelColor;
 	QColor          m_modifiedColor;
 	QPixmap         m_bookMarkImage;
+	int             m_timerHideout;
 	
 	QTimer m_selectionTimer;
 
