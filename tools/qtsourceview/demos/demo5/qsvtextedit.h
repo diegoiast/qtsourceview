@@ -10,6 +10,7 @@
 class QsvSyntaxHighlighterBase;
 class QsvEditorPanel;
 class QsvBlockData;
+class QFileSystemWatcher;
 class QLabel;
 
 // Unused yet
@@ -104,6 +105,8 @@ public slots:
 	void on_textDocument_contentsChange( int position, int charsRemoved, int charsAdded );
 	void on_hideTimer_timeout();
 	void adjustBottomAndTopWidget();
+	void on_fileChanged(const QString &filename);
+	void on_fileMessage_clicked(const QString &s);
 	
 signals:
 	void widgetResized();
@@ -150,6 +153,8 @@ protected:
 	QColor          m_modifiedColor;
 	QPixmap         m_bookMarkImage;
 	int             m_timerHideout;
+	QString         m_fileName;
+	QFileSystemWatcher *m_fileSystemWatcher;
 	
 	QTimer m_selectionTimer;
 

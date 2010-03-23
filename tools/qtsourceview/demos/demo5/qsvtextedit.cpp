@@ -10,6 +10,7 @@
 #include <QTextStream>
 #include <QDebug>
 #include <QLabel>
+#include <QFileSystemWatcher>
 
 #include "qsvtextedit.h"
 #include "qsvsyntaxhighlighterbase.h"
@@ -50,11 +51,17 @@ QsvTextEdit::QsvTextEdit( QWidget *parent, QsvSyntaxHighlighterBase *s ):
 	
 	m_selectionTimer.setSingleShot(true);
 	m_selectionTimer.setInterval(200);
+	
+	m_fileName.clear();
+	m_fileSystemWatcher = new QFileSystemWatcher(this);
+	
 	connect(&m_selectionTimer,SIGNAL(timeout()),this,SLOT(updateExtraSelections()));
 	connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(on_cursor_positionChanged()));
 	connect(this, SIGNAL(widgetResized()),this,SLOT(adjustBottomAndTopWidget()));
+	connect(ui_banner->label,SIGNAL(linkActivated(QString)),this,SLOT(on_fileMessage_clicked(QString)));
 	connect(document(), SIGNAL(contentsChange(int,int,int)), this, SLOT(on_textDocument_contentsChange(int,int,int)));
 	connect(verticalScrollBar(), SIGNAL(valueChanged(int)), m_panel, SLOT(update()));
+	connect(m_fileSystemWatcher, SIGNAL(fileChanged(const QString&)), this, SLOT(on_fileChanged(const QString&)));
 	
 	QFont f;
 	f.setBold(true);
@@ -264,12 +271,11 @@ void	QsvTextEdit::newDocument()
 
 int	QsvTextEdit::loadFile(QString s)
 {
-/*
 	// clear older watches, and add a new one
-	QStringList sl = fileSystemWatcher->directories();
+	QStringList sl = m_fileSystemWatcher->directories();
 	if (!sl.isEmpty())
-		fileSystemWatcher->removePaths( sl );
-*/
+		m_fileSystemWatcher->removePaths( sl );
+
 	bool m = m_config.modificationsLookupEnabled;
 	setModificationsLookupEnabled(false);
 	hideBannerMessage();
@@ -293,14 +299,14 @@ int	QsvTextEdit::loadFile(QString s)
 		setPlainText( textStream.readAll() );
 		file.close();
 	
-//		fileName = fileInfo.absoluteFilePath();
-//		fileSystemWatcher->addPath( fileName );
+		m_fileName = fileInfo.absoluteFilePath();
+		m_fileSystemWatcher->addPath(m_fileName);
 		if (!fileInfo.isWritable()) {
 			this->setReadOnly( true);
 			displayBannerMessage( tr("The file is readonly. Click <a href=':forcerw' title='Click here to try and change the file attributes for write access'>here to force write access.</a>") );
 		}
 	} else {
-//		fileName.clear();
+		m_fileName.clear();
 		setPlainText("");
 	}
 	
@@ -633,6 +639,36 @@ void	QsvTextEdit::adjustBottomAndTopWidget()
 		m_bottomWidget->show();
 	}
 }
+
+void	QsvTextEdit::on_fileChanged(const QString &filename)
+{
+	if (m_fileName != filename)
+		return;
+	
+	QFileInfo f(filename);
+	QString message;
+	if (f.exists())
+		message = QString("%1 <a href=':reload' title='%2'>%3</a>")
+		  .arg(tr("File has been modified outside the editor"))
+		  .arg(tr("Clicking this links will revert all changes to this editor"))
+		  .arg(tr("Click here to reload"));
+	else
+		message = tr("File has been deleted outside the editor.");
+	displayBannerMessage(message);
+}
+
+void	QsvTextEdit::on_fileMessage_clicked(const QString &s)
+{
+	if (s == ":reload") {
+		loadFile(m_fileName);
+		hideBannerMessage();
+	} else if (s == ":forcerw") {
+		// TODO how to do it in a portable way?
+		hideBannerMessage();
+		this->setReadOnly(false);
+	}
+}
+
 
 void	QsvTextEdit::paintEvent(QPaintEvent *e)
 {

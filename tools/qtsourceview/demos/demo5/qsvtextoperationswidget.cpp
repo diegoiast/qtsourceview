@@ -229,6 +229,7 @@ void QsvTextOperationsWidget::showSearch()
 
 	m_searchCursor = getTextCursor();
 	searchFormUi->searchText->setFocus();
+	searchFormUi->searchText->selectAll();
 	showBottomWidget(m_search);
 }
 
@@ -286,7 +287,6 @@ void QsvTextOperationsWidget::on_searchText_modified(QString s)
 	if (m_searchTimer.isActive())
 		m_searchTimer.stop();
 	m_searchTimer.start();
-//	updateSearchInput();
 	Q_UNUSED(s);
 }
 
@@ -295,7 +295,6 @@ void	QsvTextOperationsWidget::on_replaceText_modified(QString s)
 	if (m_replaceTimer.isActive())
 		m_replaceTimer.stop();
 	m_replaceTimer.start();
-//	updateReplaceInput();
 	Q_UNUSED(s);
 }
 
@@ -303,7 +302,6 @@ bool	QsvTextOperationsWidget::issue_search( const QString &text, QTextCursor new
 {
 	QTextCursor c = m_document->find( text, newCursor, findOptions );
 	bool found = ! c.isNull();
-	//qDebug() << findOptions;
 
 	//lets try again, from the start
 	if (!found) {
