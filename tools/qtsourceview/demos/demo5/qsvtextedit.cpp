@@ -46,6 +46,7 @@ QsvTextEdit::QsvTextEdit( QWidget *parent, QsvSyntaxHighlighterBase *s ):
 	m_banner->hide();
 	ui_banner = new Ui::BannerMessage;
 	ui_banner->setupUi(m_banner);
+	ui_banner->frame->setFrameStyle(QFrame::Box);
 	m_topWidget = NULL;
 	m_bottomWidget = NULL;
 	
@@ -675,6 +676,11 @@ void	QsvTextEdit::paintEvent(QPaintEvent *e)
 	if (m_config.showMargins) {
 		uint position = fontMetrics().width(' ') * m_config.marginsWidth;
 		QPainter p(viewport());
+		QPen     pen = p.pen();
+		QColor   c = pen.color();
+		c.setAlpha(64);
+		pen.setColor(c);
+		p.setPen(pen);
 		p.drawLine(position,0,position,viewport()->height());
 	}
 	QPlainTextEdit::paintEvent(e);
