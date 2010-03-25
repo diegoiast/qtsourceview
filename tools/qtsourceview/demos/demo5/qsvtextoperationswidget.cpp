@@ -145,7 +145,7 @@ bool	 QsvTextOperationsWidget::eventFilter(QObject *obj, QEvent *event)
 			
 		case Qt::Key_Enter:
 		case Qt::Key_Return:
-			if (m_search->isVisible()){
+			if (m_search && m_search->isVisible()){
 				if (keyEvent->modifiers().testFlag(Qt::ControlModifier) ||
 				    keyEvent->modifiers().testFlag(Qt::AltModifier) ||
 				    keyEvent->modifiers().testFlag(Qt::ShiftModifier) )
