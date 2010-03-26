@@ -9,3 +9,5 @@ HEADERS += qsvtextedit.h \
 FORMS += searchform.ui \
     replaceform.ui \
     bannermessage.ui
+RESOURCES += demo5.qrc
+OTHER_FILES += readme.txt

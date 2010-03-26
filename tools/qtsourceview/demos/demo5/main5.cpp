@@ -39,8 +39,14 @@ public:
 		
 		if (!file.isEmpty())
 			loadFile(file);
-		else
+		else {
 			setWindowTitle("QtSourceView demo5");
+			QFile f(":/qedit/readme.txt");
+			if (!f.open(QIODevice::ReadOnly | QIODevice::Text))
+				return;
+			e->setPlainText(f.readAll());
+			e->removeModifications();
+		}
 
 #if 0
 		// tests for defaults
