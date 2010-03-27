@@ -16,7 +16,6 @@ class QTextCursor;
 #include <QTimer>
 
 class QWidget;
-class QTextDocument;
 class QLineEdit;
 
 namespace Ui{
@@ -36,9 +35,11 @@ public:
 	void initReplaceWidget();
 
 	QFlags<QTextDocument::FindFlag> getSearchFlags();
+	QFlags<QTextDocument::FindFlag> getReplaceFlags();
 
 	virtual QTextCursor getTextCursor();
 	virtual void setTextCursor(QTextCursor c);
+        virtual QTextDocument* getTextDocument();
 
 public slots:
 	void showSearch();
@@ -46,6 +47,8 @@ public slots:
 	void showBottomWidget(QWidget* w=NULL);
 	void on_searchText_modified(QString s);
 	void on_replaceText_modified(QString s);
+	void on_replaceOldText_returnPressed();
+	void on_replaceAll_clicked();
 	void searchNext();
 	void searchPrevious();
 	void searchPrev(){ searchPrevious(); };
@@ -59,7 +62,7 @@ protected:
 	bool eventFilter(QObject *obj, QEvent *event);
 
 private:
-	bool issue_search( const QString &text, QTextCursor newCursor, QFlags<QTextDocument::FindFlag> findOptions, QLineEdit *l );
+	bool issue_search( const QString &text, QTextCursor newCursor, QFlags<QTextDocument::FindFlag> findOptions, QLineEdit *l, bool moveCursor );
 
 	QTextCursor m_searchCursor;
 	QTextDocument *m_document;

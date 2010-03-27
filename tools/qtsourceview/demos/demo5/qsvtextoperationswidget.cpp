@@ -10,6 +10,7 @@
 #include <QPushButton>
 #include <QPlainTextEdit>
 #include <QTextDocument>
+#include <QMessageBox>
 
 #include <QDebug>
 
@@ -17,10 +18,12 @@ QsvTextOperationsWidget::QsvTextOperationsWidget( QWidget *parent )
 	: QObject(parent)
 {
 	setObjectName("QsvTextOperationWidget");
-	m_gotoLine = NULL;
-	m_search   = NULL;
-	m_replace  = NULL;
-	m_document = NULL;
+	m_gotoLine    = NULL;
+	m_search      = NULL;
+	m_replace     = NULL;
+	m_document    = NULL;
+	searchFormUi  = NULL;
+	replaceFormUi = NULL;
 	searchFoundColor	= QColor( "#DDDDFF" ); //QColor::fromRgb( 220, 220, 255)
 	searchNotFoundColor	= QColor( "#FFAAAA" ); //QColor::fromRgb( 255, 102, 102) "#FF6666"
 	
@@ -93,7 +96,8 @@ void	QsvTextOperationsWidget::searchNext()
 	issue_search( searchFormUi->searchText->text(), 
 		getTextCursor(), 
 		getSearchFlags() & !QTextDocument::FindBackward, 
-		searchFormUi->searchText 
+		searchFormUi->searchText,
+		true
 	);
 }
 
@@ -102,7 +106,8 @@ void	QsvTextOperationsWidget::searchPrevious()
 	issue_search( searchFormUi->searchText->text(), 
 		getTextCursor(), 
 		getSearchFlags() | QTextDocument::FindBackward, 
-		searchFormUi->searchText 
+		searchFormUi->searchText,
+		true
 	);
 }
 
@@ -113,12 +118,22 @@ void	QsvTextOperationsWidget::adjustBottomWidget()
 
 void	 QsvTextOperationsWidget::updateSearchInput()
 {
-	issue_search(searchFormUi->searchText->text(), m_searchCursor, getSearchFlags(), searchFormUi->searchText);
+	issue_search(searchFormUi->searchText->text(),
+		m_searchCursor,
+		getSearchFlags(),
+		searchFormUi->searchText,
+		true
+	);
 }
 
 void	 QsvTextOperationsWidget::updateReplaceInput()
 {
-	issue_search(replaceFormUi->findText->text(), m_searchCursor, getSearchFlags(), replaceFormUi->findText);
+	issue_search(replaceFormUi->findText->text(),
+		m_searchCursor,
+		getReplaceFlags(),
+		replaceFormUi->findText,
+		true
+	);
 }
 
 bool	 QsvTextOperationsWidget::eventFilter(QObject *obj, QEvent *event)
@@ -153,6 +168,14 @@ bool	 QsvTextOperationsWidget::eventFilter(QObject *obj, QEvent *event)
 				else
 					searchNext();
 				return true;
+			} else if (m_replace && m_replace->isVisible()){
+				if (keyEvent->modifiers().testFlag(Qt::ControlModifier) ||
+				    keyEvent->modifiers().testFlag(Qt::AltModifier) ||
+				    keyEvent->modifiers().testFlag(Qt::ShiftModifier) )
+					on_replaceAll_clicked();
+				else
+					on_replaceOldText_returnPressed();
+				return true;
 			}
 			
 			// TODO replace, goto line
@@ -169,10 +192,14 @@ bool	 QsvTextOperationsWidget::eventFilter(QObject *obj, QEvent *event)
 					m_replace->focusWidget()->previousInFocusChain()->setFocus();
 				*/
 				// Instead - cycle between those two input lines. IMHO good enough
-				if (replaceFormUi->replaceText->hasFocus())
+				if (replaceFormUi->replaceText->hasFocus()){
 					replaceFormUi->findText->setFocus();
-				else
+					replaceFormUi->findText->selectAll();
+				}
+				else{
 					replaceFormUi->replaceText->setFocus();
+					replaceFormUi->replaceText->selectAll();
+				}
 				return true;
 			}
 			break;
@@ -194,6 +221,20 @@ QFlags<QTextDocument::FindFlag> QsvTextOperationsWidget::getSearchFlags()
 	if (searchFormUi->caseSensitiveCheckBox->isChecked())
 		f = f | QTextDocument::FindCaseSensitively;
 	if (searchFormUi->wholeWorldsCheckbox->isChecked())
+		f = f | QTextDocument::FindWholeWords;
+	return f;
+}
+
+QFlags<QTextDocument::FindFlag> QsvTextOperationsWidget::getReplaceFlags()
+{
+	QFlags<QTextDocument::FindFlag> f;
+	if (!replaceFormUi){
+		qDebug("%s:%d - replaceFormUi not available, memory problems?", __FILE__, __LINE__ );
+		return f;
+	}
+	if (replaceFormUi->caseCheckBox->isChecked())
+		f = f | QTextDocument::FindCaseSensitively;
+	if (replaceFormUi->wholeWordsCheckBox->isChecked())
 		f = f | QTextDocument::FindWholeWords;
 	return f;
 }
@@ -226,6 +267,20 @@ void	QsvTextOperationsWidget::setTextCursor(QTextCursor c)
 	}
 }
 
+QTextDocument* QsvTextOperationsWidget::getTextDocument()
+{
+	QTextEdit *t = qobject_cast<QTextEdit*>(parent());
+	if (t) {
+		return t->document();
+	} else {
+		QPlainTextEdit *pt = qobject_cast<QPlainTextEdit*>(parent());
+		if (pt) {
+			return pt->document();
+		}
+	}
+	return NULL;
+}
+
 void QsvTextOperationsWidget::showSearch()
 {
 	if (!m_search)
@@ -247,6 +302,87 @@ void QsvTextOperationsWidget::showSearch()
 	showBottomWidget(m_search);
 }
 
+void	QsvTextOperationsWidget::on_replaceOldText_returnPressed()
+{
+	if (QApplication::keyboardModifiers().testFlag(Qt::ControlModifier) ||
+	    QApplication::keyboardModifiers().testFlag(Qt::AltModifier) ||
+	    QApplication::keyboardModifiers().testFlag(Qt::ShiftModifier) ) {
+		on_replaceAll_clicked();
+		showReplace();
+		return;
+	}
+
+	QTextCursor c = m_searchCursor;
+	QTextDocument *doc = getTextDocument();
+	if (!doc){
+		qDebug("%s:%d - no document found, using a wrong class? wrong parent?", __FILE__,__LINE__);
+		return;
+	}
+	c = doc->find( replaceFormUi->findText->text(), c, getReplaceFlags() );
+	if (c.isNull())
+		return;
+
+	int start = c.selectionStart();
+	int end   = c.selectionEnd();
+	c.beginEditBlock();
+	c.deleteChar();
+	c.insertText( replaceFormUi->replaceText->text() );
+	c.setPosition(start,QTextCursor::KeepAnchor);
+	c.setPosition(end  ,QTextCursor::MoveAnchor);
+	c.endEditBlock();
+	setTextCursor( c );
+
+	// is there any other apperance of this text?
+	m_searchCursor = c;
+	updateReplaceInput();
+}
+
+void	QsvTextOperationsWidget::on_replaceAll_clicked()
+{
+	// WHY NOT HIDING THE WIDGET?
+	// it seems that if you hide the widget, when the replace all action
+	// is triggered by pressing control+enter on the replace widget
+	// eventually an "enter event" is sent to the text eidtor.
+	// the work around is to update the transparency of the widget, to let the user
+	// see the text bellow the widget
+
+	//showReplaceWidget();
+	m_replace->hide();
+
+	int replaceCount = 0;
+	//        replaceWidget->setWidgetTransparency( 0.2 );
+	QTextCursor c = getTextCursor();
+	c = getTextDocument()->find( replaceFormUi->replaceText->text(), c, getReplaceFlags() );
+
+	while (!c.isNull())
+	{
+		setTextCursor( c );
+		QMessageBox::StandardButton button = QMessageBox::question( qobject_cast<QWidget*>(parent()), tr("Replace all"), tr("Replace this text?"),
+			QMessageBox::Yes | QMessageBox::Ignore | QMessageBox::Cancel );
+
+		if (button == QMessageBox::Cancel)
+		{
+			break;
+
+		}
+		else if (button == QMessageBox::Yes)
+		{
+			c.beginEditBlock();
+			c.deleteChar();
+			c.insertText( replaceFormUi->replaceText->text() );
+			c.endEditBlock();
+			setTextCursor( c );
+			replaceCount++;
+		}
+
+		c = getTextDocument()->find( replaceFormUi->replaceText->text(), c, getReplaceFlags() );
+	}
+	// replaceWidget->setWidgetTransparency( 0.8 );
+	m_replace->show();
+
+	QMessageBox::information( 0, tr("Replace all"), tr("%1 replacement(s) made").arg(replaceCount) );
+}
+
 void	QsvTextOperationsWidget::showReplace()
 {
 	if (!m_replace)
@@ -263,6 +399,7 @@ void	QsvTextOperationsWidget::showReplace()
 	}
 
 	replaceFormUi->findText->setFocus();
+	replaceFormUi->findText->selectAll();
 	showBottomWidget(m_replace);
 }
 
@@ -302,6 +439,9 @@ void QsvTextOperationsWidget::on_searchText_modified(QString s)
 		m_searchTimer.stop();
 	m_searchTimer.start();
 	Q_UNUSED(s);
+
+	//this will triggered by the timer
+	//updateSearchInput();
 }
 
 void	QsvTextOperationsWidget::on_replaceText_modified(QString s)
@@ -310,9 +450,12 @@ void	QsvTextOperationsWidget::on_replaceText_modified(QString s)
 		m_replaceTimer.stop();
 	m_replaceTimer.start();
 	Q_UNUSED(s);
+
+	//this will be triggered by the timer
+	//updateReplaceInput();
 }
 
-bool	QsvTextOperationsWidget::issue_search( const QString &text, QTextCursor newCursor, QFlags<QTextDocument::FindFlag> findOptions, QLineEdit *l )
+bool	QsvTextOperationsWidget::issue_search( const QString &text, QTextCursor newCursor, QFlags<QTextDocument::FindFlag> findOptions, QLineEdit *l, bool moveCursor )
 {
 	QTextCursor c = m_document->find( text, newCursor, findOptions );
 	bool found = ! c.isNull();
@@ -337,6 +480,13 @@ bool	QsvTextOperationsWidget::issue_search( const QString &text, QTextCursor new
 		c =  m_searchCursor;
 	}
 	l->setPalette(p);
-	setTextCursor( c );
+
+	if (moveCursor){
+		int start = c.selectionStart();
+		int end   = c.selectionEnd();
+		c.setPosition(end  ,QTextCursor::MoveAnchor);
+		c.setPosition(start,QTextCursor::KeepAnchor);
+		setTextCursor(c);
+	}
 	return found;
 }

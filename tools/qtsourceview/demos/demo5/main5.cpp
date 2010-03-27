@@ -49,6 +49,7 @@ public:
 		}
 
 #if 0
+		e->setMarkCurrentLine(false);
 		// tests for defaults
 		e->setShowLineNumbers(true);
 		e->setShowMargins(true);
