@@ -93,6 +93,8 @@ void QsvTextOperationsWidget::initReplaceWidget()
 
 void	QsvTextOperationsWidget::searchNext()
 {
+	if (!searchFormUi)
+		return;
 	issue_search( searchFormUi->searchText->text(), 
 		getTextCursor(), 
 		getSearchFlags() & !QTextDocument::FindBackward, 
@@ -103,7 +105,9 @@ void	QsvTextOperationsWidget::searchNext()
 
 void	QsvTextOperationsWidget::searchPrevious()
 {
-	issue_search( searchFormUi->searchText->text(), 
+	if (!searchFormUi)
+	return;
+	issue_search( searchFormUi->searchText->text(),
 		getTextCursor(), 
 		getSearchFlags() | QTextDocument::FindBackward, 
 		searchFormUi->searchText,
@@ -118,6 +122,8 @@ void	QsvTextOperationsWidget::adjustBottomWidget()
 
 void	 QsvTextOperationsWidget::updateSearchInput()
 {
+	if (!searchFormUi)
+		return;
 	issue_search(searchFormUi->searchText->text(),
 		m_searchCursor,
 		getSearchFlags(),
@@ -128,6 +134,8 @@ void	 QsvTextOperationsWidget::updateSearchInput()
 
 void	 QsvTextOperationsWidget::updateReplaceInput()
 {
+	if (!replaceFormUi)
+		return;
 	issue_search(replaceFormUi->findText->text(),
 		m_searchCursor,
 		getReplaceFlags(),
