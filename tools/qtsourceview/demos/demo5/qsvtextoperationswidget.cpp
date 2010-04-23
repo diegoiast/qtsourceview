@@ -406,6 +406,8 @@ void	QsvTextOperationsWidget::showReplace()
 		return;
 	}
 
+	if (m_searchCursor.isNull())
+		m_searchCursor = getTextCursor();
 	replaceFormUi->findText->setFocus();
 	replaceFormUi->findText->selectAll();
 	showBottomWidget(m_replace);
