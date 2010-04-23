@@ -83,12 +83,15 @@ public:
 	QTextCursor getCurrentTextCursor();
 	void paintPanel(QPaintEvent *e);
 	
-	void newDocument();
-	int loadFile(QString s);
+	int loadFile(const QString &fileName);
+	int saveFile(const QString &fileName);
 	void displayBannerMessage(QString message,int time=15);
 	void hideBannerMessage();
 	
 public slots:
+	void newDocument();
+	int saveFile();
+	int saveFileAs();
 	void smartHome();
 	void smartEnd();
 	void transformBlockToUpper();

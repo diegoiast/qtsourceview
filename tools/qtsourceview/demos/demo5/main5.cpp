@@ -20,8 +20,12 @@ public:
 		QsvTextOperationsWidget *textOpetations = new QsvTextOperationsWidget(e);
 	
 		QToolBar *b = addToolBar( "" );
+		b->addAction( tr("&New"), e, SLOT(newDocument()))
+		 ->setShortcut(QKeySequence("Ctrl+N"));
 		b->addAction( tr("&Open"), this, SLOT(loadFile()))
 		 ->setShortcut(QKeySequence("Ctrl+O"));
+		b->addAction( tr("&Save"), e, SLOT(saveFile()))
+		 ->setShortcut(QKeySequence("Ctrl+S"));
 		b->addAction( tr("&Find"), textOpetations, SLOT(showSearch()))
 		 ->setShortcut(QKeySequence("Ctrl+F"));
 		b->addAction( tr("&Replace"), textOpetations, SLOT(showReplace()))
@@ -63,8 +67,9 @@ public:
 public slots:
 	void loadFile( QString filename ="" )
 	{
+		const QString dir;
 		if (filename.isEmpty()) {
-			filename = QFileDialog::getOpenFileName(this,tr("Load file"));
+			filename = QFileDialog::getOpenFileName(this,tr("Load file"),dir);
 			if (filename.isEmpty())
 				return;
 		}

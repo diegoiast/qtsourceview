@@ -11,6 +11,7 @@
 #include <QDebug>
 #include <QLabel>
 #include <QFileSystemWatcher>
+#include <QFileDialog>
 
 #include "qsvtextedit.h"
 #include "qsvsyntaxhighlighterbase.h"
@@ -270,21 +271,21 @@ void	QsvTextEdit::newDocument()
 	loadFile("");
 }
 
-int	QsvTextEdit::loadFile(QString s)
+int	QsvTextEdit::loadFile(const QString &fileName)
 {
 	// clear older watches, and add a new one
 	QStringList sl = m_fileSystemWatcher->directories();
 	if (!sl.isEmpty())
-		m_fileSystemWatcher->removePaths( sl );
+		m_fileSystemWatcher->removePaths(sl);
 
-	bool m = m_config.modificationsLookupEnabled;
+	bool modificationsEnabledState = getModificationsLookupEnabled();
 	setModificationsLookupEnabled(false);
 	hideBannerMessage();
 	this->setReadOnly(false);
 	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 	QApplication::processEvents();
-	if (!s.isEmpty()) {
-		QFile file(s);
+	if (!fileName.isEmpty()) {
+		QFile file(fileName);
 		QFileInfo fileInfo(file);
 		
 		if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
@@ -308,12 +309,70 @@ int	QsvTextEdit::loadFile(QString s)
 		}
 	} else {
 		m_fileName.clear();
-		setPlainText("");
+		clear();
 	}
 	
-	setModificationsLookupEnabled(m);
+	setModificationsLookupEnabled(modificationsEnabledState);
 	removeModifications();
 
+	QApplication::restoreOverrideCursor();
+	return 0;
+}
+
+int	QsvTextEdit::saveFile(const QString &fileName)
+{
+	QStringList sl = m_fileSystemWatcher->directories();
+	if (!sl.isEmpty())
+		m_fileSystemWatcher->removePaths(sl);
+	bool modificationsEnabledState = getModificationsLookupEnabled();
+	setModificationsLookupEnabled(false);
+	hideBannerMessage();
+	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+	QApplication::processEvents();
+
+	QFile file(fileName);
+	if (!file.open(QIODevice::WriteOnly))
+		return false;
+
+	QTextCodec *c = NULL;
+	//	QTextCodec *c = textCodec;
+	if (c == NULL)
+		c = QTextCodec::codecForLocale();
+
+	QTextStream textStream(&file);
+	textStream.setCodec(c);
+
+	QTextBlock block = document()->begin();
+	while(block.isValid()) {
+//		if (endOfLine==KeepOldStyle){
+			textStream << block.text();
+			// TODO WTF? - which type the file originally had?
+			textStream << "\n";
+/*		} else {
+			QString s = block.text();
+			int i = s.length();
+
+			if (!s.isEmpty()) if ((s[i-1] == '\n') || (s[i-1] == '\r'))
+				s = s.left( i-1 );
+			if (!s.isEmpty()) if ((s[i-1] == '\n') || (s[i-1] == '\r'))
+				s = s.left( i-1 );
+			textStream << s;
+			switch (endOfLine) {
+				case DOS:	textStream << "\r\n"; break;
+				case Unix: 	textStream << "\n"; break;
+				case Mac:	textStream << "\r"; break;
+				default:	return 0; // just to keep gcc happy
+			}
+		}*/
+		block = block.next();
+	}
+	file.close();
+
+	m_fileName = fileName;
+	removeModifications();
+	setModificationsLookupEnabled(modificationsEnabledState);
+//	m_fileSystemWatcher->addPath(m_fileName);
+	
 	QApplication::restoreOverrideCursor();
 	return 0;
 }
@@ -336,6 +395,23 @@ void	QsvTextEdit::hideBannerMessage()
 	// TODO: find WTF this is happening
 	if (m_topWidget == m_banner)
 		m_topWidget = NULL;
+}
+
+int	QsvTextEdit::saveFile()
+{
+	if (m_fileName.isEmpty()){
+		return saveFileAs();
+	} else
+		return saveFile(m_fileName);
+}
+
+int	QsvTextEdit::saveFileAs()
+{
+	const QString lastDirectory;
+	QString s = QFileDialog::getSaveFileName(this,tr("Save file"),lastDirectory);
+	if (s.isEmpty())
+		return false;
+	return saveFile(s);
 }
 
 void	QsvTextEdit::smartHome()
