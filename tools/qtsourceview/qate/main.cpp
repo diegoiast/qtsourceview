@@ -10,34 +10,29 @@
 #include "highlighterexception.h"
 #include "qate/highlightdefinitionhandler-v2.h"
 
-
+#define LANGUAGE  "/usr/share/kde4/apps/katepart/syntax/sql.xml"
+#define TEST_FILE "../tests/highlight.pas"
 void load_text(QString fe, QPlainTextEdit *te );
 QSharedPointer<TextEditor::Internal::HighlightDefinition> get_highlighter_definition(QString definitionFileName);
 
 int main( int argc, char* argv[] )
 {
 	QApplication app( argc, argv );
-	QString         definitionFileName = "/usr/share/kde4/apps/katepart/syntax/sql.xml";
+	QString         definitionFileName = LANGUAGE;
 	QSharedPointer<TextEditor::Internal::HighlightDefinition> def = get_highlighter_definition(definitionFileName);
 	
 	QMainWindow    *mw = new QMainWindow;
 	QPlainTextEdit *te = new QPlainTextEdit(mw);
 	TextEditor::Internal::Highlighter *hl = new TextEditor::Internal::Highlighter;
+	Formats::ApplyToHighlighter(hl);
 
-	hl->configureFormat(TextEditor::Internal::Highlighter::Normal,   Formats::instance().charFormat() );
-	hl->configureFormat(TextEditor::Internal::Highlighter::Keyword,  Formats::instance().keywordFormat() );
-	hl->configureFormat(TextEditor::Internal::Highlighter::Decimal,  Formats::instance().decimalFormat() );
-	hl->configureFormat(TextEditor::Internal::Highlighter::Comment,  Formats::instance().commentFormat() );
-	hl->configureFormat(TextEditor::Internal::Highlighter::Function, Formats::instance().functionFormat() );
-
+	te->setFont( QFont("Courier new",10) );
 	hl->setParent(te);
 	hl->setDocument(te->document());
 	hl->setDefaultContext(def->initialContext());
 	hl->rehighlight();
 
-
-//	load_text(__FILE__, te);
-	load_text("/home/elcuco/test.sql", te);
+	load_text(TEST_FILE, te);
 	mw->setWindowTitle("Kate syntax highter test");
 	mw->setCentralWidget(te);
 	mw->show();

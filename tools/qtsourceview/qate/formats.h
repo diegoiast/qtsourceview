@@ -35,6 +35,12 @@
 
 #include <QtGui/QTextCharFormat>
 
+namespace TextEditor{
+	namespace Internal {
+		class Highlighter;
+	}
+}
+
 class Formats
 {
 public:
@@ -55,6 +61,7 @@ public:
     const QTextCharFormat &othersFormat() const { return m_othersFormat; }
 
     QString name(const QTextCharFormat &format) const;
+	static void ApplyToHighlighter(TextEditor::Internal::Highlighter *hl);
 
 private:
     Formats();

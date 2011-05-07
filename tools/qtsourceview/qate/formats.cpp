@@ -33,25 +33,40 @@
 #include "formats.h"
 
 #include <QtCore/Qt>
+#include "highlighter.h"
 
 Formats::Formats()
 {
-    m_keywordFormat.setForeground(Qt::blue);
-    m_keywordFormat.setFontWeight(75);
+	m_keywordFormat.setForeground(Qt::black);
+	m_keywordFormat.setFontWeight(75);
+	
+	m_dataTypeFormat.setForeground(Qt::blue);
+	
+	m_decimalFormat.setForeground(Qt::darkYellow);
 
-    m_dataTypeFormat.setForeground(Qt::cyan);
-    m_decimalFormat.setForeground(Qt::green);
-
-    m_baseNFormat.setForeground(Qt::red);
-    m_floatFormat.setForeground(Qt::green);
-    m_charFormat.setForeground(Qt::blue);
-    m_stringFormat.setForeground(Qt::cyan);
-    m_commentFormat.setForeground(Qt::magenta);
-    m_alertFormat.setForeground(Qt::yellow);
-    m_errorFormat.setForeground(Qt::darkRed);
-    m_functionFormat.setForeground(Qt::darkGreen);
-    m_regionMarkerFormat.setForeground(Qt::darkBlue);
-    m_othersFormat.setForeground(Qt::darkCyan);
+	m_baseNFormat.setForeground(Qt::darkYellow);
+	
+	m_floatFormat.setForeground(Qt::darkYellow);
+	
+	m_charFormat.setForeground(Qt::red);
+	
+	m_stringFormat.setForeground(Qt::red);
+	
+	m_commentFormat.setForeground(Qt::gray);
+	
+	m_alertFormat.setForeground(Qt::red);
+	m_alertFormat.setFontUnderline(true);
+	m_alertFormat.setUnderlineStyle(QTextCharFormat::WaveUnderline);
+	
+	m_errorFormat.setForeground(Qt::red);
+	m_errorFormat.setFontUnderline(true);
+	m_errorFormat.setUnderlineStyle(QTextCharFormat::DashUnderline);
+	
+	m_functionFormat.setForeground(Qt::cyan);
+	
+	m_regionMarkerFormat.setForeground(Qt::green);
+	
+	//m_othersFormat;
 }
 
 Formats &Formats::instance()
@@ -93,3 +108,24 @@ QString Formats::name(const QTextCharFormat &format) const
     else
         return "Unidentified format";
 }
+
+using namespace TextEditor::Internal;
+void Formats::ApplyToHighlighter(TextEditor::Internal::Highlighter *hl)
+{
+//	hl->configureFormat(Highlighter::Normal,           instance().m_othersFormat       );
+//	hl->configureFormat(Highlighter::VisualWhitespace, instance().m_othersFormat       );
+	hl->configureFormat(Highlighter::Keyword,          instance().m_keywordFormat      );
+	hl->configureFormat(Highlighter::DataType,         instance().m_dataTypeFormat     );
+	hl->configureFormat(Highlighter::Decimal,          instance().m_decimalFormat      );
+	hl->configureFormat(Highlighter::BaseN,            instance().m_baseNFormat        );
+	hl->configureFormat(Highlighter::Float,            instance().m_floatFormat        );
+	hl->configureFormat(Highlighter::Char,             instance().m_charFormat         );
+	hl->configureFormat(Highlighter::String,           instance().m_stringFormat       );
+	hl->configureFormat(Highlighter::Comment,          instance().m_commentFormat      );
+	hl->configureFormat(Highlighter::Alert,            instance().m_alertFormat        );
+	hl->configureFormat(Highlighter::Error,            instance().m_errorFormat        );
+	hl->configureFormat(Highlighter::Function,         instance().m_functionFormat     );
+	hl->configureFormat(Highlighter::RegionMarker,     instance().m_regionMarkerFormat );
+	hl->configureFormat(Highlighter::Others,           instance().m_othersFormat       );
+}
+

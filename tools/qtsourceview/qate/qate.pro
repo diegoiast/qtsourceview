@@ -50,7 +50,7 @@ HEADERS += \
 	formats.h 
 #    highlightermock.h
 
-INCLUDEPATH += $$EDITOR_DIR $$COREPLUGIN_DIR
+INCLUDEPATH += $$EDITOR_DIR $$COREPLUGIN_DIR qate
 
 
 #	qate/highlightdefinitionhanlder-v2.h \
