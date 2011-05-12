@@ -1,14 +1,12 @@
-QTCREATR_DIR=/home/elcuco/src/gitorious/qt-creator
-
 !exists(qate.pri){
 	message("Please create a file called qate.pri, containing:")
-	message("QTCREATR_DIR=...")
+	message("QTCREATOR_DIR=...")
 	error("configuration failed")
 }
 include(qate.pri)
 
-EDITOR_DIR = $$QTCREATR_DIR/src/plugins/texteditor/generichighlighter
-COREPLUGIN_DIR = $$QTCREATR_DIR/src/plugins/coreplugin
+EDITOR_DIR = $$QTCREATOR_DIR/src/plugins/texteditor/generichighlighter
+COREPLUGIN_DIR = $$QTCREATOR_DIR/src/plugins/coreplugin
 
 QT += xml
 TARGET=qate-demo
