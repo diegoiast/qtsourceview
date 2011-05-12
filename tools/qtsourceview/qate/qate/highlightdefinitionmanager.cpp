@@ -29,7 +29,7 @@ bool HighlightDefinitionManager::isBuildingDefinition(const QString &externalNam
 
 QSharedPointer<HighlightDefinition> HighlightDefinitionManager::definition(const QString &externalName)
 {
-	
+	return QSharedPointer<HighlightDefinition>();
 }
 
 HighlightDefinitionManager *HighlightDefinitionManager::instance()
