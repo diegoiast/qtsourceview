@@ -16,6 +16,11 @@ Begin
 	*)
 	WriTe('B');
 	write('y');
+
+        // also support hightlited words inside comments
+        // fixme
+        // todo
+        // ###
 	Write('r');
 	
 	// single line comment

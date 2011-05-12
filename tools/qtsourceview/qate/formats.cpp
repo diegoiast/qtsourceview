@@ -66,7 +66,7 @@ Formats::Formats()
 	
 	m_regionMarkerFormat.setForeground(Qt::green);
 	
-	//m_othersFormat;
+        m_othersFormat.setForeground(Qt::darkBlue);
 }
 
 Formats &Formats::instance()

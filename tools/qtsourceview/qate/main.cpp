@@ -10,8 +10,13 @@
 #include "highlighterexception.h"
 #include "qate/highlightdefinitionhandler-v2.h"
 
-#define LANGUAGE  "/usr/share/kde4/apps/katepart/syntax/sql.xml"
-#define TEST_FILE "../tests/highlight.pas"
+//#define LANGUAGE  "/usr/share/kde4/apps/katepart/syntax/d.xml"
+//#define TEST_FILE "../tests/highlight.d"
+
+#define LANGUAGE  "/usr/share/kde4/apps/katepart/syntax/cpp.xml"
+#define TEST_FILE __FILE__
+
+
 void load_text(QString fe, QPlainTextEdit *te );
 QSharedPointer<TextEditor::Internal::HighlightDefinition> get_highlighter_definition(QString definitionFileName);
 
@@ -19,18 +24,17 @@ int main( int argc, char* argv[] )
 {
 	QApplication app( argc, argv );
 	QString         definitionFileName = LANGUAGE;
-	QSharedPointer<TextEditor::Internal::HighlightDefinition> def = get_highlighter_definition(definitionFileName);
-	
 	QMainWindow    *mw = new QMainWindow;
 	QPlainTextEdit *te = new QPlainTextEdit(mw);
-	TextEditor::Internal::Highlighter *hl = new TextEditor::Internal::Highlighter;
+
+        TextEditor::Internal::Highlighter                         *hl     = new TextEditor::Internal::Highlighter(te->document());
+        QSharedPointer<TextEditor::Internal::HighlightDefinition> def     = get_highlighter_definition(definitionFileName);
+        QSharedPointer<TextEditor::Internal::Context>             context = def->initialContext();
+
 	Formats::ApplyToHighlighter(hl);
 
 	te->setFont( QFont("Courier new",10) );
-	hl->setParent(te);
-	hl->setDocument(te->document());
-	hl->setDefaultContext(def->initialContext());
-	hl->rehighlight();
+        hl->setDefaultContext(context);
 
 	load_text(TEST_FILE, te);
 	mw->setWindowTitle("Kate syntax highter test");
