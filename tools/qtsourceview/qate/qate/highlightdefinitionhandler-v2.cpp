@@ -41,8 +41,9 @@
 
 #include <QtCore/QLatin1String>
 
-using namespace TextEditor;
-using namespace Internal;
+using namespace Qate;
+using namespace TextEditor::Internal;
+
 
 namespace {
     static const QLatin1String kName("name");
@@ -111,28 +112,28 @@ namespace {
     static const QLatin1String kDoubleHash("##");
 }
 
-HighlightDefinitionHandlerV2::
-HighlightDefinitionHandlerV2(const QSharedPointer<HighlightDefinition> &definition) :
+HighlightDefinitionHandler::
+HighlightDefinitionHandler(const QSharedPointer<HighlightDefinition> &definition) :
     m_definition(definition),
     m_processingKeyword(false),
     m_initialContext(true)
 {}
 
-HighlightDefinitionHandlerV2::~HighlightDefinitionHandlerV2()
+HighlightDefinitionHandler::~HighlightDefinitionHandler()
 {}
 
-bool HighlightDefinitionHandlerV2::startDocument()
+bool HighlightDefinitionHandler::startDocument()
 {
     return true;
 }
 
-bool HighlightDefinitionHandlerV2::endDocument()
+bool HighlightDefinitionHandler::endDocument()
 {
     processIncludeRules();
     return true;
 }
 
-bool HighlightDefinitionHandlerV2::startElement(const QString &,
+bool HighlightDefinitionHandler::startElement(const QString &,
                                               const QString &,
                                               const QString &qName,
                                               const QXmlAttributes &atts)
@@ -190,7 +191,7 @@ bool HighlightDefinitionHandlerV2::startElement(const QString &,
     return true;
 }
 
-bool HighlightDefinitionHandlerV2::endElement(const QString &, const QString &, const QString &qName)
+bool HighlightDefinitionHandler::endElement(const QString &, const QString &, const QString &qName)
 {
     if (qName == kItem) {
         m_currentList->addKeyword(m_currentKeyword.trimmed());
@@ -206,7 +207,7 @@ bool HighlightDefinitionHandlerV2::endElement(const QString &, const QString &, 
     return true;
 }
 
-bool HighlightDefinitionHandlerV2::characters(const QString& ch)
+bool HighlightDefinitionHandler::characters(const QString& ch)
 {
     // Character data of an element may be reported in more than one chunk.
     if (m_processingKeyword)
@@ -215,18 +216,18 @@ bool HighlightDefinitionHandlerV2::characters(const QString& ch)
     return true;
 }
 
-void HighlightDefinitionHandlerV2::listElementStarted(const QXmlAttributes &atts)
+void HighlightDefinitionHandler::listElementStarted(const QXmlAttributes &atts)
 {
     m_currentList = m_definition->createKeywordList(atts.value(kName));
 }
 
-void HighlightDefinitionHandlerV2::itemElementStarted()
+void HighlightDefinitionHandler::itemElementStarted()
 {
     m_currentKeyword.clear();
     m_processingKeyword = true;
 }
 
-void HighlightDefinitionHandlerV2::contextElementStarted(const QXmlAttributes &atts)
+void HighlightDefinitionHandler::contextElementStarted(const QXmlAttributes &atts)
 {
     m_currentContext = m_definition->createContext(atts.value(kName), m_initialContext);
     m_currentContext->setDefinition(m_definition);
@@ -240,7 +241,7 @@ void HighlightDefinitionHandlerV2::contextElementStarted(const QXmlAttributes &a
     m_initialContext = false;
 }
 
-void HighlightDefinitionHandlerV2::ruleElementStarted(const QXmlAttributes &atts,
+void HighlightDefinitionHandler::ruleElementStarted(const QXmlAttributes &atts,
                                                     const QSharedPointer<Rule> &rule)
 {
     // The definition of a rule is not necessarily the same of its enclosing context because of
@@ -262,7 +263,7 @@ void HighlightDefinitionHandlerV2::ruleElementStarted(const QXmlAttributes &atts
     m_currentRule.push(rule);
 }
 
-void HighlightDefinitionHandlerV2::itemDataElementStarted(const QXmlAttributes &atts) const
+void HighlightDefinitionHandler::itemDataElementStarted(const QXmlAttributes &atts) const
 {
     QSharedPointer<ItemData> itemData = m_definition->createItemData(atts.value(kName));
     itemData->setStyle(atts.value(kDefStyleNum));
@@ -274,7 +275,7 @@ void HighlightDefinitionHandlerV2::itemDataElementStarted(const QXmlAttributes &
     itemData->setStrikeOut(atts.value(kStrikeout));
 }
 
-void HighlightDefinitionHandlerV2::commentElementStarted(const QXmlAttributes &atts) const
+void HighlightDefinitionHandler::commentElementStarted(const QXmlAttributes &atts) const
 {
     const QString &commentType = atts.value(kName);
     if (commentType.compare(kSingleLine, Qt::CaseInsensitive) == 0) {
@@ -287,7 +288,7 @@ void HighlightDefinitionHandlerV2::commentElementStarted(const QXmlAttributes &a
     }
 }
 
-void HighlightDefinitionHandlerV2::keywordsElementStarted(const QXmlAttributes &atts) const
+void HighlightDefinitionHandler::keywordsElementStarted(const QXmlAttributes &atts) const
 {
     // Global case sensitivity appears last in the document (required by dtd) and is set here.
     m_definition->setKeywordsSensitive(atts.value(kCaseSensitive));
@@ -296,12 +297,12 @@ void HighlightDefinitionHandlerV2::keywordsElementStarted(const QXmlAttributes &
     //@todo: wordWrapDelimiters?
 }
 
-void HighlightDefinitionHandlerV2::foldingElementStarted(const QXmlAttributes &atts) const
+void HighlightDefinitionHandler::foldingElementStarted(const QXmlAttributes &atts) const
 {
     m_definition->setIndentationBasedFolding(atts.value(kIndentationSensitive));
 }
 
-void HighlightDefinitionHandlerV2::detectCharStarted(const QXmlAttributes &atts)
+void HighlightDefinitionHandler::detectCharStarted(const QXmlAttributes &atts)
 {
     DetectCharRule *rule = new DetectCharRule;
     rule->setChar(atts.value(kChar));
@@ -309,7 +310,7 @@ void HighlightDefinitionHandlerV2::detectCharStarted(const QXmlAttributes &atts)
     ruleElementStarted(atts, QSharedPointer<Rule>(rule));
 }
 
-void HighlightDefinitionHandlerV2::detect2CharsStarted(const QXmlAttributes &atts)
+void HighlightDefinitionHandler::detect2CharsStarted(const QXmlAttributes &atts)
 {
     Detect2CharsRule *rule = new Detect2CharsRule;
     rule->setChar(atts.value(kChar));
@@ -318,14 +319,14 @@ void HighlightDefinitionHandlerV2::detect2CharsStarted(const QXmlAttributes &att
     ruleElementStarted(atts, QSharedPointer<Rule>(rule));
 }
 
-void HighlightDefinitionHandlerV2::anyCharStarted(const QXmlAttributes &atts)
+void HighlightDefinitionHandler::anyCharStarted(const QXmlAttributes &atts)
 {
     AnyCharRule *rule = new AnyCharRule;
     rule->setCharacterSet(atts.value(kString));
     ruleElementStarted(atts, QSharedPointer<Rule>(rule));
 }
 
-void HighlightDefinitionHandlerV2::stringDetectedStarted(const QXmlAttributes &atts)
+void HighlightDefinitionHandler::stringDetectedStarted(const QXmlAttributes &atts)
 {
     StringDetectRule *rule = new StringDetectRule;
     rule->setString(atts.value(kString));
@@ -334,7 +335,7 @@ void HighlightDefinitionHandlerV2::stringDetectedStarted(const QXmlAttributes &a
     ruleElementStarted(atts, QSharedPointer<Rule>(rule));
 }
 
-void HighlightDefinitionHandlerV2::regExprStarted(const QXmlAttributes &atts)
+void HighlightDefinitionHandler::regExprStarted(const QXmlAttributes &atts)
 {
     RegExprRule *rule = new RegExprRule;
     rule->setPattern(atts.value(kString));
@@ -344,7 +345,7 @@ void HighlightDefinitionHandlerV2::regExprStarted(const QXmlAttributes &atts)
     ruleElementStarted(atts, QSharedPointer<Rule>(rule));
 }
 
-void HighlightDefinitionHandlerV2::keywordStarted(const QXmlAttributes &atts)
+void HighlightDefinitionHandler::keywordStarted(const QXmlAttributes &atts)
 {
     KeywordRule *rule = new KeywordRule(m_definition);
     rule->setList(atts.value(kString));
@@ -352,37 +353,37 @@ void HighlightDefinitionHandlerV2::keywordStarted(const QXmlAttributes &atts)
     ruleElementStarted(atts, QSharedPointer<Rule>(rule));
 }
 
-void HighlightDefinitionHandlerV2::intStarted(const QXmlAttributes &atts)
+void HighlightDefinitionHandler::intStarted(const QXmlAttributes &atts)
 {    
     ruleElementStarted(atts, QSharedPointer<Rule>(new IntRule));
 }
 
-void HighlightDefinitionHandlerV2::floatStarted(const QXmlAttributes &atts)
+void HighlightDefinitionHandler::floatStarted(const QXmlAttributes &atts)
 {
     ruleElementStarted(atts, QSharedPointer<Rule>(new FloatRule));
 }
 
-void HighlightDefinitionHandlerV2::hlCOctStarted(const QXmlAttributes &atts)
+void HighlightDefinitionHandler::hlCOctStarted(const QXmlAttributes &atts)
 {    
     ruleElementStarted(atts, QSharedPointer<Rule>(new HlCOctRule));
 }
 
-void HighlightDefinitionHandlerV2::hlCHexStarted(const QXmlAttributes &atts)
+void HighlightDefinitionHandler::hlCHexStarted(const QXmlAttributes &atts)
 {    
     ruleElementStarted(atts, QSharedPointer<Rule>(new HlCHexRule));
 }
 
-void HighlightDefinitionHandlerV2::hlCStringCharStarted(const QXmlAttributes &atts)
+void HighlightDefinitionHandler::hlCStringCharStarted(const QXmlAttributes &atts)
 {    
     ruleElementStarted(atts, QSharedPointer<Rule>(new HlCStringCharRule));
 }
 
-void HighlightDefinitionHandlerV2::hlCCharStarted(const QXmlAttributes &atts)
+void HighlightDefinitionHandler::hlCCharStarted(const QXmlAttributes &atts)
 {
     ruleElementStarted(atts, QSharedPointer<Rule>(new HlCCharRule));
 }
 
-void HighlightDefinitionHandlerV2::rangeDetectStarted(const QXmlAttributes &atts)
+void HighlightDefinitionHandler::rangeDetectStarted(const QXmlAttributes &atts)
 {
     RangeDetectRule *rule = new RangeDetectRule;
     rule->setChar(atts.value(kChar));
@@ -390,12 +391,12 @@ void HighlightDefinitionHandlerV2::rangeDetectStarted(const QXmlAttributes &atts
     ruleElementStarted(atts, QSharedPointer<Rule>(rule));
 }
 
-void HighlightDefinitionHandlerV2::lineContinue(const QXmlAttributes &atts)
+void HighlightDefinitionHandler::lineContinue(const QXmlAttributes &atts)
 {    
     ruleElementStarted(atts, QSharedPointer<Rule>(new LineContinueRule));
 }
 
-void HighlightDefinitionHandlerV2::includeRulesStarted(const QXmlAttributes &atts)
+void HighlightDefinitionHandler::includeRulesStarted(const QXmlAttributes &atts)
 {
     // Include rules are treated as instructions for latter processing.
     IncludeRulesInstruction instruction(atts.value(kContext), m_currentContext->rules().size(),
@@ -405,17 +406,17 @@ void HighlightDefinitionHandlerV2::includeRulesStarted(const QXmlAttributes &att
     m_currentContext->addIncludeRulesInstruction(instruction);
 }
 
-void HighlightDefinitionHandlerV2::detectSpacesStarted(const QXmlAttributes &atts)
+void HighlightDefinitionHandler::detectSpacesStarted(const QXmlAttributes &atts)
 {
     ruleElementStarted(atts, QSharedPointer<Rule>(new DetectSpacesRule));
 }
 
-void HighlightDefinitionHandlerV2::detectIdentifier(const QXmlAttributes &atts)
+void HighlightDefinitionHandler::detectIdentifier(const QXmlAttributes &atts)
 {
     ruleElementStarted(atts, QSharedPointer<Rule>(new DetectIdentifierRule));
 }
 
-void HighlightDefinitionHandlerV2::processIncludeRules() const
+void HighlightDefinitionHandler::processIncludeRules() const
 {
     const QHash<QString, QSharedPointer<Context> > &allContexts = m_definition->contexts();
     int i = 0;
@@ -425,7 +426,7 @@ void HighlightDefinitionHandlerV2::processIncludeRules() const
 	}
 }
 
-void HighlightDefinitionHandlerV2::processIncludeRules(const QSharedPointer<Context> &context) const
+void HighlightDefinitionHandler::processIncludeRules(const QSharedPointer<Context> &context) const
 {
     if (context->includeRulesInstructions().isEmpty())
         return;

@@ -1,5 +1,14 @@
-#include "highlightdefinitionmanager.h"
+/*
+ * Qate: This file is part of the QtSourceView/Qate project.
+ *
+ * Parts of this file have been based on the syntax highlighter classes
+ * fount in QtCreator by Nokia.
+ *
+ */
+#include "qate/highlightdefinitionmanager.h"
+#include "qate/highlightdefinitionhandler-v2.h"
 #include "qate/mimedatabase.h"
+#include "highlighterexception.h"
 
 #include <QDir>
 #include <QFileInfo>
@@ -8,6 +17,7 @@
 
 using namespace TextEditor;
 using namespace Internal;
+using namespace Qate;
 
 HighlightDefinitionManager *HighlightDefinitionManager::m_instance = NULL;
 
@@ -27,9 +37,33 @@ bool HighlightDefinitionManager::isBuildingDefinition(const QString &externalNam
 	return false;
 }
 
-QSharedPointer<HighlightDefinition> HighlightDefinitionManager::definition(const QString &externalName)
+// shameslly stollen from QSharedPointer<HighlightDefinition> Manager::definition(const QString &id)
+QSharedPointer<HighlightDefinition> HighlightDefinitionManager::definition(const QString &id)
 {
-	return QSharedPointer<HighlightDefinition>();
+	if (id.isEmpty() || m_definitions.contains(id)) {
+		return QSharedPointer<HighlightDefinition>();
+	}
+
+	QFile definitionFile(id);
+	if (!definitionFile.open(QIODevice::ReadOnly | QIODevice::Text))
+		return QSharedPointer<TextEditor::Internal::HighlightDefinition>();
+
+	QSharedPointer<TextEditor::Internal::HighlightDefinition> definition(new TextEditor::Internal::HighlightDefinition);
+	Qate::HighlightDefinitionHandler handler(definition);
+	QXmlInputSource source(&definitionFile);
+	QXmlSimpleReader reader;
+	reader.setContentHandler(&handler);
+	m_isBuilding.insert(id);
+	try {
+		reader.parse(source);
+	} catch (TextEditor::Internal::HighlighterException &) {
+		definition.clear();
+	}
+	m_isBuilding.remove(id);
+	definitionFile.close();
+
+	m_definitions.insert(id, definition);
+	return definition;
 }
 
 HighlightDefinitionManager *HighlightDefinitionManager::instance()
@@ -41,6 +75,7 @@ HighlightDefinitionManager *HighlightDefinitionManager::instance()
 	return m_instance;
 }
 
+// shameslly stollen from QSharedPointer<HighlightDefinition> Manager::parseDefinitionMetadata(const QString &id)
 void HighlightDefinitionManager::parseDefinitionMetadata(const QFileInfo &fileInfo,
 	QString *comment,
 	QStringList *mimeTypes,
@@ -97,6 +132,7 @@ void HighlightDefinitionManager::parseDefinitionMetadata(const QFileInfo &fileIn
 	definitionFile.close();
 }
 
+// stollen from QSharedPointer<HighlightDefinition> Manager::buildMimeDatabase(const QString &id)
 void HighlightDefinitionManager::buildMimeDatabase( const QString &originDir )
 {
 	QDir definitionsDir( originDir );

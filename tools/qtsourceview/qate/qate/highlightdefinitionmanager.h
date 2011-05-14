@@ -14,16 +14,14 @@ namespace Core{
 class MimeDatabase;
 }
 
-namespace TextEditor {
-namespace Internal {
-
+namespace Qate {
 class HighlightDefinitionManager
 {
 public:
 	static HighlightDefinitionManager *instance();
-	const QString definitionIdByName(const QString &externalName);
+	const QString definitionIdByName(const QString &id);
 	bool isBuildingDefinition(const QString &externalName);
-	QSharedPointer<HighlightDefinition> definition(const QString &externalName);
+	QSharedPointer<TextEditor::Internal::HighlightDefinition> definition(const QString &id);
 	void parseDefinitionMetadata(const QFileInfo &fileInfo,
 				     QString *comment,
 				     QStringList *mimeTypes,
@@ -42,13 +40,12 @@ private:
 	Core::MimeDatabase *m_mime;
 	
 //	PriorityCompare m_priorityComp;
+	QSet<QString> m_isBuilding;
 	QHash<QString, QString> m_idByName;
 	QMultiHash<QString, QString> m_idByMimeType;
-	QHash<QString, QSharedPointer<HighlightDefinition> > m_definitions;
+	QHash<QString, QSharedPointer<TextEditor::Internal::HighlightDefinition> > m_definitions;
 };
 
-
-}
 }
 
 #endif // HIGHLIGHTDEFINITIONMANAGER_H

@@ -9,12 +9,16 @@
 #include "highlightdefinition.h"
 #include "highlighterexception.h"
 #include "qate/highlightdefinitionhandler-v2.h"
+#include "qate/highlightdefinitionmanager.h"
 
 //#define LANGUAGE  "/usr/share/kde4/apps/katepart/syntax/d.xml"
 //#define TEST_FILE "../tests/highlight.d"
 
 #define LANGUAGE  "/usr/share/kde4/apps/katepart/syntax/cpp.xml"
 #define TEST_FILE __FILE__
+
+// fixme todo  ###
+/// doxygen comment
 
 
 void load_text(QString fe, QPlainTextEdit *te );
@@ -28,13 +32,16 @@ int main( int argc, char* argv[] )
 	QPlainTextEdit *te = new QPlainTextEdit(mw);
 
         TextEditor::Internal::Highlighter                         *hl     = new TextEditor::Internal::Highlighter(te->document());
-        QSharedPointer<TextEditor::Internal::HighlightDefinition> def     = get_highlighter_definition(definitionFileName);
-        QSharedPointer<TextEditor::Internal::Context>             context = def->initialContext();
-
+	//QSharedPointer<TextEditor::Internal::HighlightDefinition> def     = get_highlighter_definition(definitionFileName);
+	QSharedPointer<TextEditor::Internal::HighlightDefinition> def     = Qate::HighlightDefinitionManager::instance()->definition(definitionFileName);
+	QSharedPointer<TextEditor::Internal::Context>             context;
 	Formats::ApplyToHighlighter(hl);
-
 	te->setFont( QFont("Courier new",10) );
-        hl->setDefaultContext(context);
+
+	if (!def.isNull()) {
+		context = def->initialContext();
+	}
+	hl->setDefaultContext(context);
 
 	load_text(TEST_FILE, te);
 	mw->setWindowTitle("Kate syntax highter test");
@@ -63,7 +70,7 @@ QSharedPointer<TextEditor::Internal::HighlightDefinition> get_highlighter_defini
 		return QSharedPointer<TextEditor::Internal::HighlightDefinition>();
 	
 	QSharedPointer<TextEditor::Internal::HighlightDefinition> definition(new TextEditor::Internal::HighlightDefinition);
-	TextEditor::Internal::HighlightDefinitionHandlerV2 handler(definition);
+	Qate::HighlightDefinitionHandler handler(definition);
 	
 	QXmlInputSource source(&definitionFile);
 	QXmlSimpleReader reader;
