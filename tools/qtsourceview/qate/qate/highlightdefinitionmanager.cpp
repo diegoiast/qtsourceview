@@ -164,7 +164,7 @@ void HighlightDefinitionManager::registerMimeTypes()
     if (!m_registeringMimeTypes) {
         m_registeringMimeTypes = true;
         clear();
-        QFuture<Core::MimeType> future =
+        QFuture<Qate::MimeType> future =
             QtConcurrent::run(&HighlightDefinitionManager::gatherDefinitionsMimeTypes, this);
         m_mimeTypeWatcher.setFuture(future);
         /*Core::ICore::instance()->progressManager()->addTask(future,
@@ -176,7 +176,7 @@ void HighlightDefinitionManager::registerMimeTypes()
     }
 }
 
-void HighlightDefinitionManager::gatherDefinitionsMimeTypes(QFutureInterface<Core::MimeType> &future)
+void HighlightDefinitionManager::gatherDefinitionsMimeTypes(QFutureInterface<Qate::MimeType> &future)
 {
     // Please be aware of the following limitation in the current implementation.
     // The generic highlighter only register its types after all other plugins
@@ -196,12 +196,12 @@ void HighlightDefinitionManager::gatherDefinitionsMimeTypes(QFutureInterface<Cor
         definitionsPaths.append(settings.fallbackDefinitionFilesPath());*/
 
 //    Core::MimeDatabase *mimeDatabase = Core::ICore::instance()->mimeDatabase();
-    Core::MimeDatabase *mimeDatabase = this->mimeDatabase();
+    Qate::MimeDatabase *mimeDatabase = this->mimeDatabase();
     QSet<QString> knownSuffixes = QSet<QString>::fromList(mimeDatabase->suffixes());
 
-    QHash<QString, Core::MimeType> userModified;
-    const QList<Core::MimeType> &userMimeTypes = mimeDatabase->readUserModifiedMimeTypes();
-    foreach (const Core::MimeType &userMimeType, userMimeTypes)
+    QHash<QString, Qate::MimeType> userModified;
+    const QList<Qate::MimeType> &userMimeTypes = mimeDatabase->readUserModifiedMimeTypes();
+    foreach (const Qate::MimeType &userMimeType, userMimeTypes)
         userModified.insert(userMimeType.type(), userMimeType);
 
     foreach (const QString &path, definitionsPaths) {
@@ -239,13 +239,13 @@ void HighlightDefinitionManager::gatherDefinitionsMimeTypes(QFutureInterface<Cor
             // tell which patterns belong to which MIME types nor whether a MIME type is just
             // an alias for the other. Currently, I associate all patterns with all MIME
             // types from a definition.
-            QList<Core::MimeGlobPattern> globPatterns;
+            QList<Qate::MimeGlobPattern> globPatterns;
             foreach (const QString &type, metaData->mimeTypes()) {
                 if (m_idByMimeType.contains(type))
                     continue;
 
                 m_idByMimeType.insert(type, id);
-                Core::MimeType mimeType = mimeDatabase->findByType(type);
+                Qate::MimeType mimeType = mimeDatabase->findByType(type);
                 if (mimeType.isNull()) {
                     mimeType.setType(type);
                     mimeType.setSubClassesOf(textPlain);
@@ -254,7 +254,7 @@ void HighlightDefinitionManager::gatherDefinitionsMimeTypes(QFutureInterface<Cor
                     // If there's a user modification for this mime type, we want to use the
                     // modified patterns and rule-based matchers. If not, just consider what
                     // is specified in the definition file.
-                    QHash<QString, Core::MimeType>::const_iterator it =
+                    QHash<QString, Qate::MimeType>::const_iterator it =
                         userModified.find(mimeType.type());
                     if (it == userModified.end()) {
                         if (globPatterns.isEmpty()) {
@@ -268,7 +268,7 @@ void HighlightDefinitionManager::gatherDefinitionsMimeTypes(QFutureInterface<Cor
                                         continue;
                                 }
                                 QRegExp regExp(pattern, Qt::CaseSensitive, QRegExp::Wildcard);
-                                globPatterns.append(Core::MimeGlobPattern(regExp, 50));
+                                globPatterns.append(Qate::MimeGlobPattern(regExp, 50));
                             }
                         }
                         mimeType.setGlobPatterns(globPatterns);
@@ -287,7 +287,7 @@ void HighlightDefinitionManager::gatherDefinitionsMimeTypes(QFutureInterface<Cor
 
 void HighlightDefinitionManager::registerMimeType(int index) const
 {
-    const Core::MimeType &mimeType = m_mimeTypeWatcher.resultAt(index);
+    const Qate::MimeType &mimeType = m_mimeTypeWatcher.resultAt(index);
 //    TextEditorPlugin::instance()->editorFactory()->addMimeType(mimeType.type());
 //	TODO
 //    mimeDatabase()->addMimeType(mimeType.type());
@@ -448,12 +448,12 @@ bool HighlightDefinitionManager::isDownloadingDefinitions() const
     return m_downloadingDefinitions;
 }
 
-Core::MimeDatabase* HighlightDefinitionManager::mimeDatabase()
+Qate::MimeDatabase* HighlightDefinitionManager::mimeDatabase()
 {
 	return m_mimeDatabase;
 }
 
-void HighlightDefinitionManager::setMimeDatabase(Core::MimeDatabase* db)
+void HighlightDefinitionManager::setMimeDatabase(Qate::MimeDatabase* db)
 {
 	m_mimeDatabase = db;
 }

@@ -48,7 +48,7 @@ class QIODevice;
 class QDebug;
 QT_END_NAMESPACE
 
-namespace Core {
+namespace Qate {
 
 class MimeTypeData;
 class MimeDatabasePrivate;

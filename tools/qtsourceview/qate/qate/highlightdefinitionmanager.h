@@ -87,8 +87,8 @@ public:
     void downloadAvailableDefinitionsMetaData();
     void downloadDefinitions(const QList<QUrl> &urls, const QString &savePath);
     bool isDownloadingDefinitions() const;
-    Core::MimeDatabase* mimeDatabase();
-    void setMimeDatabase(Core::MimeDatabase* );
+    Qate::MimeDatabase* mimeDatabase();
+    void setMimeDatabase(Qate::MimeDatabase* );
 
     static QSharedPointer<TextEditor::Internal::HighlightDefinitionMetaData> parseMetadata(const QFileInfo &fileInfo);
 
@@ -108,7 +108,7 @@ private:
     HighlightDefinitionManager();
     Q_DISABLE_COPY(HighlightDefinitionManager)
 
-    void gatherDefinitionsMimeTypes(QFutureInterface<Core::MimeType> &future);
+    void gatherDefinitionsMimeTypes(QFutureInterface<Qate::MimeType> &future);
     QList<TextEditor::Internal::HighlightDefinitionMetaData> parseAvailableDefinitionsList(QIODevice *device) const;
     void clear();
 
@@ -126,8 +126,8 @@ private:
     QNetworkAccessManager m_networkManager;
 
     QFutureWatcher<void> m_downloadWatcher;
-    QFutureWatcher<Core::MimeType> m_mimeTypeWatcher;
-    Core::MimeDatabase* m_mimeDatabase;
+    QFutureWatcher<Qate::MimeType> m_mimeTypeWatcher;
+    Qate::MimeDatabase* m_mimeDatabase;
 
     struct PriorityComp
     {

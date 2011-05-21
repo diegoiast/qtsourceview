@@ -92,7 +92,7 @@ static const char littleEndianByteOrderMarkC[] = "\xFF\xFE";
 
 // Fallback priorities, must be low.
 enum {
-    BinaryMatchPriority = Core::MimeGlobPattern::MinWeight + 1,
+    BinaryMatchPriority = Qate::MimeGlobPattern::MinWeight + 1,
     TextMatchPriority
 };
 
@@ -106,7 +106,7 @@ enum {
     \sa Core::Internal::BaseMimeTypeParser, Core::Internal::MimeTypeParser
 */
 
-namespace Core {
+namespace Qate {
 
 typedef QSharedPointer<MagicRuleMatcher> MagicRuleMatcherPtr;
 
@@ -1772,7 +1772,7 @@ QList<MimeGlobPattern> MimeDatabasePrivate::toGlobPatterns(const QStringList &pa
     QList<MimeGlobPattern> globPatterns;
     foreach (const QString &pattern, patterns) {
         QRegExp regExp(pattern, Qt::CaseSensitive, QRegExp::Wildcard);
-        globPatterns.append(Core::MimeGlobPattern(regExp, weight));
+        globPatterns.append(Qate::MimeGlobPattern(regExp, weight));
     }
     return globPatterns;
 }
