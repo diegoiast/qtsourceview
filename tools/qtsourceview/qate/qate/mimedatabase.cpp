@@ -31,9 +31,9 @@
 **
 **************************************************************************/
 
-#include "mimedatabase.h"
-#include "coreconstants.h"
-#include "icore.h"
+#include "qate/mimedatabase.h"
+//#include "coreconstants.h"
+//#include "icore.h"
 
 #include <utils/qtcassert.h>
 
@@ -1292,7 +1292,9 @@ MimeDatabasePrivate::MimeDatabasePrivate() :
     m_maxLevel(-1)
 {
     // Assign here to avoid non-local static data initialization issues.
-    kModifiedMimeTypesPath = ICore::instance()->userResourcePath() + QLatin1String("/mimetypes/");
+//    kModifiedMimeTypesPath = ICore::instance()->userResourcePath() + QLatin1String("/mimetypes/");
+    // TODO - use a normal path
+    kModifiedMimeTypesPath =  QLatin1String("/mimetypes/");
 }
 
 /*!
@@ -1885,8 +1887,9 @@ QString MimeDatabase::allFiltersString(QString *allFilesFilter) const
     filters.sort();
     filters.erase(std::unique(filters.begin(), filters.end()), filters.end());
 
-    static const QString allFiles =
-        QCoreApplication::translate("Core", Constants::ALL_FILES_FILTER);
+    // TODO - add proper i18n
+    static const QString allFiles = "All *;;";
+        //QCoreApplication::translate("Core", Constants::ALL_FILES_FILTER);
     if (allFilesFilter)
         *allFilesFilter = allFiles;
 

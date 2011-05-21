@@ -31,20 +31,21 @@
 **
 **************************************************************************/
 
-#include "highlightdefinitionhandler.h"
+#include "qate/highlightdefinitionhandler-v2.h"
 #include "highlightdefinition.h"
 #include "specificrules.h"
 #include "itemdata.h"
 #include "keywordlist.h"
 #include "context.h"
 #include "reuse.h"
-#include "manager.h"
+#include "qate/highlightdefinitionmanager.h"
 #include "highlighterexception.h"
 
 #include <QtCore/QLatin1String>
 
 using namespace TextEditor;
 using namespace Internal;
+using namespace Qate;
 
 namespace {
     static const QLatin1String kName("name");
@@ -442,14 +443,14 @@ void HighlightDefinitionHandler::processIncludeRules(const QSharedPointer<Contex
             // definition they are from.
             QString externalName = QString::fromRawData(sourceName.unicode() + 2,
                                                         sourceName.length() - 2);
-            const QString &id = Manager::instance()->definitionIdByName(externalName);
+            const QString &id = HighlightDefinitionManager::instance()->definitionIdByName(externalName);
 
             // If there is an incorrect circular dependency among definitions this is skipped.
-            if (Manager::instance()->isBuildingDefinition(id))
+            if (HighlightDefinitionManager::instance()->isBuildingDefinition(id))
                 continue;
 
             const QSharedPointer<HighlightDefinition> &externalDefinition =
-                Manager::instance()->definition(id);
+                HighlightDefinitionManager::instance()->definition(id);
             if (externalDefinition.isNull())
                 continue;
 

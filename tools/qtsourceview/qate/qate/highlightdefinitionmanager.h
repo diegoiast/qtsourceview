@@ -36,9 +36,10 @@
 
 #include "highlightdefinitionmetadata.h"
 
-#include <coreplugin/mimedatabase.h>
+#include <qate/mimedatabase.h>
 
 #include <QtCore/QString>
+#include <QtCore/QStringList>
 #include <QtCore/QHash>
 #include <QtCore/QSet>
 #include <QtCore/QUrl>
@@ -59,30 +60,37 @@ namespace Internal {
 
 class HighlightDefinition;
 class DefinitionDownloader;
+}
+}
+
+namespace Qate{
 
 // This is the generic highlighter manager. It is not thread-safe.
 
-class Manager : public QObject
+class HighlightDefinitionManager : public QObject
 {
     Q_OBJECT
 public:
-    virtual ~Manager();
-    static Manager *instance();
+    virtual ~HighlightDefinitionManager();
+    static HighlightDefinitionManager *instance();
 
     QString definitionIdByName(const QString &name) const;
     QString definitionIdByMimeType(const QString &mimeType) const;
     QString definitionIdByAnyMimeType(const QStringList &mimeTypes) const;
+    QStringList definitionsPaths() const;
 
     bool isBuildingDefinition(const QString &id) const;
 
-    QSharedPointer<HighlightDefinition> definition(const QString &id);
-    QSharedPointer<HighlightDefinitionMetaData> definitionMetaData(const QString &id) const;
+    QSharedPointer<TextEditor::Internal::HighlightDefinition> definition(const QString &id);
+    QSharedPointer<TextEditor::Internal::HighlightDefinitionMetaData> definitionMetaData(const QString &id) const;
 
     void downloadAvailableDefinitionsMetaData();
     void downloadDefinitions(const QList<QUrl> &urls, const QString &savePath);
     bool isDownloadingDefinitions() const;
+    Core::MimeDatabase* mimeDatabase();
+    void setMimeDatabase(Core::MimeDatabase* );
 
-    static QSharedPointer<HighlightDefinitionMetaData> parseMetadata(const QFileInfo &fileInfo);
+    static QSharedPointer<TextEditor::Internal::HighlightDefinitionMetaData> parseMetadata(const QFileInfo &fileInfo);
 
 public slots:
     void registerMimeTypes();
@@ -97,11 +105,11 @@ signals:
     void mimeTypesRegistered();
 
 private:
-    Manager();
-    Q_DISABLE_COPY(Manager)
+    HighlightDefinitionManager();
+    Q_DISABLE_COPY(HighlightDefinitionManager)
 
     void gatherDefinitionsMimeTypes(QFutureInterface<Core::MimeType> &future);
-    QList<HighlightDefinitionMetaData> parseAvailableDefinitionsList(QIODevice *device) const;
+    QList<TextEditor::Internal::HighlightDefinitionMetaData> parseAvailableDefinitionsList(QIODevice *device) const;
     void clear();
 
     bool m_downloadingDefinitions;
@@ -110,30 +118,30 @@ private:
 
     QHash<QString, QString> m_idByName;
     QHash<QString, QString> m_idByMimeType;
-    QHash<QString, QSharedPointer<HighlightDefinition> > m_definitions;
-    QHash<QString, QSharedPointer<HighlightDefinitionMetaData> > m_definitionsMetaData;
+    QHash<QString, QSharedPointer<TextEditor::Internal::HighlightDefinition> > m_definitions;
+    QHash<QString, QSharedPointer<TextEditor::Internal::HighlightDefinitionMetaData> > m_definitionsMetaData;
     QSet<QString> m_isBuilding;
 
-    QList<DefinitionDownloader *> m_downloaders;
+    QList<TextEditor::Internal::DefinitionDownloader *> m_downloaders;
     QNetworkAccessManager m_networkManager;
 
     QFutureWatcher<void> m_downloadWatcher;
     QFutureWatcher<Core::MimeType> m_mimeTypeWatcher;
+    Core::MimeDatabase* m_mimeDatabase;
 
     struct PriorityComp
     {
-        bool operator()(const QSharedPointer<HighlightDefinitionMetaData> &a,
-                        const QSharedPointer<HighlightDefinitionMetaData> &b) {
+        bool operator()(const QSharedPointer<TextEditor::Internal::HighlightDefinitionMetaData> &a,
+                        const QSharedPointer<TextEditor::Internal::HighlightDefinitionMetaData> &b) {
             return a->priority() > b->priority();
         }
     };
 
 signals:
-    void definitionsMetaDataReady(const QList<Internal::HighlightDefinitionMetaData>&);
+    void definitionsMetaDataReady(const QList<TextEditor::Internal::HighlightDefinitionMetaData>&);
     void errorDownloadingDefinitionsMetaData();
 };
 
 } // namespace Internal
-} // namespace TextEditor
 
 #endif // MANAGER_H

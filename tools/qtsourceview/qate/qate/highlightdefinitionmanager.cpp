@@ -31,20 +31,21 @@
 **
 **************************************************************************/
 
-#include "manager.h"
+#include <qate/highlightdefinitionmanager.h>
 #include "highlightdefinition.h"
-#include "highlightdefinitionhandler.h"
+#include <qate/highlightdefinitionhandler-v2.h>
 #include "highlighterexception.h"
 #include "definitiondownloader.h"
 #include "highlightersettings.h"
-#include "plaintexteditorfactory.h"
-#include "texteditorconstants.h"
-#include "texteditorplugin.h"
-#include "texteditorsettings.h"
+//#include "plaintexteditorfactory.h"
+//#include "texteditorconstants.h"
+//#include "texteditorplugin.h"
+//#include "texteditorsettings.h"
 
-#include <coreplugin/icore.h>
-#include <utils/qtcassert.h>
-#include <coreplugin/progressmanager/progressmanager.h>
+//#include <coreplugin/icore.h>
+//#include <utils/qtcassert.h>
+//#include <coreplugin/progressmanager/progressmanager.h>
+//#include <qtconcurrent/QtConcurrentTools>
 #include <qtconcurrent/QtConcurrentTools>
 
 #include <QtCore/QtAlgorithms>
@@ -74,8 +75,9 @@
 
 using namespace TextEditor;
 using namespace Internal;
+using namespace Qate;
 
-Manager::Manager() :
+HighlightDefinitionManager::HighlightDefinitionManager() :
     m_downloadingDefinitions(false),
     m_registeringMimeTypes(false),
     m_queuedMimeTypeRegistrations(0)
@@ -85,22 +87,22 @@ Manager::Manager() :
     connect(&m_downloadWatcher, SIGNAL(finished()), this, SLOT(downloadDefinitionsFinished()));
 }
 
-Manager::~Manager()
+HighlightDefinitionManager::~HighlightDefinitionManager()
 {}
 
-Manager *Manager::instance()
+HighlightDefinitionManager *HighlightDefinitionManager::instance()
 {
-    static Manager manager;
+    static HighlightDefinitionManager manager;
     return &manager;
 }
 
-QString Manager::definitionIdByName(const QString &name) const
+QString HighlightDefinitionManager::definitionIdByName(const QString &name) const
 { return m_idByName.value(name); }
 
-QString Manager::definitionIdByMimeType(const QString &mimeType) const
+QString HighlightDefinitionManager::definitionIdByMimeType(const QString &mimeType) const
 { return m_idByMimeType.value(mimeType); }
 
-QString Manager::definitionIdByAnyMimeType(const QStringList &mimeTypes) const
+QString HighlightDefinitionManager::definitionIdByAnyMimeType(const QStringList &mimeTypes) const
 {
     QString definitionId;
     foreach (const QString &mimeType, mimeTypes) {
@@ -111,7 +113,19 @@ QString Manager::definitionIdByAnyMimeType(const QStringList &mimeTypes) const
     return definitionId;
 }
 
-QSharedPointer<HighlightDefinition> Manager::definition(const QString &id)
+QStringList HighlightDefinitionManager::definitionsPaths() const
+{
+	QStringList l;
+	// TODO - user proper directories:
+	// - use the platform directories for $HOME
+	// - read the KDE home dir from the env
+	// - add API for application developers to add a new directory
+	l.append("/usr/share/kde4/apps/katepart/syntax/");
+	l.append("~/.kde/share/apps/katepart/syntax/");
+	return l;
+}
+
+QSharedPointer<HighlightDefinition> HighlightDefinitionManager::definition(const QString &id)
 {
     if (!id.isEmpty() && !m_definitions.contains(id)) {
         QFile definitionFile(id);
@@ -119,7 +133,7 @@ QSharedPointer<HighlightDefinition> Manager::definition(const QString &id)
             return QSharedPointer<HighlightDefinition>();
 
         QSharedPointer<HighlightDefinition> definition(new HighlightDefinition);
-        HighlightDefinitionHandler handler(definition);
+        Qate::HighlightDefinitionHandler handler(definition);
 
         QXmlInputSource source(&definitionFile);
         QXmlSimpleReader reader;
@@ -139,30 +153,30 @@ QSharedPointer<HighlightDefinition> Manager::definition(const QString &id)
     return m_definitions.value(id);
 }
 
-QSharedPointer<HighlightDefinitionMetaData> Manager::definitionMetaData(const QString &id) const
+QSharedPointer<HighlightDefinitionMetaData> HighlightDefinitionManager::definitionMetaData(const QString &id) const
 { return m_definitionsMetaData.value(id); }
 
-bool Manager::isBuildingDefinition(const QString &id) const
+bool HighlightDefinitionManager::isBuildingDefinition(const QString &id) const
 { return m_isBuilding.contains(id); }
 
-void Manager::registerMimeTypes()
+void HighlightDefinitionManager::registerMimeTypes()
 {
     if (!m_registeringMimeTypes) {
         m_registeringMimeTypes = true;
         clear();
         QFuture<Core::MimeType> future =
-            QtConcurrent::run(&Manager::gatherDefinitionsMimeTypes, this);
+            QtConcurrent::run(&HighlightDefinitionManager::gatherDefinitionsMimeTypes, this);
         m_mimeTypeWatcher.setFuture(future);
-        Core::ICore::instance()->progressManager()->addTask(future,
+        /*Core::ICore::instance()->progressManager()->addTask(future,
                                                             tr("Registering definitions"),
-                                                            Constants::TASK_REGISTER_DEFINITIONS);
+                                                            Constants::TASK_REGISTER_DEFINITIONS);*/
     } else {
         // QFutures returned from QConcurrent::run cannot be cancelled. So the queue.
         ++m_queuedMimeTypeRegistrations;
     }
 }
 
-void Manager::gatherDefinitionsMimeTypes(QFutureInterface<Core::MimeType> &future)
+void HighlightDefinitionManager::gatherDefinitionsMimeTypes(QFutureInterface<Core::MimeType> &future)
 {
     // Please be aware of the following limitation in the current implementation.
     // The generic highlighter only register its types after all other plugins
@@ -175,13 +189,14 @@ void Manager::gatherDefinitionsMimeTypes(QFutureInterface<Core::MimeType> &futur
     // (considering hierarchies, aliases, etc) of the MIME database whenever there
     // is a change in the generic highlighter settings.
 
-    QStringList definitionsPaths;
-    const HighlighterSettings &settings = TextEditorSettings::instance()->highlighterSettings();
+    QStringList definitionsPaths = this->definitionsPaths();
+    /*const HighlighterSettings &settings = TextEditorSettings::instance()->highlighterSettings();
     definitionsPaths.append(settings.definitionFilesPath());
     if (settings.useFallbackLocation())
-        definitionsPaths.append(settings.fallbackDefinitionFilesPath());
+        definitionsPaths.append(settings.fallbackDefinitionFilesPath());*/
 
-    Core::MimeDatabase *mimeDatabase = Core::ICore::instance()->mimeDatabase();
+//    Core::MimeDatabase *mimeDatabase = Core::ICore::instance()->mimeDatabase();
+    Core::MimeDatabase *mimeDatabase = this->mimeDatabase();
     QSet<QString> knownSuffixes = QSet<QString>::fromList(mimeDatabase->suffixes());
 
     QHash<QString, Core::MimeType> userModified;
@@ -270,13 +285,15 @@ void Manager::gatherDefinitionsMimeTypes(QFutureInterface<Core::MimeType> &futur
     }
 }
 
-void Manager::registerMimeType(int index) const
+void HighlightDefinitionManager::registerMimeType(int index) const
 {
     const Core::MimeType &mimeType = m_mimeTypeWatcher.resultAt(index);
-    TextEditorPlugin::instance()->editorFactory()->addMimeType(mimeType.type());
+//    TextEditorPlugin::instance()->editorFactory()->addMimeType(mimeType.type());
+//	TODO
+//    mimeDatabase()->addMimeType(mimeType.type());
 }
 
-void Manager::registerMimeTypesFinished()
+void HighlightDefinitionManager::registerMimeTypesFinished()
 {
     m_registeringMimeTypes = false;
     if (m_queuedMimeTypeRegistrations > 0) {
@@ -287,7 +304,7 @@ void Manager::registerMimeTypesFinished()
     }
 }
 
-QSharedPointer<HighlightDefinitionMetaData> Manager::parseMetadata(const QFileInfo &fileInfo)
+QSharedPointer<HighlightDefinitionMetaData> HighlightDefinitionManager::parseMetadata(const QFileInfo &fileInfo)
 {
     static const QLatin1Char kSemiColon(';');
     static const QLatin1Char kSpace(' ');
@@ -335,7 +352,7 @@ QSharedPointer<HighlightDefinitionMetaData> Manager::parseMetadata(const QFileIn
     return metaData;
 }
 
-QList<HighlightDefinitionMetaData> Manager::parseAvailableDefinitionsList(QIODevice *device) const
+QList<HighlightDefinitionMetaData> HighlightDefinitionManager::parseAvailableDefinitionsList(QIODevice *device) const
 {
     static const QLatin1Char kSlash('/');
     static const QLatin1String kDefinition("Definition");
@@ -364,7 +381,7 @@ QList<HighlightDefinitionMetaData> Manager::parseAvailableDefinitionsList(QIODev
     return metaDataList;
 }
 
-void Manager::downloadAvailableDefinitionsMetaData()
+void HighlightDefinitionManager::downloadAvailableDefinitionsMetaData()
 {
     QUrl url(QLatin1String("http://www.kate-editor.org/syntax/update-3.2.xml"));
     QNetworkRequest request(url);
@@ -373,7 +390,7 @@ void Manager::downloadAvailableDefinitionsMetaData()
     connect(reply, SIGNAL(finished()), this, SLOT(downloadAvailableDefinitionsListFinished()));
 }
 
-void Manager::downloadAvailableDefinitionsListFinished()
+void HighlightDefinitionManager::downloadAvailableDefinitionsListFinished()
 {
     if (QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender())) {
         if (reply->error() == QNetworkReply::NoError)
@@ -384,7 +401,7 @@ void Manager::downloadAvailableDefinitionsListFinished()
     }
 }
 
-void Manager::downloadDefinitions(const QList<QUrl> &urls, const QString &savePath)
+void HighlightDefinitionManager::downloadDefinitions(const QList<QUrl> &urls, const QString &savePath)
 {
     m_downloaders.clear();
     foreach (const QUrl &url, urls)
@@ -393,12 +410,12 @@ void Manager::downloadDefinitions(const QList<QUrl> &urls, const QString &savePa
     m_downloadingDefinitions = true;
     QFuture<void> future = QtConcurrent::map(m_downloaders, DownloaderStarter());
     m_downloadWatcher.setFuture(future);
-    Core::ICore::instance()->progressManager()->addTask(future,
+    /*Core::ICore::instance()->progressManager()->addTask(future,
                                                         tr("Downloading definitions"),
-                                                        Constants::TASK_DOWNLOAD_DEFINITIONS);
+                                                        Constants::TASK_DOWNLOAD_DEFINITIONS);*/
 }
 
-void Manager::downloadDefinitionsFinished()
+void HighlightDefinitionManager::downloadDefinitionsFinished()
 {
     int errors = 0;
     bool writeError = false;
@@ -426,12 +443,22 @@ void Manager::downloadDefinitionsFinished()
     m_downloadingDefinitions = false;
 }
 
-bool Manager::isDownloadingDefinitions() const
+bool HighlightDefinitionManager::isDownloadingDefinitions() const
 {
     return m_downloadingDefinitions;
 }
 
-void Manager::clear()
+Core::MimeDatabase* HighlightDefinitionManager::mimeDatabase()
+{
+	return m_mimeDatabase;
+}
+
+void HighlightDefinitionManager::setMimeDatabase(Core::MimeDatabase* db)
+{
+	m_mimeDatabase = db;
+}
+
+void HighlightDefinitionManager::clear()
 {
     m_idByName.clear();
     m_idByMimeType.clear();

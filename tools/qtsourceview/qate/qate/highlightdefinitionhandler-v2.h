@@ -48,11 +48,15 @@ class KeywordList;
 class Context;
 class Rule;
 class HighlightDefinition;
+}
+}
+
+namespace Qate {
 
 class HighlightDefinitionHandler : public QXmlDefaultHandler
 {
 public:
-    HighlightDefinitionHandler(const QSharedPointer<HighlightDefinition> &definition);
+    HighlightDefinitionHandler(const QSharedPointer<TextEditor::Internal::HighlightDefinition> &definition);
     ~HighlightDefinitionHandler();
 
     bool startDocument();
@@ -70,7 +74,7 @@ private:
     void commentElementStarted(const QXmlAttributes &atts) const;
     void keywordsElementStarted(const QXmlAttributes &atts) const;
     void foldingElementStarted(const QXmlAttributes &atts) const;
-    void ruleElementStarted(const QXmlAttributes &atts, const QSharedPointer<Rule> &rule);
+    void ruleElementStarted(const QXmlAttributes &atts, const QSharedPointer<TextEditor::Internal::Rule> &rule);
 
     // Specific rules.
     void detectCharStarted(const QXmlAttributes &atts);
@@ -92,20 +96,19 @@ private:
     void detectIdentifier(const QXmlAttributes &atts);
 
     void processIncludeRules() const;
-    void processIncludeRules(const QSharedPointer<Context> &context) const;
+    void processIncludeRules(const QSharedPointer<TextEditor::Internal::Context> &context) const;
 
-    QSharedPointer<HighlightDefinition> m_definition;
+    QSharedPointer<TextEditor::Internal::HighlightDefinition> m_definition;
 
     bool m_processingKeyword;
     QString m_currentKeyword;
-    QSharedPointer<KeywordList> m_currentList;
-    QSharedPointer<Context> m_currentContext;
-    QStack<QSharedPointer<Rule> > m_currentRule;
+    QSharedPointer<TextEditor::Internal::KeywordList> m_currentList;
+    QSharedPointer<TextEditor::Internal::Context> m_currentContext;
+    QStack<QSharedPointer<TextEditor::Internal::Rule> > m_currentRule;
 
     bool m_initialContext;
 };
 
-} // namespace Internal
-} // namespace TextEditor
+} // namespace Qate
 
 #endif // HIGHLIGHTDEFINITIONHANDLER_H

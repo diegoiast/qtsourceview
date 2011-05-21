@@ -34,7 +34,7 @@
 #ifndef MIMEDATABASE_H
 #define MIMEDATABASE_H
 
-#include <coreplugin/core_global.h>
+//#include <coreplugin/core_global.h>
 #include <QtCore/QStringList>
 #include <QtCore/QSharedDataPointer>
 #include <QtCore/QSharedPointer>
