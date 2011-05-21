@@ -2,7 +2,7 @@ TARGET		=	qtsourceview
 TEMPLATE	=	lib
 QT		=	xml core  gui
 CONFIG		+=	staticlib warn_on lib
-VERSION		=	0.0.2
+VERSION		=	0.0.3
 DEPENDPATH	=	.
 INCLUDEPATH	=	.
 

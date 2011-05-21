@@ -11,7 +11,7 @@
 #include "qate/defaultcolors.h"
 
 #define LANGUAGE  "/usr/share/kde4/apps/katepart/syntax/cpp.xml"
-#define TEST_FILE __FILE__
+#define TEST_FILE "demos/demo6/demo6.cpp"
 
 // fixme todo  ###
 /// doxygen comment

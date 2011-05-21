@@ -1,9 +1,9 @@
-!exists(qate.pri){
-	message("Please create a file called qate.pri, containing:")
+!exists(qtcreator-src.pri){
+	message("Please create a file called qtcreator-src.pri, containing:")
 	message("QTCREATOR_DIR=...")
 	error("configuration failed")
 }
-include(qate.pri)
+include(qtcreator-src.pri)
 
 EDITOR_DIR = $$QTCREATOR_DIR/src/plugins/texteditor/generichighlighter
 COREPLUGIN_DIR = $$QTCREATOR_DIR/src/plugins/coreplugin
@@ -26,10 +26,10 @@ SOURCES +=  \
 	$$EDITOR_DIR/progressdata.cpp \
 	$$EDITOR_DIR/rule.cpp \
 	$$EDITOR_DIR/specificrules.cpp \
-	qate/mimedatabase.cpp \
-	qate/highlightdefinitionhandler.cpp \
-	qate/highlightdefinitionmanager.cpp \
-	qate/defaultcolors.cpp \
+	$$QATE_SRC_DIR/qate/mimedatabase.cpp \
+	$$QATE_SRC_DIR/qate/highlightdefinitionhandler.cpp \
+	$$QATE_SRC_DIR/qate/highlightdefinitionmanager.cpp \
+	$$QATE_SRC_DIR/qate/defaultcolors.cpp \
 
 HEADERS += \
 	$$EDITOR_DIR/context.h \
@@ -44,15 +44,15 @@ HEADERS += \
 	$$EDITOR_DIR/progressdata.h \
 	$$EDITOR_DIR/rule.h \
 	$$EDITOR_DIR/specificrules.h \
-	qate/mimedatabase.h \
-	qate/highlightdefinitionhandler.h \
-	qate/highlightdefinitionmanager.h \
-	qate/syntaxhighlighter.h \
-	qate/basetextdocumentlayout.h \
-	qate/tabsettings.h \
-	qate/defaultcolors.h 
+	$$QATE_SRC_DIR/qate/mimedatabase.h \
+	$$QATE_SRC_DIR/qate/highlightdefinitionhandler.h \
+	$$QATE_SRC_DIR/qate/highlightdefinitionmanager.h \
+	$$QATE_SRC_DIR/qate/syntaxhighlighter.h \
+	$$QATE_SRC_DIR/qate/basetextdocumentlayout.h \
+	$$QATE_SRC_DIR/qate/tabsettings.h \
+	$$QATE_SRC_DIR/qate/defaultcolors.h 
 
-INCLUDEPATH += qate $$EDITOR_DIR $$QTCREATOR_DIR/src/libs/
+INCLUDEPATH += $$QATE_SRC_DIR $$QATE_SRC_DIR/qate $$EDITOR_DIR $$QTCREATOR_DIR/src/libs/
 
 
 #	qate/highlightdefinitionhanlder-v2.h \
