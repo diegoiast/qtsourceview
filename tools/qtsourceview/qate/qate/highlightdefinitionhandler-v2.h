@@ -4,26 +4,27 @@
 **
 ** Copyright (c) 2011 Nokia Corporation and/or its subsidiary(-ies).
 **
-** Contact: Nokia Corporation (info@qt.nokia.com)
+** Contact: Nokia Corporation (qt-info@nokia.com)
 **
+** No Commercial Usage
+**
+** This file contains pre-release code and may not be distributed.
+** You may use this file in accordance with the terms and conditions
+** contained in the Technology Preview License Agreement accompanying
+** this package.
 **
 ** GNU Lesser General Public License Usage
 **
-** This file may be used under the terms of the GNU Lesser General Public
-** License version 2.1 as published by the Free Software Foundation and
-** appearing in the file LICENSE.LGPL included in the packaging of this file.
-** Please review the following information to ensure the GNU Lesser General
-** Public License version 2.1 requirements will be met:
-** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+** Alternatively, this file may be used under the terms of the GNU Lesser
+** General Public License version 2.1 as published by the Free Software
+** Foundation and appearing in the file LICENSE.LGPL included in the
+** packaging of this file.  Please review the following information to
+** ensure the GNU Lesser General Public License version 2.1 requirements
+** will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
 **
 ** In addition, as a special exception, Nokia gives you certain additional
-** rights. These rights are described in the Nokia Qt LGPL Exception
+** rights.  These rights are described in the Nokia Qt LGPL Exception
 ** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
-**
-** Other Usage
-**
-** Alternatively, this file may be used in accordance with the terms and
-** conditions contained in a signed written agreement between you and Nokia.
 **
 ** If you have questions regarding the use of this file, please contact
 ** Nokia at qt-info@nokia.com.
@@ -40,22 +41,18 @@
 
 #include <QtXml/QXmlDefaultHandler>
 
-// some forward declatations
 namespace TextEditor {
 namespace Internal {
+
 class KeywordList;
 class Context;
 class Rule;
 class HighlightDefinition;
-}
-}
 
-
-namespace Qate {
 class HighlightDefinitionHandler : public QXmlDefaultHandler
 {
 public:
-    HighlightDefinitionHandler(const QSharedPointer<TextEditor::Internal::HighlightDefinition> &definition);
+    HighlightDefinitionHandler(const QSharedPointer<HighlightDefinition> &definition);
     ~HighlightDefinitionHandler();
 
     bool startDocument();
@@ -73,7 +70,7 @@ private:
     void commentElementStarted(const QXmlAttributes &atts) const;
     void keywordsElementStarted(const QXmlAttributes &atts) const;
     void foldingElementStarted(const QXmlAttributes &atts) const;
-    void ruleElementStarted(const QXmlAttributes &atts, const QSharedPointer<TextEditor::Internal::Rule> &rule);
+    void ruleElementStarted(const QXmlAttributes &atts, const QSharedPointer<Rule> &rule);
 
     // Specific rules.
     void detectCharStarted(const QXmlAttributes &atts);
@@ -95,19 +92,20 @@ private:
     void detectIdentifier(const QXmlAttributes &atts);
 
     void processIncludeRules() const;
-    void processIncludeRules(const QSharedPointer<TextEditor::Internal::Context> &context) const;
+    void processIncludeRules(const QSharedPointer<Context> &context) const;
 
-    QSharedPointer<TextEditor::Internal::HighlightDefinition> m_definition;
+    QSharedPointer<HighlightDefinition> m_definition;
 
     bool m_processingKeyword;
     QString m_currentKeyword;
-    QSharedPointer<TextEditor::Internal::KeywordList> m_currentList;
-    QSharedPointer<TextEditor::Internal::Context> m_currentContext;
-    QStack<QSharedPointer<TextEditor::Internal::Rule> > m_currentRule;
+    QSharedPointer<KeywordList> m_currentList;
+    QSharedPointer<Context> m_currentContext;
+    QStack<QSharedPointer<Rule> > m_currentRule;
 
     bool m_initialContext;
 };
 
-} // namespace Qate
+} // namespace Internal
+} // namespace TextEditor
 
 #endif // HIGHLIGHTDEFINITIONHANDLER_H
