@@ -9,6 +9,7 @@ EDITOR_DIR = $$QTCREATOR_DIR/src/plugins/texteditor/generichighlighter
 COREPLUGIN_DIR = $$QTCREATOR_DIR/src/plugins/coreplugin
 
 QT += xml network
+CONFIG+=silent
 TARGET=qate-demo
 DEFINES+= CORE_EXPORT=Q_DECL_EXPORT
 

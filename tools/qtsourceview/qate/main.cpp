@@ -11,15 +11,12 @@
 #include "qate/highlightdefinitionhandler-v2.h"
 #include "qate/highlightdefinitionmanager.h"
 
-//#define LANGUAGE  "/usr/share/kde4/apps/katepart/syntax/d.xml"
-//#define TEST_FILE "../tests/highlight.d"
-
 #define LANGUAGE  "/usr/share/kde4/apps/katepart/syntax/cpp.xml"
 #define TEST_FILE __FILE__
 
 // fixme todo  ###
 /// doxygen comment
-
+/// \brief bla bla bala
 
 void load_text(QString fe, QPlainTextEdit *te );
 QSharedPointer<TextEditor::Internal::HighlightDefinition> get_highlighter_definition(QString definitionFileName);
@@ -27,29 +24,69 @@ QSharedPointer<TextEditor::Internal::HighlightDefinition> get_highlighter_defini
 int main( int argc, char* argv[] )
 {
 	QApplication app( argc, argv );
-	QString         definitionFileName = LANGUAGE;
-	QMainWindow    *mw = new QMainWindow;
-	QPlainTextEdit *te = new QPlainTextEdit(mw);
+	QMainWindow    *main_window = new QMainWindow;
+	QPlainTextEdit *text_editor;
 
-        TextEditor::Internal::Highlighter                         *hl     = new TextEditor::Internal::Highlighter(te->document());
-	//QSharedPointer<TextEditor::Internal::HighlightDefinition> def     = get_highlighter_definition(definitionFileName);
-	QSharedPointer<TextEditor::Internal::HighlightDefinition> def     = Qate::HighlightDefinitionManager::instance()->definition(definitionFileName);
-	QSharedPointer<TextEditor::Internal::Context>             context;
-	Formats::ApplyToHighlighter(hl);
-	te->setFont( QFont("Courier new",10) );
+	Qate::MimeDatabase                                        *mimes;
+	Qate::HighlightDefinitionManager                          *hl_manager;
+	TextEditor::Internal::Highlighter                         *highlight;
+	QSharedPointer<TextEditor::Internal::HighlightDefinition>  highlight_definition;
+	QSharedPointer<TextEditor::Internal::Context>              context;
+	
+	// create the main widget
+	text_editor = new QPlainTextEdit(main_window);
+	highlight   = new TextEditor::Internal::Highlighter(text_editor->document());
+	Formats::ApplyToHighlighter(highlight);
+	text_editor->setFont( QFont("Courier new",10) );
+	
+	// create the highlighters manager
+	hl_manager = Qate::HighlightDefinitionManager::instance();
 
-	if (!def.isNull()) {
-		context = def->initialContext();
+	// here is where the magic starts:
+	//
+	// The first option is to ask the manager for a specific file:
+	//
+	//	highlight_definition = hl_manager->definition(LANGUAGE);
+	//
+	// This will load the forward declarations and includes, and will work perfectly.
+	// The downside, is that you still need to know the exact path, and if your
+	// definitions are spread in several dirs - this will be a pain.
+	//
+	// The recommended way is to ask for a definition by name, or by mimetype
+	// by calling definitionIdByAnyMimeType(). This example uses the former.
+	//
+	// Notes: 
+	//  - if the syntax you loaded contains several includes or forward
+	//    and you do not see them, this means that 
+	//    Qate::HighlightDefinitionManager::registerMimeTypes() failed
+	//  - if your application needs a single definition, you can there is 
+	//    not need to setup the mime database, nor register the mime types
+	//    see the first example.
+	
+#if 0 
+	highlight_definition = hl_manager->definition(LANGUAGE);
+#else
+	mimes = new Qate::MimeDatabase();
+	hl_manager->setMimeDatabase(mimes);
+	hl_manager->registerMimeTypes();
+	
+	// ugly - but, let the highlight manager build the mime DB
+	// in  real life, you should wait for the signal definitionsMetaDataReady()
+	sleep(1);  
+	highlight_definition = hl_manager->definition( hl_manager->definitionIdByName("C++") );
+#endif
+	if (!highlight_definition.isNull()) {
+		context = highlight_definition->initialContext();
 	}
-	hl->setDefaultContext(context);
+	highlight->setDefaultContext(context);
 
-	load_text(TEST_FILE, te);
-	mw->setWindowTitle("Kate syntax highter test");
-	mw->setCentralWidget(te);
-	mw->show();
+	load_text(TEST_FILE, text_editor);
+	main_window->setWindowTitle("Kate syntax highter test");
+	main_window->setCentralWidget(text_editor);
+	main_window->show();
 	return app.exec();
 	
-	Q_UNUSED(hl);
+	Q_UNUSED(highlight);
 }
 
 void load_text(QString fe, QPlainTextEdit *te )
@@ -62,28 +99,3 @@ void load_text(QString fe, QPlainTextEdit *te )
 	te->setLineWrapMode(QPlainTextEdit::NoWrap);
 }
 
-// stollen from QSharedPointer<HighlightDefinition> Manager::definition(const QString &id)
-QSharedPointer<TextEditor::Internal::HighlightDefinition> get_highlighter_definition(QString definitionFileName)
-{
-	QFile definitionFile(definitionFileName);
-	if (!definitionFile.open(QIODevice::ReadOnly | QIODevice::Text))
-		return QSharedPointer<TextEditor::Internal::HighlightDefinition>();
-	
-	QSharedPointer<TextEditor::Internal::HighlightDefinition> definition(new TextEditor::Internal::HighlightDefinition);
-	Qate::HighlightDefinitionHandler handler(definition);
-	
-	QXmlInputSource source(&definitionFile);
-	QXmlSimpleReader reader;
-	reader.setContentHandler(&handler);
-	//m_isBuilding.insert(id);
-	try {
-		reader.parse(source);
-	} catch (TextEditor::Internal::HighlighterException &) {
-		definition.clear();
-	}
-	//m_isBuilding.remove(id);
-	definitionFile.close();
-	
-//	m_definitions.insert(id, definition);
-	return definition;
-}
