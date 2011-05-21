@@ -30,12 +30,14 @@
 **
 **************************************************************************/
 
-#include "formats.h"
+#include "qate/defaultcolors.h"
 
 #include <QtCore/Qt>
 #include "highlighter.h"
 
-Formats::Formats()
+using namespace Qate;
+
+DefaultColors::DefaultColors()
 {
 	m_keywordFormat.setForeground(Qt::black);
 	m_keywordFormat.setFontWeight(75);
@@ -52,7 +54,7 @@ Formats::Formats()
 	
 	m_stringFormat.setForeground(Qt::red);
 	
-	m_commentFormat.setForeground(Qt::gray);
+	m_commentFormat.setForeground(QColor(0x60,0x60,0x60));
 	
 	m_alertFormat.setForeground(Qt::red);
 	m_alertFormat.setFontUnderline(true);
@@ -69,13 +71,13 @@ Formats::Formats()
         m_othersFormat.setForeground(Qt::darkBlue);
 }
 
-Formats &Formats::instance()
+DefaultColors &DefaultColors::instance()
 {
-    static Formats formats;
-    return formats;
+    static DefaultColors DefaultColors;
+    return DefaultColors;
 }
 
-QString Formats::name(const QTextCharFormat &format) const
+QString DefaultColors::name(const QTextCharFormat &format) const
 {
     if (format == QTextCharFormat())
         return "Default format";
@@ -110,7 +112,7 @@ QString Formats::name(const QTextCharFormat &format) const
 }
 
 using namespace TextEditor::Internal;
-void Formats::ApplyToHighlighter(TextEditor::Internal::Highlighter *hl)
+void DefaultColors::ApplyToHighlighter(TextEditor::Internal::Highlighter *hl)
 {
 //	hl->configureFormat(Highlighter::Normal,           instance().m_othersFormat       );
 //	hl->configureFormat(Highlighter::VisualWhitespace, instance().m_othersFormat       );

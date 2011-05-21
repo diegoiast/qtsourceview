@@ -4,12 +4,11 @@
 #include <QFile>
 #include <QIODevice>
 
-#include "formats.h"
+#include "context.h"
 #include "highlighter.h"
 #include "highlightdefinition.h"
-#include "highlighterexception.h"
-#include "qate/highlightdefinitionhandler-v2.h"
 #include "qate/highlightdefinitionmanager.h"
+#include "qate/defaultcolors.h"
 
 #define LANGUAGE  "/usr/share/kde4/apps/katepart/syntax/cpp.xml"
 #define TEST_FILE __FILE__
@@ -36,7 +35,7 @@ int main( int argc, char* argv[] )
 	// create the main widget
 	text_editor = new QPlainTextEdit(main_window);
 	highlight   = new TextEditor::Internal::Highlighter(text_editor->document());
-	Formats::ApplyToHighlighter(highlight);
+	Qate::DefaultColors::ApplyToHighlighter(highlight);
 	text_editor->setFont( QFont("Courier new",10) );
 	
 	// create the highlighters manager

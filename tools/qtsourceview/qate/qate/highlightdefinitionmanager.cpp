@@ -33,7 +33,7 @@
 
 #include <qate/highlightdefinitionmanager.h>
 #include "highlightdefinition.h"
-#include <qate/highlightdefinitionhandler-v2.h>
+#include <qate/highlightdefinitionhandler.h>
 #include "highlighterexception.h"
 #include "definitiondownloader.h"
 #include "highlightersettings.h"

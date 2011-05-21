@@ -31,7 +31,7 @@
 **
 **************************************************************************/
 
-#include "qate/highlightdefinitionhandler-v2.h"
+#include "qate/highlightdefinitionhandler.h"
 #include "highlightdefinition.h"
 #include "specificrules.h"
 #include "itemdata.h"

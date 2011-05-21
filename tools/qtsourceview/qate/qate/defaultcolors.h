@@ -30,8 +30,8 @@
 **
 **************************************************************************/
 
-#ifndef FORMATS_H
-#define FORMATS_H
+#ifndef QATE_DEFAULT_COLORS_H
+#define QATE_DEFAULT_COLORS_H
 
 #include <QtGui/QTextCharFormat>
 
@@ -41,10 +41,13 @@ namespace TextEditor{
 	}
 }
 
-class Formats
+
+namespace Qate {
+
+class DefaultColors
 {
 public:
-    static Formats &instance();
+    static DefaultColors &instance();
 
     const QTextCharFormat &keywordFormat() const { return m_keywordFormat; }
     const QTextCharFormat &dataTypeFormat() const { return m_dataTypeFormat; }
@@ -64,8 +67,8 @@ public:
 	static void ApplyToHighlighter(TextEditor::Internal::Highlighter *hl);
 
 private:
-    Formats();
-    Q_DISABLE_COPY(Formats);
+    DefaultColors();
+    Q_DISABLE_COPY(DefaultColors);
 
     QTextCharFormat m_keywordFormat;
     QTextCharFormat m_dataTypeFormat;
@@ -82,4 +85,6 @@ private:
     QTextCharFormat m_othersFormat;
 };
 
-#endif // FORMATS_H
+}
+
+#endif // QATE_DEFAULT_COLORS_H

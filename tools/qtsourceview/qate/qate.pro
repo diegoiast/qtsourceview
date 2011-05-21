@@ -27,12 +27,9 @@ SOURCES +=  \
 	$$EDITOR_DIR/rule.cpp \
 	$$EDITOR_DIR/specificrules.cpp \
 	qate/mimedatabase.cpp \
-	qate/highlightdefinitionhandler-v2.cpp \
+	qate/highlightdefinitionhandler.cpp \
 	qate/highlightdefinitionmanager.cpp \
-	formats.cpp \
-	main.cpp
-#    highlightermock.cpp \
-	#qate/mimedatabase.cpp \
+	qate/defaultcolors.cpp \
 
 HEADERS += \
 	$$EDITOR_DIR/context.h \
@@ -48,13 +45,12 @@ HEADERS += \
 	$$EDITOR_DIR/rule.h \
 	$$EDITOR_DIR/specificrules.h \
 	qate/mimedatabase.h \
+	qate/highlightdefinitionhandler.h \
 	qate/highlightdefinitionmanager.h \
 	qate/syntaxhighlighter.h \
 	qate/basetextdocumentlayout.h \
 	qate/tabsettings.h \
-	formats.h 
-#    highlightermock.h
-#	qate/mimedatabase.h \
+	qate/defaultcolors.h 
 
 INCLUDEPATH += qate $$EDITOR_DIR $$QTCREATOR_DIR/src/libs/
 
