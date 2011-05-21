@@ -5,10 +5,10 @@
 #include <QSyntaxHighlighter>
 #include <QFile>
 
-#include "qsvcolordef.h"
-#include "qsvcolordeffactory.h"
-#include "qsvlangdef.h"
-#include "qsvsyntaxhighlighter.h"
+#include "qsvsh/qsvcolordef.h"
+#include "qsvsh/qsvcolordeffactory.h"
+#include "qsvsh/qsvlangdef.h"
+#include "qsvsh/qsvsyntaxhighlighter.h"
 #include "mainwindow1.h"
 
 MainWindow1::MainWindow1( QMainWindow *parent )

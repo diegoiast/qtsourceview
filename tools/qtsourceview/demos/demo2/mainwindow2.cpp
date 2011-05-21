@@ -7,10 +7,10 @@
 #include <QSyntaxHighlighter>
 #include <QFile>
 
-#include "qsvcolordef.h"
-#include "qsvcolordeffactory.h"
-#include "qsvlangdef.h"
-#include "qsvsyntaxhighlighter.h"
+#include "qsvsh/qsvcolordef.h"
+#include "qsvsh/qsvcolordeffactory.h"
+#include "qsvsh/qsvlangdef.h"
+#include "qsvsh/qsvsyntaxhighlighter.h"
 #include "mainwindow2.h"
 
 //	QString dataPath  = QApplication::applicationDirPath();
