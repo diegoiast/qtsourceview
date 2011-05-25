@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <itemDatas name="Turbo" description="Nostalgic color which resembles the colors of good old Turbo Pascal 7" version="1.0" author="Diego Iastrubni (elcuco@kde.org)" >
-	<itemData defStyleNum="dsNormal"   name="Normal"         color="#FFFF99" selColor="#ffffff" bold="0" italic="0" />
+	<itemData defStyleNum="dsNormal"   name="Normal"         color="#FFFF99" selColor="#ffffff" bold="0" italic="0" background="#000080" />
 	<itemData defStyleNum="dsKeyword"  name="Keyword"        color="#ffffff" selColor="#ffffff" bold="1" italic="0" />
 	<itemData defStyleNum="dsDataType" name="Data type"      color="#00a000" selColor="#00ff00" bold="0" italic="0" />
 	<itemData defStyleNum="dsDecVal"   name="Decimal/Value"  color="#800000" selColor="#ff0000" bold="0" italic="0" />

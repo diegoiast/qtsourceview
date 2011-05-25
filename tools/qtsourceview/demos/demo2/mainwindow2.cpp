@@ -143,10 +143,14 @@ void MainWindow2::update_syntax_color()
 	// set the background of the texteditor, to the same as the syntax		
 	// also set the default color of the syntax
 	// this must be done before setting the new syntax highlighter
-	QPalette p( textEdit->palette() );
-	p.setColor( QPalette::Base, defColors->getColorDef("dsNormal").getBackground() );
+	QPalette p( palette() );
+	QsvColorDef dsNormal = defColors->getColorDef("dsNormal");
+	
+	if (dsNormal.getBackground().isValid())
+	    p.setColor( QPalette::Base, dsNormal.getBackground() );
+	p.setColor( QPalette::Text, dsNormal.getColor() );
 	textEdit->setPalette( p );
-	textEdit->setTextColor( defColors->getColorDef("dsNormal").getColor() );
+	textEdit->setTextColor( dsNormal.getColor() );
 	
         defLang   = new QsvLangDef( dataPath + "/data/langs/" + comboBox_syntax->currentText() );
 	highlight = new QsvSyntaxHighlighter( textEdit, defColors, defLang );

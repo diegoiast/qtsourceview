@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <itemDatas name="VIM" description="Color scheme which resembles VIM colors on terminals" version="1.0" author="Diego Iastrubni (elcuco@kde.org)" >
-	<itemData defStyleNum="dsNormal"   name="Normal"         color="#777777" selColor="#ffffff" bold="0" italic="0" />
- 	<itemData defStyleNum="dsKeyword"  name="Keyword"        color="#B26818" selColor="#ffffff" bold="0" italic="0" /> 
+	<itemData defStyleNum="dsNormal"   name="Normal"         color="#777777" selColor="#ffffff" bold="0" italic="0" background="#000000" />
+	<itemData defStyleNum="dsKeyword"  name="Keyword"        color="#B26818" selColor="#ffffff" bold="0" italic="0" /> 
 	<itemData defStyleNum="dsDataType" name="Data type"      color="#00a000" selColor="#00ff00" bold="0" italic="0" />
 	<itemData defStyleNum="dsDecVal"   name="Decimal/Value"  color="#800000" selColor="#ff0000" bold="0" italic="0" />
 	<itemData defStyleNum="dsBaseN"    name="Base-N Integer" color="#800000" selColor="#ff0000" bold="0" italic="0" />
