@@ -30,7 +30,6 @@ int main( int argc, char* argv[] )
 	Qate::HighlightDefinitionManager                          *hl_manager;
 	TextEditor::Internal::Highlighter                         *highlight;
 	QSharedPointer<TextEditor::Internal::HighlightDefinition>  highlight_definition;
-	QSharedPointer<TextEditor::Internal::Context>              context;
 	
 	// create the main widget
 	text_editor = new QPlainTextEdit(main_window);
@@ -71,13 +70,12 @@ int main( int argc, char* argv[] )
 	
 	// ugly - but, let the highlight manager build the mime DB
 	// in  real life, you should wait for the signal definitionsMetaDataReady()
-	sleep(1);  
+	sleep(1);
 	highlight_definition = hl_manager->definition( hl_manager->definitionIdByName("C++") );
 #endif
 	if (!highlight_definition.isNull()) {
-		context = highlight_definition->initialContext();
+		highlight->setDefaultContext(highlight_definition->initialContext());
 	}
-	highlight->setDefaultContext(context);
 
 	load_text(TEST_FILE, text_editor);
 	main_window->setWindowTitle("Kate syntax highter test");
