@@ -1,9 +1,121 @@
 /**
 
-\mainpage
+\mainpage The QtSourceView library documentation
 
 QtSourceView is a library which enables you to define basic syntax
 highliters for your Qt4 based editors. 
+
+This is a bundle of several libraires:
+- \ref QtSourceViewHighlight "QtSourceViewHighlight" -  an highlighter engine based on GtkSourceView - deprecated
+- \ref Qate "Qate" - an highlighter engine based on KatePart
+ 
+\page Qate Qate - Highlighter engine based on KatePart
+
+This is a port of the generic syntax highlighter found in Nokia's QtCreator
+to a pure Qt environment outside of QtCreator, to be embedded inside 3rd party 
+applications.
+
+This library provides two ways for loading a syntax definition to your text 
+editor:
+ - By loading a defintion file directly - \ref loading_definition_by_file
+ - By asking the highlight definition manager the best syntax \ref loading_definition_by_mime
+
+\note 
+The qate library is under heavy development. As the moment, the library is not 
+a full fork of the code, and it depends on you having the code of QtCreator
+available locally. I only forked the minimal code needed to get this
+working, and all forked classes are inside the namespace Qate.
+
+To compile the code you will need to add inside src directory a file with this content:
+
+\verbatim
+QTCREATOR_DIR=/home/myself/src/qt-creator
+\endverbatim
+
+This should be the place in which you have the full QtCreator source checkout. 
+
+To add the qate library to your *pro file, add the following code:
+\verbatim
+QATE_SRC_DIR=/home/mysely/qtsourceview/
+include(/home/mysely/qtsourceview/src/qate.pri)
+CONFIG	+= qt warn_on silent
+TARGET	 = my_cool_app
+SOURCES	+= my_cool_app.cpp # always add files! 
+\endverbatim
+
+Note that you need to include the PRI file and also set a global variable before it,
+specifing the exact dir. Note that by doing this you \b will link the Qate library
+into your application \b statically and it will render your application a GPL
+application. If you need this in a non-GPL application, you will need to compile 
+qate into a shared library (something out of the scope of this documentation at
+the moment).
+
+\section license License of Qate
+Qate is a derivative work of QtCreator which is released under the LGPL 2.1. 
+Therefor the license of Qate is the LGPL 2.1, which can be found here
+http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html
+
+
+\page loading_definition_by_file Qate - Example: Loading a definition by file
+
+If your application is a small one and you need a specific syntax, you can use
+this code:
+
+\code
+#include "highlighter.h"
+#include "qate/highlightdefinitionmanager.h"
+#include "qate/defaultcolors.h"
+
+#define LANGUAGE  "/usr/share/kde4/apps/katepart/syntax/cpp.xml"
+
+QPlainTextEdit *text_editor = new QPlainTextEdit;
+TextEditor::Internal::Highlighter *highlight = new TextEditor::Internal::Highlighter(text_editor->document());
+
+Qate::DefaultColors::ApplyToHighlighter(highlight);
+highlight->setDefaultContext(Qate::HighlightDefinitionManager::instance()->definition(LANGUAGE));
+\endcode
+
+\page loading_definition_by_mime Qate - Example: Loading a definition by MIME type
+
+This is a minimal example to load a definition by mime name. It's not 
+trivial, but it is very powerfull.
+
+You can ask the highlight manager for a specific MIME type. Highlight manager 
+will find the most suited file for you.
+
+
+\code
+#include "context.h"
+#include "highlighter.h"
+#include "highlightdefinition.h"
+#include "qate/highlightdefinitionmanager.h"
+#include "qate/defaultcolors.h"
+
+QPlainTextEdit                                            *text_editor;
+Qate::MimeDatabase                                        *mimes;
+Qate::HighlightDefinitionManager                          *hl_manager;
+TextEditor::Internal::Highlighter                         *highlight;
+QSharedPointer<TextEditor::Internal::HighlightDefinition>  highlight_definition;
+
+hl_manager = Qate::HighlightDefinitionManager::instance();
+editor = new QPlainTextEdit(main_window);
+highlight = new TextEditor::Internal::Highlighter(text_editor->document());
+Qate::DefaultColors::ApplyToHighlighter(highlight);
+
+mimes = new Qate::MimeDatabase();
+hl_manager->setMimeDatabase(mimes);
+hl_manager->registerMimeTypes();
+
+highlight_definition = hl_manager->definition(hl_manager->definitionIdByName("C++"));
+if (!highlight_definition.isNull()) {
+	highlight->setDefaultContext(highlight_definition->initialContext());
+}
+\endcode
+
+\page QtSourceViewHighlight QtSourceViewHighlight - Highlighter engine based on GtkSourceView definitions
+
+This is an old (experimental) code I wrote for a syntax highlighter. This is 
+deprecated and I recommend using \ref Qate instead.
 
 The library is splited into 2 main parts:
 - Syntax definitions
@@ -12,7 +124,7 @@ The library is splited into 2 main parts:
 This separation between definition and on screen rendering makes the
 highliter flexible enough to disable a lot of syntax in very different schemes.
 
-A very minimal example for using this library (this is teh code behind demo1):
+A very minimal example for using this library (this is the code behind demo1):
 \code
 QString dataPath  = QApplication::applicationDirPath();
 
