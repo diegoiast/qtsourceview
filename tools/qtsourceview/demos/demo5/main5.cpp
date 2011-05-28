@@ -4,10 +4,36 @@
 #include <QTimer>
 #include <QMainWindow>
 #include <QFileDialog>
+#include <QSyntaxHighlighter>
 
 #include "qsvtextedit.h"
 #include "qsvsyntaxhighlighterbase.h"
 #include "qsvtextoperationswidget.h"
+
+class Highlighter: public QSyntaxHighlighter, public QsvSyntaxHighlighterBase
+{
+public:
+	Highlighter( QObject *parent=NULL) : QSyntaxHighlighter(parent)
+	{
+		setMatchBracketList("()[]''\"\"");
+	}
+
+	void highlightBlock(const QString &text)
+	{
+		QsvSyntaxHighlighterBase::highlightBlock(text);
+	}
+	
+	virtual QTextBlockUserData* currentBlockUserDataProxy() 
+	{
+		return currentBlockUserData();
+	}
+
+	virtual void setCurrentBlockUserDataProxy(QTextBlockUserData * data)
+	{
+		setCurrentBlockUserData(data);
+	}
+	
+};
 
 class MainWindow : QMainWindow
 {
@@ -15,8 +41,8 @@ class MainWindow : QMainWindow
 public:
 	MainWindow( const QString &file )
 	{
-		QsvSyntaxHighlighterBase *s             = new QsvSyntaxHighlighterBase;
-		QsvTextEdit              *e             = new QsvTextEdit(this, s);
+		Highlighter             *s              = new Highlighter;
+		QsvTextEdit             *e              = new QsvTextEdit(this, s);
 		QsvTextOperationsWidget *textOpetations = new QsvTextOperationsWidget(e);
 	
 		QToolBar *b = addToolBar( "" );

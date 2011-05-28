@@ -1,7 +1,7 @@
 #ifndef QSVSYNTAXHIGHLIGHTERBASE_H
 #define QSVSYNTAXHIGHLIGHTERBASE_H
 
-#include <QSyntaxHighlighter>
+#include <QTextBlockUserData>
 
 class MatchData {
 public:
@@ -49,18 +49,22 @@ public:
 	void setDebug( bool on )	{ setFlag(Debug,on);    }
 	void toggleDebug()		{ toggleFlag(Debug);    }
 };	
-Q_DECLARE_OPERATORS_FOR_FLAGS(QsvBlockData::LineFlags)
+Q_DECLARE_OPERATORS_FOR_FLAGS(QsvBlockData::LineFlags);
 
-class QsvSyntaxHighlighterBase : public QSyntaxHighlighter
+class QsvSyntaxHighlighterBase
 {
-	Q_OBJECT
 public:
-	QsvSyntaxHighlighterBase( QObject* parent=NULL );
+	QsvSyntaxHighlighterBase();
+	virtual ~QsvSyntaxHighlighterBase();
 
 	void setMatchBracketList( const QString &m );
 	const QString getMatchBracketList();
-protected:
 	void highlightBlock(const QString &text);
+	void setDocument(QTextDocument * document);
+	
+	virtual QTextBlockUserData* currentBlockUserDataProxy() = 0;
+	virtual void setCurrentBlockUserDataProxy(QTextBlockUserData * data) = 0;
+protected:
 	QString m_matchBracketsList;
 };
 

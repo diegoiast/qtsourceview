@@ -1,17 +1,22 @@
 #include "qsvsyntaxhighlighterbase.h"
 
 #include <QDebug>
+#include <QSyntaxHighlighter>
 #include <QTextBlockUserData>
 #include <QTextEdit>
 
-QsvSyntaxHighlighterBase::QsvSyntaxHighlighterBase( QObject *parent ):
-	QSyntaxHighlighter(parent)
+QsvSyntaxHighlighterBase::QsvSyntaxHighlighterBase()
 {
+}
+
+QsvSyntaxHighlighterBase::~QsvSyntaxHighlighterBase()
+{
+	
 }
 
 void QsvSyntaxHighlighterBase::highlightBlock(const QString &text)
 {
-	QsvBlockData *data = static_cast<QsvBlockData*>(currentBlockUserData());
+	QsvBlockData *data = static_cast<QsvBlockData*>(currentBlockUserDataProxy());
 	if (data)
 		data->matches.clear();
 
@@ -37,7 +42,14 @@ void QsvSyntaxHighlighterBase::highlightBlock(const QString &text)
 			bracketPosition = text.indexOf(bracket, bracketPosition+1);
 		}
 	}
-	setCurrentBlockUserData( data );
+	setCurrentBlockUserDataProxy(data);
+}
+
+void QsvSyntaxHighlighterBase::setDocument(QTextDocument *document)
+{
+	QSyntaxHighlighter *hl = dynamic_cast<QSyntaxHighlighter*>(this);
+	if (hl)
+		hl->setDocument(document);
 }
 
 void QsvSyntaxHighlighterBase::setMatchBracketList( const QString &m )
