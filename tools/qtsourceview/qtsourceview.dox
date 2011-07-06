@@ -38,7 +38,6 @@ To add the qate library to your *pro file, add the following code:
 \verbatim
 QATE_SRC_DIR=/home/mysely/qtsourceview/
 include(/home/mysely/qtsourceview/src/qate.pri)
-CONFIG	+= qt warn_on silent
 TARGET	 = my_cool_app
 SOURCES	+= my_cool_app.cpp # always add files! 
 \endverbatim
@@ -137,6 +136,26 @@ langCpp   = new QsvLangDef( dataPath + "/data/langs/cpp.lang" );
 // assign to it the new syntax highlighter, with the default colors and language
 highlight = new QsvSyntaxHighlighter( textEdit, defColors, langCpp );
 \endcode
+
+The lines you need to include in your *.pro file are:
+
+In include the code directly into your build system and thus making a static build:
+\verbatim
+QTSOURCEVIEW_SRC_DIR = .
+include(qsvsh.pri)
+TARGET	 = my_cool_app
+SOURCES	+= my_cool_app.cpp # always add files! 
+\endverbatim
+
+if you are interested in linking library (*.so, *.a or similar):
+\verbatim
+TARGET		= my_cool_app
+SOURCES		= my_cool_app.cpp
+INCLUDEPATH	= /home/myself/qtsourceview .
+LIBS		= -L/home/myself/qtsourceview -lqtsourceview
+\endverbatim
+Note that you wil need to issue "make" in your application directory and inside 
+QtSourceView's directory.
 
 \section SyntaxDef Syntax definitions
 
