@@ -1,13 +1,14 @@
-!exists(qtcreator-src.pri){
-	message("Please create a file called qtcreator-src.pri, containing:")
-	message("QTCREATOR_DIR=...")
-	error("configuration failed")
-}
-include(qtcreator-src.pri)
+#!exists(qtcreator-src.pri){
+#	message("Please create a file called qtcreator-src.pri, containing:")
+#	message("QTCREATOR_DIR=...")
+#	error("configuration failed")
+#}
+#include(qtcreator-src.pri)
 
 EDITOR_DIR = $$QTCREATOR_DIR/src/plugins/texteditor/generichighlighter
 COREPLUGIN_DIR = $$QTCREATOR_DIR/src/plugins/coreplugin
 
+EDITOR_DIR	=	$$QATE_SRC_DIR/qate
 QT		+=	xml network
 DEFINES		+=	CORE_EXPORT=Q_DECL_EXPORT
 
@@ -50,7 +51,8 @@ HEADERS += \
 	$$QATE_SRC_DIR/qate/tabsettings.h \
 	$$QATE_SRC_DIR/qate/defaultcolors.h 
 
-INCLUDEPATH += $$QATE_SRC_DIR $$QATE_SRC_DIR/qate $$EDITOR_DIR $$QTCREATOR_DIR/src/libs/
+#INCLUDEPATH += $$QATE_SRC_DIR $$QATE_SRC_DIR/qate $$EDITOR_DIR $$QTCREATOR_DIR/src/libs/
+INCLUDEPATH += $$QATE_SRC_DIR $$QATE_SRC_DIR/qate 
 
 
 #	qate/highlightdefinitionhanlder-v2.h \
