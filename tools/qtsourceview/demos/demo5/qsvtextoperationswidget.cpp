@@ -435,10 +435,11 @@ void	QsvTextOperationsWidget::showBottomWidget(QWidget* w)
 
 	r = parent->rect();
 	w->adjustSize();
-	r.adjust(10, 0, -10, 0);
+        r.adjust(10, 0, -10, 0);
 	r.setHeight(w->height());
 	r.moveBottom(parent->rect().height()-10);
-	r.moveRight(parent->rect().right()+10);
+
+        r.moveLeft(parent->pos().x() + 10);
 	w->setGeometry(r);
 	w->show();
 }

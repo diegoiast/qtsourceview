@@ -700,7 +700,7 @@ void	QsvTextEdit::adjustBottomAndTopWidget()
 		r.adjust(10, 0, -10, 0);
 		r.setHeight(m_topWidget->height());
 		r.moveTop(10);
-		r.moveRight(parent->rect().right()+10);
+                r.moveLeft(parent->pos().x()+10);
 		m_topWidget->setGeometry(r);
 		m_topWidget->show();
 	}	
@@ -711,7 +711,7 @@ void	QsvTextEdit::adjustBottomAndTopWidget()
 		r.adjust(10, 0, -10, 0);
 		r.setHeight(m_bottomWidget->height());
 		r.moveBottom(parent->rect().height()-10);
-		r.moveRight(parent->rect().right()+10);
+                r.moveLeft(parent->pos().x()+10);
 		m_bottomWidget->setGeometry(r);
 		m_bottomWidget->show();
 	}
