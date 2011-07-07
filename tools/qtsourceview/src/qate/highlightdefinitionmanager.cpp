@@ -120,8 +120,14 @@ QStringList HighlightDefinitionManager::definitionsPaths() const
 	// - use the platform directories for $HOME
 	// - read the KDE home dir from the env
 	// - add API for application developers to add a new directory
-	l.append("/usr/share/kde4/apps/katepart/syntax/");
-	l.append("~/.kde/share/apps/katepart/syntax/");
+#ifdef WIN32
+        l.append("C:\\QtSDK\\QtCreator\\share\\qtcreator\\generic-highlighter\\");
+        l.append(QDir::homePath() + "\\AppData\\Roaming\\Nokia\\qtcreator\\generic-highlighter\\");
+#else
+        l.append("/usr/share/kde4/apps/katepart/syntax/");
+        l.append("~/.kde/share/apps/katepart/syntax/");
+        l.append("~/.kde4/share/apps/katepart/syntax/");
+#endif
 	return l;
 }
 

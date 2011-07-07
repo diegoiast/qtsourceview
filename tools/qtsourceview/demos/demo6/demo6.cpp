@@ -3,6 +3,7 @@
 #include <QPlainTextEdit>
 #include <QFile>
 #include <QIODevice>
+#include <QDir>
 
 #include "context.h"
 #include "highlighter.h"
@@ -10,9 +11,15 @@
 #include "qate/highlightdefinitionmanager.h"
 #include "qate/defaultcolors.h"
 
-#define LANGUAGE  "/usr/share/kde4/apps/katepart/syntax/cpp.xml"
+#ifdef __WIN32
+#   include <windows.h>
+#   define LANGUAGE  QDir::homePath() + "\\AppData\\Roaming\\Nokia\\qtcreator\\generic-highlighter\\cpp.xml"
+#else
+#   define LANGUAGE  "/usr/share/kde4/apps/katepart/syntax/cpp.xml"
+#endif
 #define TEST_FILE "demos/demo6/demo6.cpp"
 
+/* some examples for different formats inside comments */
 // fixme todo  ###
 /// doxygen comment
 /// \brief bla bla bala
@@ -61,29 +68,38 @@ int main( int argc, char* argv[] )
 	//    not need to setup the mime database, nor register the mime types
 	//    see the first example.
 	
-#if 0 
+#if 0
 	highlight_definition = hl_manager->definition(LANGUAGE);
 #else
 	mimes = new Qate::MimeDatabase();
 	hl_manager->setMimeDatabase(mimes);
 	hl_manager->registerMimeTypes();
-	
-	// ugly - but, let the highlight manager build the mime DB
-	// in  real life, you should wait for the signal definitionsMetaDataReady()
-	sleep(1);
-	highlight_definition = hl_manager->definition( hl_manager->definitionIdByName("C++") );
+
+        // ugly - but... let the highlight manager build the mime DB
+        // in  real life, you should the the highlight when the signal
+        // definitionsMetaDataReady() is emmited
+        // this code just waits "up to" a second for the HL to be available
+        int timeout = 1000;
+        while (timeout != 0) {
+        #ifdef __WIN32
+            SleepEx(1,true);
+        #else
+            usleep(1000);
+        #endif
+            highlight_definition = hl_manager->definition( hl_manager->definitionIdByName("C++") );
+            if (!highlight_definition.isNull())
+                break;
+            timeout --;
+        }
 #endif
-	if (!highlight_definition.isNull()) {
+        if (!highlight_definition.isNull())
 		highlight->setDefaultContext(highlight_definition->initialContext());
-	}
 
 	load_text(TEST_FILE, text_editor);
 	main_window->setWindowTitle("Kate syntax highter test");
 	main_window->setCentralWidget(text_editor);
 	main_window->show();
 	return app.exec();
-	
-	Q_UNUSED(highlight);
 }
 
 void load_text(QString fe, QPlainTextEdit *te )
