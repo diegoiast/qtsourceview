@@ -10,10 +10,10 @@
 #include "qsvsyntaxhighlighterbase.h"
 #include "qsvtextoperationswidget.h"
 
-class Highlighter: public QSyntaxHighlighter, public QsvSyntaxHighlighterBase
+class MyHighlighter: public QSyntaxHighlighter, public QsvSyntaxHighlighterBase
 {
 public:
-	Highlighter( QObject *parent=NULL) : QSyntaxHighlighter(parent)
+	MyHighlighter( QObject *parent=NULL) : QSyntaxHighlighter(parent)
 	{
 		setMatchBracketList("()[]''\"\"");
 	}
@@ -41,7 +41,7 @@ class MainWindow : QMainWindow
 public:
 	MainWindow( const QString &file )
 	{
-		Highlighter             *s              = new Highlighter;
+		MyHighlighter             *s              = new MyHighlighter;
 		QsvTextEdit             *e              = new QsvTextEdit(this, s);
 		QsvTextOperationsWidget *textOpetations = new QsvTextOperationsWidget(e);
 	
