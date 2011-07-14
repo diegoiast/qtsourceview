@@ -60,7 +60,7 @@ public:
 	void setMatchBracketList( const QString &m );
 	const QString getMatchBracketList();
 	void highlightBlock(const QString &text);
-	void setDocument(QTextDocument * document);
+	void setTextDocument(QTextDocument * document);
 	
 	virtual QTextBlockUserData* currentBlockUserDataProxy() = 0;
 	virtual void setCurrentBlockUserDataProxy(QTextBlockUserData * data) = 0;

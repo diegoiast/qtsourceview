@@ -45,7 +45,7 @@ void QsvSyntaxHighlighterBase::highlightBlock(const QString &text)
 	setCurrentBlockUserDataProxy(data);
 }
 
-void QsvSyntaxHighlighterBase::setDocument(QTextDocument *document)
+void QsvSyntaxHighlighterBase::setTextDocument(QTextDocument *document)
 {
 	QSyntaxHighlighter *hl = dynamic_cast<QSyntaxHighlighter*>(this);
 	if (hl)
