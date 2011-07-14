@@ -77,6 +77,8 @@ public:
 	void setShowWhiteSpace( bool on );
 	bool getShowWhiteSpace() const;
 	void setDefaultConfig();
+	void setHighlighter(QsvSyntaxHighlighterBase *s);
+	QsvSyntaxHighlighterBase* getHighlighter() const;
 	static void setDefaultConfig( QsvEditorConfigData *config );
 	
 	

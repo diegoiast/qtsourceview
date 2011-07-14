@@ -40,7 +40,8 @@ QsvTextEdit::QsvTextEdit( QWidget *parent, QsvSyntaxHighlighterBase *s ):
 	QPlainTextEdit(parent)
 {
 	m_highlighter = s;
-	m_highlighter->setDocument( document() );
+	if (m_highlighter)
+		m_highlighter->setTextDocument( document() );
 	m_panel = new QsvEditorPanel(this);
 	m_banner = new QWidget(this);
 	m_banner->setFont(QApplication::font());
@@ -1180,6 +1181,19 @@ bool QsvTextEdit::getTabIndents() const
 void QsvTextEdit::setDefaultConfig()
 {
 	setDefaultConfig(&m_config);
+}
+
+void QsvTextEdit::setHighlighter(QsvSyntaxHighlighterBase *s)
+{
+	if (m_highlighter)
+		m_highlighter->setTextDocument(NULL);
+	m_highlighter = s;
+	m_highlighter->setTextDocument(document());
+}
+
+QsvSyntaxHighlighterBase* QsvTextEdit::getHighlighter() const
+{
+	return m_highlighter;
 }
 
 void QsvTextEdit::setShowWhiteSpace( bool on )
