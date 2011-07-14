@@ -13,6 +13,7 @@
 #include "qorderedmap.h"
 
 class QTextCharFormat;
+class QPlainTextEdit;
 class QsvLangDef;
 class QsvColorDefFactory;
 
@@ -29,6 +30,7 @@ public:
 	QsvSyntaxHighlighter( QsvColorDefFactory *colors, QsvLangDef *lang );
 	QsvSyntaxHighlighter( QTextDocument *parent = 0, QsvColorDefFactory *colors=0, QsvLangDef *lang=0 );
 	QsvSyntaxHighlighter( QTextEdit *parent = 0, QsvColorDefFactory *colors=0, QsvLangDef *lang=0 );
+	QsvSyntaxHighlighter( QPlainTextEdit *parent = 0, QsvColorDefFactory *colors=0, QsvLangDef *lang=0 );
 	~QsvSyntaxHighlighter();
 	void setHighlight( QsvLangDef *newLang=0 );
 	void setColorsDef( QsvColorDefFactory *newColors=0 );

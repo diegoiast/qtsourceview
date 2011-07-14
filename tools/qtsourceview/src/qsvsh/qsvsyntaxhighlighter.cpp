@@ -12,6 +12,7 @@
 #include <QDomNode>
 #include <QFile>
 #include <QTextCharFormat>
+#include <QPlainTextEdit>
 
 #include "qorderedmap.h"
 #include "qsvlangdef.h"
@@ -102,6 +103,15 @@ QsvSyntaxHighlighter::QsvSyntaxHighlighter( QTextDocument *parent, QsvColorDefFa
  */
 QsvSyntaxHighlighter::QsvSyntaxHighlighter( QTextEdit *parent, QsvColorDefFactory *colors, QsvLangDef *lang )
 	:QSyntaxHighlighter(parent)
+{
+	language = NULL;
+	this->colors = colors;
+
+	setHighlight( lang );
+}
+
+QsvSyntaxHighlighter::QsvSyntaxHighlighter( QPlainTextEdit *parent, QsvColorDefFactory *colors, QsvLangDef *lang )
+	:QSyntaxHighlighter(parent->document())
 {
 	language = NULL;
 	this->colors = colors;
