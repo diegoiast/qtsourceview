@@ -140,4 +140,4 @@ int main(int argc, char *argv[])
 	return a.exec();
 }
 
-#include "main7.moc"
+#include "main5.moc"
