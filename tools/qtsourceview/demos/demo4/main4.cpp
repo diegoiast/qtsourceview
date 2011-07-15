@@ -70,7 +70,7 @@ public:
 		if (!file.isEmpty())
 			loadFile(file);
 		else {
-			setWindowTitle("QtSourceView demo5");
+			setWindowTitle("QtSourceView demo4");
 			QFile f(":/qedit/readme.txt");
 			if (!f.open(QIODevice::ReadOnly | QIODevice::Text))
 				return;
@@ -124,4 +124,4 @@ int main(int argc, char *argv[])
 	return a.exec();
 }
 
-#include "main5.moc"
+#include "main4.moc"

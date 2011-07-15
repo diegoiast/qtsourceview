@@ -1,12 +1,14 @@
 
 
 
-qedit - aka, demo5
-------------------
+demo - no syntax-highlighter
+-----------------------------
 
 This is a small text editor, single file, single window. Very keyboard
 oriented, which puts the document you are editing in the front. This is a small
-replacement for Notepad.exe, or Notepad on steroids.
+replacement for Notepad.exe, or Notepad on steroids. This application
+just shows how to use the text editor widget, which does not include a 
+syntax highlighter.
 
 [NIY] = not implemented yet
 
@@ -18,9 +20,9 @@ Shortcuts:
  - control + b
    * toggle bookmark
  - control + page up
-   * goto previous bookmark (usually up, but also wraps around to the end [NIY] )
+   * goto previous bookmark (usually up, but also wraps around to the end)
  - control + page down
-   * goto next bookmark (usually down, but also wraps around to the start [NIY] )
+   * goto next bookmark (usually down, but also wraps around to the start)
  - control + {,},6 (any one of those keys)
    * navigate to the matching braket
  - control + f

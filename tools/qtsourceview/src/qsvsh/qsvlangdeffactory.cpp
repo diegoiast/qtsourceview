@@ -242,6 +242,7 @@ void	QsvLangDefFactory::clearMimeTypes()
  */
 bool	QsvLangDefFactory::addDefaultMimeTypes()
 {
+	Q_INIT_RESOURCE(qtsourceview);
 	return addMimeTypes( ":/mime.types" );
 }
 

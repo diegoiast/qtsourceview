@@ -16,18 +16,17 @@ MainWindow1::MainWindow1( QMainWindow *parent )
 {
 	setupUi( this );
 	QString dataPath  = QApplication::applicationDirPath();
-//	QString dataPath  = QApplication::applicationDirPath() + "/../../";
 	
 	// load a default color set
 	defColors = new QsvColorDefFactory( dataPath + "/data/colors/kate.xml" );
-
-        // load a default language definition
-        langCpp   = new QsvLangDef( dataPath + "/data/langs/cpp.lang" );
-        
+	
+	// load a default language definition
+	langCpp   = new QsvLangDef( dataPath + "/data/langs/cpp.lang" );
+	
 	// assign to it the new syntax highlighter, with the default colors and language
 	highlight = new QsvSyntaxHighlighter( textEdit, defColors, langCpp );
 	
-        statusBar()->showMessage(tr("Welcome, the default syntax is C++"), 10000);
+	statusBar()->showMessage(tr("Welcome, the default syntax is C++"), 10000);
 }
 
 MainWindow1::~MainWindow1()
@@ -71,7 +70,7 @@ void MainWindow1::on_action_About_triggered()
 {
 	QMessageBox::information(this, "Demo 1",
     "First demo of the qtsourceview library.\n"
-    "Diego Iastrubni <diegoiast@gmail.com> 2006, lincensed under the terms of the LGPL.");
+    "Diego Iastrubni <diegoiast@gmail.com> 2006-2011, licensed under the terms of the LGPL.");
 }
 
 void MainWindow1::on_actionAbout_Qt_triggered()

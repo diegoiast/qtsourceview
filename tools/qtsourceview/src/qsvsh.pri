@@ -1,6 +1,6 @@
 QT      += xml core  gui
 
-RESOURCES += $$QTSOURCEVIEW_SRC_DIR/qsvsh/qtsourceview.qrc
+RESOURCES	+=	$$QTSOURCEVIEW_SRC_DIR/qsvsh/qtsourceview.qrc
 
 HEADERS += \
 	$$QTSOURCEVIEW_SRC_DIR/qsvsh/qorderedmap.h \

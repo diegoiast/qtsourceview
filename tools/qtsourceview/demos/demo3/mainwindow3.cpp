@@ -17,24 +17,22 @@ const int MessageTimeOut = 10000;
 MainWindow3::MainWindow3( QMainWindow *parent )
 :QMainWindow( parent )
 {
-	setupUi( this );	
-//	QString dataPath  = QApplication::applicationDirPath() + "/../../";
+	setupUi( this );
 	QString dataPath  = QApplication::applicationDirPath();
 	
 	// setup the mime types definitions
-	QsvLangDefFactory::getInstanse()->addMimeTypes( dataPath +"/src/mime.types" );
 	QsvLangDefFactory::getInstanse()->loadDirectory( dataPath + "/data/langs/" );
 
 	// load a default color set
 	defColors = new QsvColorDefFactory( dataPath + "/data/colors/kate.xml" );
 
-	// load a default language definition
+	// load a default language definition, works via a glob
 	langDefinition = QsvLangDefFactory::getInstanse()->getHighlight("1.cpp");
 
 	// assign to it the new syntax highlighter, with the default colors and language
 	highlight = new QsvSyntaxHighlighter( textEdit, defColors, langDefinition );
 	
-        statusBar()->showMessage(tr("Welcome, the default syntax is C++"), MessageTimeOut );
+	statusBar()->showMessage(tr("Welcome, the default syntax is C++"), MessageTimeOut );
 }
 
 void MainWindow3::on_action_New_triggered()
@@ -84,7 +82,7 @@ void MainWindow3::on_action_About_triggered()
 {
 	QMessageBox::information(this, "Demo 1",
 		"Third demo of the qtsourceview library.\n"
-		"Diego Iastrubni <diegoiast@gmail.com> 2006, lincensed under the terms of the LGPL.");
+		"Diego Iastrubni <diegoiast@gmail.com> 2006-2011, licensed under the terms of the LGPL.");
 }
 
 void MainWindow3::on_actionAbout_Qt_triggered()

@@ -56,7 +56,7 @@ public:
 	MainWindow( const QString &file )
 	{
 		QString dataPath  = QApplication::applicationDirPath();
-		QsvLangDefFactory::getInstanse()->addMimeTypes( dataPath +"/src/qsvsh/mime.types" );
+		//QsvLangDefFactory::getInstanse()->addMimeTypes( dataPath +"/data/mime.types" );
 		QsvLangDefFactory::getInstanse()->loadDirectory( dataPath + "/data/langs/" );
 		editor           = new QsvTextEdit(this, NULL);
 		defColors        = new QsvColorDefFactory( dataPath + "/data/colors/kate.xml" );
