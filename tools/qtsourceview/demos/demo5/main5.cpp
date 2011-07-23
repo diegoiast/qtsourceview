@@ -81,12 +81,12 @@ public:
 		textOpetations->initSearchWidget();
 		textOpetations->m_search->findChild<QAbstractButton*>("closeButton")->setIcon( style()->standardIcon(QStyle::SP_DockWidgetCloseButton) );
 		p = textOpetations->m_search->findChild<QPushButton*>("previousButton");
-		p->setIcon( style()->standardIcon(QStyle::SP_ArrowLeft) );
+		p->setIcon( style()->standardIcon(QStyle::SP_ArrowUp) );
 		p->setText("");
 		p->setFlat(true);
 		p->setAutoRepeat(true);
 		p = textOpetations->m_search->findChild<QPushButton*>("nextButton");
-		p->setIcon( style()->standardIcon(QStyle::SP_ArrowRight) );
+		p->setIcon( style()->standardIcon(QStyle::SP_ArrowDown) );
 		p->setText("");
 		p->setFlat(true);
 		p->setAutoRepeat(true);
@@ -113,7 +113,7 @@ public:
 		if (!file.isEmpty())
 			loadFile(file);
 		else {
-			setWindowTitle("QtSourceView demo7");
+			setWindowTitle("QtSourceView demo5 - qedit");
 			QFile f(":/qedit/readme.txt");
 			if (!f.open(QIODevice::ReadOnly | QIODevice::Text))
 				return;

@@ -52,7 +52,7 @@
          <cursorShape>PointingHandCursor</cursorShape>
         </property>
         <property name="toolTip">
-         <string>Search next apperence of the text, downwards</string>
+         <string>Search previous apperence of the text, upwards</string>
         </property>
         <property name="text">
          <string>Previous</string>
@@ -68,7 +68,7 @@
          <cursorShape>PointingHandCursor</cursorShape>
         </property>
         <property name="toolTip">
-         <string>Search next apperence of the text, downwardss</string>
+         <string>Search next apperence of the text, downwards</string>
         </property>
         <property name="text">
          <string>Next</string>
