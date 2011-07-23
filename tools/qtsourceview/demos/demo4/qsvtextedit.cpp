@@ -51,7 +51,7 @@ QsvTextEdit::QsvTextEdit( QWidget *parent, QsvSyntaxHighlighterBase *s ):
 	ui_banner->setupUi(m_banner);
 	m_topWidget = NULL;
 	m_bottomWidget = NULL;
-	if (ui_banner->frame->style()->inherits("QWindowsXPStyle"))
+	if (ui_banner->frame->style()->inherits("QWindowsStyle"))
 		ui_banner->frame->setFrameStyle(QFrame::StyledPanel);
 	m_selectionTimer.setSingleShot(true);
 	m_selectionTimer.setInterval(200);
