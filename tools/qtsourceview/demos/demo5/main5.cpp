@@ -5,6 +5,10 @@
 #include <QMainWindow>
 #include <QFileDialog>
 #include <QSyntaxHighlighter>
+#include <QToolButton>
+#include <QPushButton>
+#include <QDebug>
+#include <QCommonStyle>
 
 #include "qsvsh/qsvcolordef.h"
 #include "qsvsh/qsvcolordeffactory.h"
@@ -56,10 +60,10 @@ public:
 	MainWindow( const QString &file )
 	{
 		QString dataPath  = QApplication::applicationDirPath();
-		//QsvLangDefFactory::getInstanse()->addMimeTypes( dataPath +"/data/mime.types" );
-		QsvLangDefFactory::getInstanse()->loadDirectory( dataPath + "/data/langs/" );
+		//QsvLangDefFactory::getInstanse()->addMimeTypes( "data/mime.types" );
+		QsvLangDefFactory::getInstanse()->loadDirectory( "data/langs/" );
 		editor           = new QsvTextEdit(this, NULL);
-		defColors        = new QsvColorDefFactory( dataPath + "/data/colors/kate.xml" );
+		defColors        = new QsvColorDefFactory( "data/colors/kate.xml" );
 		langDefinition   = QsvLangDefFactory::getInstanse()->getHighlight("1.cpp");
 		highlight        = new MyHighlighter(editor->document());
 		textOpetations = new QsvTextOperationsWidget(editor);
@@ -67,8 +71,30 @@ public:
 		highlight->setColorsDef(defColors);
 		highlight->setHighlight(langDefinition);
 		editor->setHighlighter(highlight);
-
-
+		editor->setFrameStyle(QFrame::NoFrame);
+		
+		editor->findChild<QWidget*>("banner")
+			->findChild<QToolButton*>("closeButton")
+			->setIcon( style()->standardIcon(QStyle::SP_DockWidgetCloseButton) );
+		
+		QPushButton *p;
+		textOpetations->initSearchWidget();
+		textOpetations->m_search->findChild<QAbstractButton*>("closeButton")->setIcon( style()->standardIcon(QStyle::SP_DockWidgetCloseButton) );
+		p = textOpetations->m_search->findChild<QPushButton*>("previousButton");
+		p->setIcon( style()->standardIcon(QStyle::SP_ArrowLeft) );
+		p->setText("");
+		p->setFlat(true);
+		p->setAutoRepeat(true);
+		p = textOpetations->m_search->findChild<QPushButton*>("nextButton");
+		p->setIcon( style()->standardIcon(QStyle::SP_ArrowRight) );
+		p->setText("");
+		p->setFlat(true);
+		p->setAutoRepeat(true);
+		
+		textOpetations->initReplaceWidget();
+		textOpetations->m_replace->findChild<QAbstractButton*>("closeButton")->setIcon( style()->standardIcon(QStyle::SP_DockWidgetCloseButton) );
+		p = textOpetations->m_search->findChild<QPushButton*>("previousButton");
+		
 		QToolBar *b = addToolBar( "" );
 		b->addAction( tr("&New"), editor, SLOT(newDocument()))              ->setShortcut(QKeySequence("Ctrl+N"));
 		b->addAction( tr("&Open"), this, SLOT(loadFile()))                  ->setShortcut(QKeySequence("Ctrl+O"));
