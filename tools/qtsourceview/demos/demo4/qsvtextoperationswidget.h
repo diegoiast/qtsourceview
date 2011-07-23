@@ -51,7 +51,7 @@ public slots:
 	void on_replaceAll_clicked();
 	void searchNext();
 	void searchPrevious();
-	void searchPrev(){ searchPrevious(); };
+	void searchPrev(){ searchPrevious(); }
 	void adjustBottomWidget();
 	
 	void updateSearchInput();
@@ -60,22 +60,21 @@ public slots:
 
 protected:
 	bool eventFilter(QObject *obj, QEvent *event);
-
-private:
 	bool issue_search( const QString &text, QTextCursor newCursor, QFlags<QTextDocument::FindFlag> findOptions, QLineEdit *l, bool moveCursor );
 
 	QTextCursor m_searchCursor;
 	QTextDocument *m_document;
+	QTimer m_replaceTimer;
+	QTimer m_searchTimer;
+	
+public:
 	QWidget *m_search;
 	QWidget *m_replace;
 	QWidget *m_gotoLine;
-
 	QColor searchFoundColor;
 	QColor searchNotFoundColor;
-	
-	QTimer m_replaceTimer;
-	QTimer m_searchTimer;
 
+	
 	Ui::searchForm *searchFormUi;
 	Ui::replaceForm *replaceFormUi;
 };

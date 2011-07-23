@@ -46,9 +46,10 @@ QsvTextEdit::QsvTextEdit( QWidget *parent, QsvSyntaxHighlighterBase *s ):
 	m_banner = new QWidget(this);
 	m_banner->setFont(QApplication::font());
 	m_banner->hide();
+	m_banner->setObjectName("banner");
 	ui_banner = new Ui::BannerMessage;
 	ui_banner->setupUi(m_banner);
-	ui_banner->frame->setFrameStyle(QFrame::Box);
+//	ui_banner->frame->setFrameStyle(QFrame::Box);
 	m_topWidget = NULL;
 	m_bottomWidget = NULL;
 	

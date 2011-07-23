@@ -59,7 +59,7 @@ void QsvTextOperationsWidget::initSearchWidget()
 	searchFormUi = new Ui::searchForm();
 	searchFormUi->setupUi(m_search);
 	searchFormUi->searchText->setFont( m_search->parentWidget()->font() );
-	searchFormUi->frame->setFrameStyle(QFrame::Box);
+//	searchFormUi->frame->setFrameStyle(QFrame::Box);
 	// otherwise it inherits the default font from the editor - fixed
 	m_search->setFont(QApplication::font());
 	m_search->adjustSize();
@@ -80,7 +80,7 @@ void QsvTextOperationsWidget::initReplaceWidget()
 	replaceFormUi->optionsGroupBox->hide();
 	replaceFormUi->findText->setFont( m_replace->parentWidget()->font() );
 	replaceFormUi->replaceText->setFont( m_replace->parentWidget()->font() );
-	replaceFormUi->frame->setFrameStyle(QFrame::Box);
+//	replaceFormUi->frame->setFrameStyle(QFrame::Box);
 	// otherwise it inherits the default font from the editor - fixed
 	m_replace->setFont(QApplication::font());
 	m_replace->adjustSize();
