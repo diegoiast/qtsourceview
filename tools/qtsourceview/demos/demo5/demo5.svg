@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"> 
+ 
+<title>QtSourceView - demo</title> 
+ 
+<desc>This image shows all the cool feature of the text editor widget available in QtSourceView</desc> 
+
+<!-- borrowed from http://www.pinyinology.com/ontology/ideograph.svg -->
+<defs>
+	<marker id="endArrow" viewBox="0 0 10 10" refX="1" refY="5" markerUnits="strokeWidth" orient="auto" markerWidth="5" markerHeight="4">
+		<polyline points="0,0 10,5 0,10 1,5" fill="lime" />
+	</marker>
+	<marker id="startArrow" viewBox="0 0 10 10" refX="1" refY="5" markerUnits="strokeWidth" orient="auto" markerWidth="5" markerHeight="4">
+		<polyline points="10,0 0,5 10,10 9,5" fill="lime" />
+	</marker>
+</defs>
+
+<image xlink:href='demo5.png' y="50" x="150" width="683px" height="504px" ></image>
+
+<rect x="75" y="7" rx="5" ry="5" width="600" height="25" style="fill:#FFDEAD;stroke:blue;stroke-width:1;opacity:0.5"/>
+<line x1="550" y1="35" x2="550" y2="117" stroke="lime" stroke-width="2" marker-end="url(#endArrow)" ></line>
+<text x="85" y="25" style="font-size:14" fill="black">
+No popup windows. File status is displayed in a floating 
+banner. Clicking the link will reload the file.	
+</text>
+
+<g>
+	<rect x="620" y="194" rx="5" ry="5" width="176" height="25" style="fill:#FFDEAD;stroke:blue;stroke-width:1;opacity:0.5"/>
+	<line x1="785" y1="190" x2="785" y2="152" stroke="lime" stroke-width="2" marker-end="url(#endArrow)" ></line>
+	<text x="630" y="210" style="font-size:14" fill="black">Banner auto-closes in 11 sec</text>
+</g>
+
+<g>
+	<rect x="15" y="293" rx="5" ry="5" width="80" height="25" style="fill:#FFDEAD;stroke:blue;stroke-width:1;opacity:0.5"/>
+	<line x1="98" y1="306" x2="198" y2="306" stroke="lime" stroke-width="2" marker-end="url(#endArrow)" ></line>
+	<line x1="98" y1="306" x2="198" y2="350" stroke="lime" stroke-width="2" marker-end="url(#endArrow)" ></line>
+	<text x="20" y="310" style="font-size:14" fill="black">Bookmarks</text>
+</g>
+
+<g>
+	<rect x="15" y="353" rx="5" ry="5" width="80" height="25" style="fill:#FFDEAD;stroke:blue;stroke-width:1;opacity:0.5"/>
+	<line x1="98" y1="367" x2="170" y2="367" stroke="lime" stroke-width="2" marker-end="url(#endArrow)" ></line>
+	<text x="20" y="370" style="font-size:14" fill="black">Current line</text>
+</g>
+
+<g>
+	<rect x="15" y="403" rx="5" ry="5" width="130" height="25" style="fill:#FFDEAD;stroke:blue;stroke-width:1;opacity:0.5"/>
+	<line x1="147" y1="415" x2="280" y2="370" stroke="lime" stroke-width="2" marker-end="url(#endArrow)" ></line>
+	<line x1="147" y1="415" x2="280" y2="398" stroke="lime" stroke-width="2" marker-end="url(#endArrow)" ></line>
+	<text x="20" y="420" style="font-size:14" fill="black">Parenthesis matching</text>
+</g>
+
+<g>
+	<rect x="80" y="563" rx="5" ry="5" width="670" height="25" style="fill:#FFDEAD;stroke:blue;stroke-width:1;opacity:0.5"/>
+	<line x1="340" y1="562" x2="340" y2="502" stroke="lime" stroke-width="2" marker-end="url(#endArrow)" ></line>
+	<text x="90" y="580" style="font-size:14" fill="black">
+	Incremental search. Background changes if text is found/not found. Updated 
+	only 3 times per second for fast typers
+	</text>
+</g>
+
+
+</svg>

@@ -8,7 +8,10 @@ highliters for your Qt4 based editors.
 This is a bundle of several libraires:
 - \ref QtSourceViewHighlight "QtSourceViewHighlight" -  an highlighter engine based on GtkSourceView - deprecated
 - \ref Qate "Qate" - an highlighter engine based on KatePart
- 
+
+Note that while QtSourceViewHighlight is deprecated, this is the only "usable"
+highlighter available as Qate is not yet stable.
+
 \page Qate Qate - Highlighter engine based on KatePart
 
 This is a port of the generic syntax highlighter found in Nokia's QtCreator
@@ -113,6 +116,8 @@ if (!highlight_definition.isNull()) {
 
 \page QtSourceViewHighlight QtSourceViewHighlight - Highlighter engine based on GtkSourceView definitions
 
+\b Next \ref demo1 
+
 This is an old (experimental) code I wrote for a syntax highlighter. This is 
 deprecated and I recommend using \ref Qate instead.
 
@@ -139,10 +144,11 @@ highlight = new QsvSyntaxHighlighter( textEdit, defColors, langCpp );
 
 The lines you need to include in your *.pro file are:
 
-In include the code directly into your build system and thus making a static build:
+In include the code directly into your build system and thus making a static 
+build. Please provide the full path for the sources, as seen here:
 \verbatim
-QTSOURCEVIEW_SRC_DIR = .
-include(qsvsh.pri)
+QTSOURCEVIEW_SRC_DIR = ~/qtsourceview/
+include(~/qtsourceview/qsvsh.pri)
 TARGET	 = my_cool_app
 SOURCES	+= my_cool_app.cpp # always add files! 
 \endverbatim
@@ -179,4 +185,250 @@ You can set the syntax definition manually or use a factory for
 getting a specific syntax definition for a filename.
 
 \section ColorsDef Colors definition
+
+The colors definition is loosly based on the color definitions based on the colors d
+definition inside Kate XML files. The factory for loading them is also is original.
+
+
+\b Next \ref demo1 
+ 
+\page demo1 QtSourceViewHighlight - demo1: use the syntax hilghlighter
+ 
+ \b Next \ref demo2
+
+This small demo explains how to use the new syntax highlighter in your application.
+The demo consits of a single file, and a QTextEdit widget that works the main widget,
+with the code of the application loaded.
+ 
+This is the code of the application:
+
+\code
+#include <QTextEdit>
+#include <QApplication>
+#include <QMessageBox>
+#include <QTextStream>
+#include <QFile>
+#include <QDir>
+
+#include "qsvsh/qsvcolordef.h"
+#include "qsvsh/qsvcolordeffactory.h"
+#include "qsvsh/qsvlangdef.h"
+#include "qsvsh/qsvsyntaxhighlighter.h"
+
+int main(int argc, char *argv[])
+{
+	QApplication a(argc, argv);
+	QTextEdit *textEdit = new QTextEdit;
+	textEdit->show();
+	QFile file("demos/demo1/main1.cpp");
+	if (file.open(QFile::ReadOnly | QFile::Text)) {
+		QTextStream in(&file);
+		textEdit->setPlainText(in.readAll());
+	}
+
+	// load a default color set
+	QsvColorDefFactory *defColors = new QsvColorDefFactory( "data/colors/kate.xml" );
+
+	// load a default language definition
+	QsvLangDef *langCpp   = new QsvLangDef( "data/langs/cpp.lang" );
+
+	// new syntax highlighter, with the default colors and language
+	QsvSyntaxHighlighter *highlight = new QsvSyntaxHighlighter( textEdit, defColors, langCpp );
+
+	a.connect(&a, SIGNAL(lastWindowClosed()), &a, SLOT(quit()));
+	return a.exec();
+	
+	Q_UNUSED(highlight);
+}
+\endcode
+
+
+\note 
+While this demo uses QTextEdit, all other demos use QPlainTextEdit. There is
+no problem with that, as the whole library uses indirectly QTextDocument (trough 
+QSyntaxHighlighter), and thus it can work with any control that uses a QTextDocument.
+
+
+\b Next \ref demo2
+
+\page demo2 QtSourceViewHighlight - demo2: changing colors and language definitions
+
+\b Next \ref demo3
+
+This example shows how you can select and modify the syntax highlighter definition 
+and color of an available text. The application loads by the available language
+definition files, and color definition files ( see MainWindow2::fillComboBoxes() )
+
+\code
+dir = QDir( dataPath + "/data/langs/", "*.lang");
+syntaxFiles = dir.entryList(QDir::Files);
+comboBox_syntax->addItems( syntaxFiles );
+	
+dir = QDir( dataPath + "/data/colors/", "*.xml");
+colorFiles = dir.entryList(QDir::Files);	
+comboBox_colors->addItems( colorFiles );
+\endcode
+
+
+Each time one of the combo boxes, a new slot is triggered,
+which runs this code to change the highlighter and color definition:
+
+\code
+defColors = new QsvColorDefFactory( dataPath + "/data/colors/" + comboBox_colors->currentText() );	
+
+// set the background of the texteditor, to the same as the syntax		
+// also set the default color of the syntax
+// this must be done before setting the new syntax highlighter
+QPalette p( palette() );
+QsvColorDef dsNormal = defColors->getColorDef("dsNormal");
+
+if (dsNormal.getBackground().isValid())
+	p.setColor( QPalette::Base, dsNormal.getBackground() );
+p.setColor( QPalette::Text, dsNormal.getColor() );
+textEdit->setPalette( p );
+textEdit->setTextColor( dsNormal.getColor() );
+
+defLang   = new QsvLangDef( dataPath + "/data/langs/" + comboBox_syntax->currentText() );
+highlight = new QsvSyntaxHighlighter( textEdit, defColors, defLang );
+\endcode
+
+
+\b Next \ref demo3
+
+
+\page demo3 QtSourceViewHighlight - demo3: asking the language definition manager for the best highlighter available
+
+\b Next \ref demo4
+
+This demo shows how you can ask the syntax highlighter manager for the most suited 
+syntax definition available for you. Code used is:
+
+\code
+QsvLangDef *langDefinition;
+QsvSyntaxHighlighter *highlight;
+...
+
+langDefinition = QsvLangDefFactory::getInstanse()->getHighlight( fileName );
+highlight->setHighlight( langDefinition );
+\endcode
+
+The library uses an internal mime database to find the most suited definition
+for you. This is done by QsvLangDefFactory::addDefaultMimeTypes() which is called
+by the constructor. If you wish to use your own mimes, please use this code:
+
+\code
+QsvLangDefFactory::getInstanse()->clearMimeTypes();
+QsvLangDefFactory::getInstanse()->addMimeTypes("my/dir/contains/mime.types");
+\endcode
+
+The code in demo3 asks the user for a file using the standard QFileDialog::getOpenFileName()
+and loads the file, and sets the correct syntax highlighter definition:
+
+\code
+static QString lastDir;
+QString fileName = QFileDialog::getOpenFileName( this, "Open file", lastDir, "*" );
+
+if (fileName.isEmpty() )
+	return;
+
+QFile file(fileName);
+if (!file.open(QFile::ReadOnly | QFile::Text))
+{
+	QMessageBox::warning(this, tr("Demo 3"),
+		tr("Cannot read file %1:\n%2.")
+		.arg(fileName)
+		.arg(file.errorString()));
+	return;
+}
+
+QFileInfo info(file);
+lastDir = info.absolutePath();
+
+// detect the best hightlight for this file type
+// clear the document, so it will not get painted as well
+textEdit->clear();
+langDefinition = QsvLangDefFactory::getInstanse()->getHighlight( fileName );
+highlight->setHighlight( langDefinition );
+
+QTextStream in(&file);
+QApplication::setOverrideCursor(Qt::WaitCursor);
+textEdit->setPlainText(in.readAll());
+QApplication::restoreOverrideCursor();
+
+if (langDefinition)
+	statusBar()->showMessage(tr("File loaded, with syntax highlighter for %1").arg(langDefinition->getName()), MessageTimeOut );
+else
+	statusBar()->showMessage(tr("File loaded, no syntax highlighter"), MessageTimeOut );
+\endcode
+
+Note that after getting the syntax highlighter we can query it's internal meta data. For 
+more information look into QsvLangDef
+
+\b Next \ref demo4
+
+
+\page demo4 QtSourceViewHighlight  - demo4: text editor control (work in progress)
+\b Next \ref demo5
+
+\note
+This code is still a work in progress. Even tough it works, it has it's rough edges,
+and is not compatible with \ref Qate. The parenthesis mathing is based on the example on QtQuarterly #31, http://doc.trolltech.com/qq/QtQuarterly31.pdf (http://doc.trolltech.com/qq/qq31-parenthesis.zip). 
+
+This demo shows a text editor widget I am working on. It contains internal find/replace/goto line
+commands, and can display messages on the top of the widget. It was designed to be very keyboard 
+centric and easy to embed inside applications. It can work with another syntax highlighter 
+(see \ref demo5 for a more complete example).
+
+For the parenthesis mathcing the editor needs it's own syntax highlighter. In 
+this application we create a new one, which basically does nothing, and then 
+assign it to the editor. The editor also has a widget which can be used to
+search, replace or "goto line". From this point, the editor is now self
+sustaining, and does all the work for you. It also contains several QAction for
+you to add into your application's menus or toolbars. For more information 
+look inside QsvTextEdit documentation.
+
+\code
+class MyHighlighter: public QSyntaxHighlighter, public QsvSyntaxHighlighterBase
+{
+public:
+	MyHighlighter( QObject *parent=NULL) : QSyntaxHighlighter(parent)
+	{
+		setMatchBracketList("()[]''\"\"");
+	}
+	void highlightBlock(const QString &text)
+	{
+		QsvSyntaxHighlighterBase::highlightBlock(text);
+	}
+	virtual QTextBlockUserData* currentBlockUserDataProxy() 
+	{
+		return currentBlockUserData();
+	}
+	virtual void setCurrentBlockUserDataProxy(QTextBlockUserData * data)
+	{
+		setCurrentBlockUserData(data);
+	}
+};
+
+MyHighlighter           *highligher     = new MyHighlighter;
+QsvTextEdit             *editor         = new QsvTextEdit(this, highligher);
+QsvTextOperationsWidget *textOpetations = new QsvTextOperationsWidget(editor);
+\endcode
+
+
+
+\b Next \ref demo5
+
+
+\page demo5 QtSourceViewHighlight  - demo5: a working text editor
+
+\code
+QsvLangDefFactory::getInstanse()->loadDirectory( dataPath + "/data/langs/" );
+editor           = new QsvTextEdit(this, NULL);
+defColors        = new QsvColorDefFactory( dataPath + "/data/colors/kate.xml" );
+langDefinition   = QsvLangDefFactory::getInstanse()->getHighlight("1.cpp");
+highlight        = new MyHighlighter(editor->document());
+textOpetations   = new QsvTextOperationsWidget(editor);
+\endcode
+
+
 */
