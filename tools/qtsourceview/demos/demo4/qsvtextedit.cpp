@@ -1295,18 +1295,28 @@ void	QsvTextEdit::paintPanel(QPaintEvent*e)
 		return;
 
 	QPainter p(m_panel);
+	QTextBlock current = textCursor().block();
 	QTextBlock block = firstVisibleBlock();
+	QString s;
 	int y = blockBoundingRect(block).translated(contentOffset()).top();
 	int l = block.blockNumber();
 	int h = fontMetrics().height();
 	int w = m_panel->width();
-	QString s;
 
 	p.setFont(font());
 	p.fillRect( e->rect(), m_panelColor );
 	while (block.isValid() && block.isVisible()){
 		s = s.number(l);
-		p.drawText( 0, y, w-5, h, Qt::AlignRight, s );
+		if (block.isVisible() &&  block == current) {
+			QFont f = p.font();
+			f.setBold(true);
+			p.setFont(f);
+			p.drawText( 0, y, w-5, h, Qt::AlignRight, s );
+			f.setBold(false);
+			p.setFont( f );
+		}
+		else
+			p.drawText( 0, y, w-5, h, Qt::AlignRight, s );
 
 		QsvBlockData *data = dynamic_cast<QsvBlockData*>(block.userData());
 		if (data) {
