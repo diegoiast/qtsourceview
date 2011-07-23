@@ -81,7 +81,7 @@ void QsvTextOperationsWidget::initReplaceWidget()
 	replaceFormUi->optionsGroupBox->hide();
 	replaceFormUi->findText->setFont( m_replace->parentWidget()->font() );
 	replaceFormUi->replaceText->setFont( m_replace->parentWidget()->font() );
-	if (searchFormUi->frame->style()->inherits("QWindowsXPStyle"))
+	if (replaceFormUi->frame->style()->inherits("QWindowsXPStyle"))
 		replaceFormUi->frame->setFrameStyle(QFrame::StyledPanel);
 	// otherwise it inherits the default font from the editor - fixed
 	m_replace->setFont(QApplication::font());
