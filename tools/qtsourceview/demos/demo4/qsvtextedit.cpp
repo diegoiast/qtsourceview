@@ -49,10 +49,10 @@ QsvTextEdit::QsvTextEdit( QWidget *parent, QsvSyntaxHighlighterBase *s ):
 	m_banner->setObjectName("banner");
 	ui_banner = new Ui::BannerMessage;
 	ui_banner->setupUi(m_banner);
-//	ui_banner->frame->setFrameStyle(QFrame::Box);
 	m_topWidget = NULL;
 	m_bottomWidget = NULL;
-	
+	if (ui_banner->frame->style()->inherits("QWindowsXPStyle"))
+		ui_banner->frame->setFrameStyle(QFrame::StyledPanel);
 	m_selectionTimer.setSingleShot(true);
 	m_selectionTimer.setInterval(200);
 	
