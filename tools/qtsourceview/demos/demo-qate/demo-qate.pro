@@ -11,8 +11,8 @@ DESTDIR		=	../../
 #include(../../src/qate.pri)
 CONFIG		+=	qt warn_on
 QT              +=      xml network
-TARGET		=	demo6
-SOURCES		+=	demo6.cpp
+TARGET		=	demo-qate
+SOURCES		+=	demo-qate.cpp
 
 # TODO
 #   in the future, the correct syntax should be
@@ -20,5 +20,5 @@ SOURCES		+=	demo6.cpp
 DEFINES         +=      CORE_EXPORT=Q_DECL_EXPORT
 LIBS		=	-L../../ -lqate
 INCLUDEPATH	=	../../src ../../src/qate
-TARGET		=	../../demo6
+TARGET		=	demo6-qate
 
