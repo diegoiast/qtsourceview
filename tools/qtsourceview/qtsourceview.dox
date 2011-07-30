@@ -12,6 +12,10 @@ This is a bundle of several libraires:
 Note that while QtSourceViewHighlight is deprecated, this is the only "usable"
 highlighter available as Qate is not yet stable.
 
+\image html demo5-explain.png
+
+Don't know what this image is? Follow this link: \ref QtSourceViewHighlight 
+
 \page Qate Qate - Highlighter engine based on KatePart
 
 This is a port of the generic syntax highlighter found in Nokia's QtCreator
