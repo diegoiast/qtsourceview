@@ -192,7 +192,7 @@ definition inside Kate XML files. The factory for loading them is also is origin
 
 \b Next \ref demo1 
  
-\page demo1 QtSourceViewHighlight - demo1: use the syntax hilghlighter
+\page demo1 QtSourceViewHighlight - demo1: using the syntax hilghlighter
  
  \b Next \ref demo2
 
@@ -260,6 +260,9 @@ and color of an available text. The application loads by the available language
 definition files, and color definition files ( see MainWindow2::fillComboBoxes() )
 
 \code
+QString dir;
+QStringList colorFiles, syntaxFiles;
+
 dir = QDir( dataPath + "/data/langs/", "*.lang");
 syntaxFiles = dir.entryList(QDir::Files);
 comboBox_syntax->addItems( syntaxFiles );
@@ -430,5 +433,12 @@ highlight        = new MyHighlighter(editor->document());
 textOpetations   = new QsvTextOperationsWidget(editor);
 \endcode
 
+\htmlonly
+<div align='center'>
+<embed src="demo5.svg" width="896px" height="596px" type="image/svg+xml" pluginspage="http://www.adobe.com/svg/viewer/install/" />
 
+</div>
+\endhtmlonly 
 */
+// x = 742 + 150  = 892
+// y = 562 + 25   = 585
