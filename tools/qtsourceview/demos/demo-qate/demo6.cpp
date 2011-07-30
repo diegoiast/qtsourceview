@@ -95,7 +95,7 @@ int main( int argc, char* argv[] )
         if (!highlight_definition.isNull())
 		highlight->setDefaultContext(highlight_definition->initialContext());
 
-	load_text(TEST_FILE, text_editor);
+	load_text(argv[1], text_editor);
 	main_window->setWindowTitle("Kate syntax highter test");
 	main_window->setCentralWidget(text_editor);
 	main_window->show();
@@ -111,4 +111,3 @@ void load_text(QString fe, QPlainTextEdit *te )
 	te->setPlainText(s);
 	te->setLineWrapMode(QPlainTextEdit::NoWrap);
 }
-
