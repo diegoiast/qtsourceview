@@ -7,17 +7,18 @@ DESTDIR		=	../../
 
 # set the Qate source dir, and include the pri file
 # then add your sources and that's it
-QATE_SRC_DIR=../../src/
-include(../../src/qate.pri)
-CONFIG		+=	qt warn_on silent
+#QATE_SRC_DIR=../../src/
+#include(../../src/qate.pri)
+CONFIG		+=	qt warn_on
+QT              +=      xml network
 TARGET		=	demo6
 SOURCES		+=	demo6.cpp
 
 # TODO
 #   in the future, the correct syntax should be
 #   right now this will not work, because of include path not set correctly
-#LIBS		=	-L../../ -lqate
-#INCLUDEPATH	=	../../src 
-#TARGET		=	../../demo6
-#SOURCES	+=	demo6.cpp
+DEFINES         +=      CORE_EXPORT=Q_DECL_EXPORT
+LIBS		=	-L../../ -lqate
+INCLUDEPATH	=	../../src ../../src/qate
+TARGET		=	../../demo6
 
