@@ -24,10 +24,10 @@ editor:
  - By asking the highlight definition manager the best syntax \ref loading_definition_by_mime
 
 \note 
-The qate library is under heavy development. As the moment, the library is not 
-a full fork of the code, and it depends on you having the code of QtCreator
-available locally. I only forked the minimal code needed to get this
-working, and all forked classes are inside the namespace Qate.
+The qate library is under heavy development. I forked some code and new classes
+(or modified classes) are under the Qate namespace. This documentation still
+does not cover the Qate library, and the documentation is still a work in 
+progress.
 
 To compile the code you will need to add inside src directory a file with this content:
 
@@ -424,6 +424,43 @@ QsvTextOperationsWidget *textOpetations = new QsvTextOperationsWidget(editor);
 
 \page demo5 QtSourceViewHighlight  - demo5: a working text editor
 
+This is a (more or less) real life example of using teh QtSourceViewHighlight in 
+an application. It uses the editor widget showed in \ref demo4, and the highlighter
+showed in \ref demo3 to create a real highlighter (unlike the one in demo4).
+
+This image displays the code features of this application:
+
+\image html demo5-explain.png
+
+The code for the highlighter is:
+\code
+class MyHighlighter: public QsvSyntaxHighlighter, public QsvSyntaxHighlighterBase
+{
+public:
+	MyHighlighter(QTextDocument *parent): QsvSyntaxHighlighter(parent)
+	{
+		setMatchBracketList("{}()[]''\"\"");
+	}
+
+	void highlightBlock(const QString &text)
+	{
+		QsvSyntaxHighlighterBase::highlightBlock(text);
+		QsvSyntaxHighlighter::highlightBlock(text);
+	}
+	
+	virtual QTextBlockUserData* currentBlockUserDataProxy() 
+	{
+		return currentBlockUserData();
+	}
+
+	virtual void setCurrentBlockUserDataProxy(QTextBlockUserData * data)
+	{
+		setCurrentBlockUserData(data);
+	}
+};
+\endcode
+
+Then we create the editor, and assign it the new highlighter:
 \code
 QsvLangDefFactory::getInstanse()->loadDirectory( dataPath + "/data/langs/" );
 editor           = new QsvTextEdit(this, NULL);
@@ -433,12 +470,22 @@ highlight        = new MyHighlighter(editor->document());
 textOpetations   = new QsvTextOperationsWidget(editor);
 \endcode
 
-\htmlonly
-<div align='center'>
-<embed src="demo5.svg" width="896px" height="596px" type="image/svg+xml" pluginspage="http://www.adobe.com/svg/viewer/install/" />
+Note that we also need to update the synyax highlighter after loading a file:
 
-</div>
-\endhtmlonly 
+\code
+const QString dir;
+if (filename.isEmpty()) {
+	filename = QFileDialog::getOpenFileName(this,tr("Load file"),dir);
+	if (filename.isEmpty())
+		return;
+}
+editor->clear();
+langDefinition = QsvLangDefFactory::getInstanse()->getHighlight(filename);
+highlight->setHighlight(langDefinition);
+editor->loadFile(filename);
+editor->removeModifications();
+setWindowTitle(filename);
+\endcode
+
+
 */
-// x = 742 + 150  = 892
-// y = 562 + 25   = 585
