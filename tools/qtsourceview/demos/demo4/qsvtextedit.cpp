@@ -533,7 +533,7 @@ void	QsvTextEdit::gotoMatchingBracket()
 	
 	QTextCursor cursor = textCursor();
 	// does this line have any brakcets?
-	QsvBlockData *data = static_cast<QsvBlockData*>(cursor.block().userData());
+	QsvBlockData *data = getPrivateBlockData(cursor.block(),false);
 	if (!data)
 		return;
 
@@ -565,6 +565,10 @@ void 	QsvTextEdit::toggleBookmark()
 {
 	QTextCursor cursor = textCursor();
 	QsvBlockData *data = getPrivateBlockData(cursor.block(),true);
+	if (!data){
+	    displayBannerMessage(tr("DEBUG: Please use a proper QsvSyntaxHighlighter for having bookmarks"));
+	    return;
+	}
 	data->toggleBookmark();
 	resetExtraSelections();
 }
@@ -598,7 +602,7 @@ void	QsvTextEdit::updateExtraSelections()
 		goto NO_MATCHES;
 
 	// does this line have any brakcets?
-	data = static_cast<QsvBlockData*>(textCursor().block().userData());
+	data = getPrivateBlockData(textCursor().block(),false);
 	if (!data)
 		goto NO_MATCHES;
 	
@@ -639,7 +643,7 @@ void	QsvTextEdit::removeModifications()
 {
 	int i = 1;
 	for ( QTextBlock block = document()->begin(); block.isValid(); block = block.next() ) {
-		QsvBlockData *data = dynamic_cast<QsvBlockData*>( block.userData() );
+		QsvBlockData *data = getPrivateBlockData(block,false);
 		if (!data)
 			continue;
 		data->m_isModified = false;
@@ -1036,7 +1040,7 @@ int	QsvTextEdit::findMatchingChar( QChar c1, QChar c2, bool forward, QTextBlock 
 	int i = 1;
 	while (block.isValid())
 	{
-		QsvBlockData *data = static_cast<QsvBlockData*>(block.userData());
+		QsvBlockData *data = getPrivateBlockData(block,false);
 		for( int k=0; (data) && (k<data->matches.length()); k++)
 		{
 			int j = forward? k : data->matches.length() - k - 1;
@@ -1318,7 +1322,7 @@ void	QsvTextEdit::paintPanel(QPaintEvent*e)
 		else
 			p.drawText( 0, y, w-5, h, Qt::AlignRight, s );
 
-		QsvBlockData *data = dynamic_cast<QsvBlockData*>(block.userData());
+		QsvBlockData *data = getPrivateBlockData(block,false);
 		if (data) {
 //			if (data->m_isBookmark)
 //				p.drawPixmap( 2, y, m_panel->m_bookMarkImage );
