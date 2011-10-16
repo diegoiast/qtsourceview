@@ -16,7 +16,7 @@ QsvSyntaxHighlighterBase::~QsvSyntaxHighlighterBase()
 
 void QsvSyntaxHighlighterBase::highlightBlock(const QString &text)
 {
-	QsvBlockData *data = static_cast<QsvBlockData*>(currentBlockUserDataProxy());
+	QsvBlockData *data = currentBlockUserDataProxy();
 	if (data)
 		data->matches.clear();
 

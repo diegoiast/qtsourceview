@@ -23,16 +23,25 @@ public:
 		QsvSyntaxHighlighterBase::highlightBlock(text);
 	}
 	
-	virtual QTextBlockUserData* currentBlockUserDataProxy() 
+	virtual QsvBlockData* currentBlockUserDataProxy() 
 	{
-		return currentBlockUserData();
+		return dynamic_cast<QsvBlockData*>(currentBlockUserData());
 	}
 
-	virtual void setCurrentBlockUserDataProxy(QTextBlockUserData * data)
+	virtual void setCurrentBlockUserDataProxy(QsvBlockData * data)
 	{
 		setCurrentBlockUserData(data);
 	}
-	
+
+	virtual QsvBlockData* blockDataProxy(QTextBlock &block)
+	{
+		return dynamic_cast<QsvBlockData*>(block.userData());
+	}
+
+	virtual void setBlockDataProxy(QTextBlock &block, QTextBlockUserData *data)
+	{
+		block.setUserData(data);
+	}
 };
 
 class MainWindow : QMainWindow

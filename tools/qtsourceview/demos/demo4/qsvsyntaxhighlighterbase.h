@@ -62,8 +62,10 @@ public:
 	void highlightBlock(const QString &text);
 	void setTextDocument(QTextDocument * document);
 	
-	virtual QTextBlockUserData* currentBlockUserDataProxy() = 0;
-	virtual void setCurrentBlockUserDataProxy(QTextBlockUserData * data) = 0;
+	virtual QsvBlockData* currentBlockUserDataProxy() = 0;
+	virtual void setCurrentBlockUserDataProxy(QsvBlockData * data) = 0;
+	virtual QsvBlockData* blockDataProxy(QTextBlock &block) = 0;
+	virtual void setBlockDataProxy(QTextBlock &block, QTextBlockUserData *data) = 0;
 protected:
 	QString m_matchBracketsList;
 };

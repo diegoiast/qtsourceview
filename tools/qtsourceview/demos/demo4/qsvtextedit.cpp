@@ -1070,18 +1070,30 @@ int	QsvTextEdit::findMatchingChar( QChar c1, QChar c2, bool forward, QTextBlock 
 
 QsvBlockData* QsvTextEdit::getPrivateBlockData( QTextBlock block, bool createIfNotExisting )
 {
+#if 1
+	if (m_highlighter == NULL)
+		return NULL;
+	QsvBlockData  *data = m_highlighter->blockDataProxy(block);
+	if (data)
+		return data;
+	if (!data && createIfNotExisting) {
+		data = new QsvBlockData;
+		m_highlighter->setBlockDataProxy(block,data);
+	}
+	return data;
+#else
 	QTextBlockUserData  *d1   = block.userData();
 	QsvBlockData *data = dynamic_cast<QsvBlockData*>(d1);
 
 	// a user data has been defined, and it's not our structure
 	if (d1 && !data)
 		return NULL;
-
 	if (!data && createIfNotExisting) {
 		data = new QsvBlockData;
 		block.setUserData(data);
 	}
 	return data;
+#endif
 }
 
 QTextEdit::ExtraSelection QsvTextEdit::getSelectionForBlock( QTextCursor &cursor, QTextCharFormat &format )
