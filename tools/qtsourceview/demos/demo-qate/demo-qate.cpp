@@ -35,13 +35,13 @@ int main( int argc, char* argv[] )
 
 	Qate::MimeDatabase                                        *mimes;
 	Qate::HighlightDefinitionManager                          *hl_manager;
-	TextEditor::Internal::Highlighter                         *highlight;
+	TextEditor::Internal::Highlighter                         *highlighter;
 	QSharedPointer<TextEditor::Internal::HighlightDefinition>  highlight_definition;
 	
 	// create the main widget
 	text_editor = new QPlainTextEdit(main_window);
-	highlight   = new TextEditor::Internal::Highlighter(text_editor->document());
-	Qate::DefaultColors::ApplyToHighlighter(highlight);
+	highlighter   = new TextEditor::Internal::Highlighter(text_editor->document());
+	Qate::DefaultColors::ApplyToHighlighter(highlighter);
 	text_editor->setFont( QFont("Courier new",10) );
 	
 	// create the highlighters manager
@@ -93,7 +93,7 @@ int main( int argc, char* argv[] )
         }
 #endif
         if (!highlight_definition.isNull())
-		highlight->setDefaultContext(highlight_definition->initialContext());
+		highlighter->setDefaultContext(highlight_definition->initialContext());
 
 	load_text(argv[1], text_editor);
 	main_window->setWindowTitle("Kate syntax highter test");
