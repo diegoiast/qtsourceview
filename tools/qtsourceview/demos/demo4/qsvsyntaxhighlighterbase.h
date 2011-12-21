@@ -43,10 +43,18 @@ public:
 	{
 		setFlag(f,!m_flags.testFlag(f));
 	}
+	
+	bool testFlag( LineFlag f )
+	{
+		return m_flags.testFlag(f);
+	}
 
+	bool isModified()		{ return m_isModified; }
 	void setBookmark( bool on )	{ setFlag(Bookmark,on); }
 	void toggleBookmark()		{ toggleFlag(Bookmark); }
+	bool isBookmark()		{ return m_flags.testFlag(Bookmark); }
 	void setDebug( bool on )	{ setFlag(Debug,on);    }
+	bool isDebug()			{ return m_flags.testFlag(Debug); }
 	void toggleDebug()		{ toggleFlag(Debug);    }
 };	
 Q_DECLARE_OPERATORS_FOR_FLAGS(QsvBlockData::LineFlags);
@@ -56,16 +64,19 @@ class QsvSyntaxHighlighterBase
 public:
 	QsvSyntaxHighlighterBase();
 	virtual ~QsvSyntaxHighlighterBase();
+	
+	virtual void toggleBookmark(QTextBlock &block) = 0;
+	virtual void removeModification(QTextBlock &block) = 0;
+	virtual void setBlockModified(QTextBlock &block, bool on) = 0;
+	virtual bool isBlockModified(QTextBlock &block) = 0;
+	virtual bool isBlockBookmarked(QTextBlock &block) = 0;
+	virtual QsvBlockData::LineFlags getBlockFlags(QTextBlock &block) = 0;
 
 	void setMatchBracketList( const QString &m );
 	const QString getMatchBracketList();
 	void highlightBlock(const QString &text);
 	void setTextDocument(QTextDocument * document);
-	
-	virtual QsvBlockData* currentBlockUserDataProxy() = 0;
-	virtual void setCurrentBlockUserDataProxy(QsvBlockData * data) = 0;
-	virtual QsvBlockData* blockDataProxy(QTextBlock &block) = 0;
-	virtual void setBlockDataProxy(QTextBlock &block, QTextBlockUserData *data) = 0;
+
 protected:
 	QString m_matchBracketsList;
 };

@@ -138,7 +138,6 @@ protected:
 	int getIndentationSize( const QString s );
 	QString updateIndentation( QString s, int indentation );
 	int findMatchingChar( QChar c1, QChar c2, bool forward, QTextBlock &block, int from );
-	QsvBlockData *getPrivateBlockData( QTextBlock block, bool createIfNotExisting );
 	QTextEdit::ExtraSelection getSelectionForBlock( QTextCursor &cursor, QTextCharFormat &format );
 	void resetExtraSelections();
 

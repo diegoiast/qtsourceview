@@ -16,6 +16,8 @@ QsvSyntaxHighlighterBase::~QsvSyntaxHighlighterBase()
 
 void QsvSyntaxHighlighterBase::highlightBlock(const QString &text)
 {
+#warning - port QsvSyntaxHighlighterBase::highlightBlock() to new API
+#if 0
 	QsvBlockData *data = currentBlockUserDataProxy();
 	if (data)
 		data->matches.clear();
@@ -43,6 +45,7 @@ void QsvSyntaxHighlighterBase::highlightBlock(const QString &text)
 		}
 	}
 	setCurrentBlockUserDataProxy(data);
+#endif
 }
 
 void QsvSyntaxHighlighterBase::setTextDocument(QTextDocument *document)

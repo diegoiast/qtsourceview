@@ -42,22 +42,6 @@ public:
 	{
 		setCurrentBlockUserData(data);
 	}
-
-	virtual QsvBlockData* blockDataProxy(QTextBlock &block)
-	{
-		TextBlockUserData *d = dynamic_cast<TextBlockUserData*>(block.userData());
-		if (d == NULL)
-			return NULL;
-		return reinterpret_cast<QsvBlockData*>(d->extraData);
-	}
-
-	virtual void setBlockDataProxy(QTextBlock &block, QsvBlockData *data)
-	{
-		TextBlockUserData *d = dynamic_cast<TextBlockUserData*>(block.userData());
-		if (d == NULL)
-			return;
-		d->extraData = data;
-	}
 };
 
 

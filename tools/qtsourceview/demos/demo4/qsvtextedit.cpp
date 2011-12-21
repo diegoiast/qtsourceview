@@ -532,11 +532,6 @@ void	QsvTextEdit::gotoMatchingBracket()
 	 */
 	
 	QTextCursor cursor = textCursor();
-	// does this line have any brakcets?
-	QsvBlockData *data = getPrivateBlockData(cursor.block(),false);
-	if (!data)
-		return;
-
 	QTextBlock  block     = cursor.block();
 	int blockPosition     = block.position();
 	int cursorPosition    = cursor.position();
@@ -563,13 +558,13 @@ void	QsvTextEdit::gotoMatchingBracket()
 
 void 	QsvTextEdit::toggleBookmark()
 {
-	QTextCursor cursor = textCursor();
-	QsvBlockData *data = getPrivateBlockData(cursor.block(),true);
-	if (!data){
-	    displayBannerMessage(tr("DEBUG: Please use a proper QsvSyntaxHighlighter for having bookmarks"));
-	    return;
+	if (!m_highlighter) {
+		displayBannerMessage(tr("DEBUG: Please use a proper QsvSyntaxHighlighter for having bookmarks"));
+		return;
 	}
-	data->toggleBookmark();
+	QTextCursor cursor = textCursor();
+	QTextBlock  block  = cursor.block();
+	m_highlighter->toggleBookmark(block);
 	resetExtraSelections();
 }
 
@@ -600,12 +595,8 @@ void	QsvTextEdit::updateExtraSelections()
 	
 	if (!m_config.matchBrackets)
 		goto NO_MATCHES;
-
-	// does this line have any brakcets?
-	data = getPrivateBlockData(textCursor().block(),false);
-	if (!data)
-		goto NO_MATCHES;
-	
+#warning QsvTextEdit::updateExtraSelections() - port to new API
+#if 0
 	block             = cursor.block();
 	blockPosition     = block.position();
 	cursorPosition    = cursor.position();
@@ -634,7 +625,7 @@ void	QsvTextEdit::updateExtraSelections()
 			j = findMatchingChar( m_config.matchBracketsList[j], m_config.matchBracketsList[j+1], true , block, cursorPosition );
 		appendExtraSelection(selections, j, this,m_matchesFormat);
 	}
-
+#endif
 NO_MATCHES:
 	setExtraSelections(selections);
 }
@@ -643,10 +634,7 @@ void	QsvTextEdit::removeModifications()
 {
 	int i = 1;
 	for ( QTextBlock block = document()->begin(); block.isValid(); block = block.next() ) {
-		QsvBlockData *data = getPrivateBlockData(block,false);
-		if (!data)
-			continue;
-		data->m_isModified = false;
+		m_highlighter->removeModification(block);
 		i ++;
 	}
 	m_panel->update();
@@ -657,23 +645,21 @@ void	QsvTextEdit::on_textDocument_contentsChange( int position, int charsRemoved
 	if (!m_config.modificationsLookupEnabled)
 		return;
 
+	QTextCursor cursor( document() );
+	QTextBlock  block;
 	if (charsAdded < 2) {
-		QsvBlockData* data = getPrivateBlockData( textCursor().block(), true );
-		if (!data)		return;
-		if (data->m_isModified)	return;
-		data->m_isModified = true;
+		block = this->textCursor().block();
+		m_highlighter->setBlockModified(block, true);
 	}
 	else {
 		int remaining = 0;
-		QTextCursor cursor( document() );
 		cursor.setPosition( position );
+		
 		int oldRemaining = -1;
 		while ( (remaining+1 < charsAdded) && (oldRemaining != remaining) ){
 			oldRemaining = remaining;
-			QsvBlockData* data = getPrivateBlockData( cursor.block(), true );
-			// should not happen, but can't be too safe
-			if (data)
-				data->m_isModified = true;
+			block = cursor.block();
+			m_highlighter->setBlockModified(block, true);
 			cursor.movePosition( QTextCursor::NextBlock );
 			remaining = cursor.position() - position;
 		}
@@ -1037,6 +1023,8 @@ QString	QsvTextEdit::updateIndentation( QString s, int indentation )
 
 int	QsvTextEdit::findMatchingChar( QChar c1, QChar c2, bool forward, QTextBlock &block, int from )
 {
+#warning QsvTextEdit::findMatchingChar() - port to new API
+#if 0
 	int i = 1;
 	while (block.isValid())
 	{
@@ -1065,35 +1053,8 @@ int	QsvTextEdit::findMatchingChar( QChar c1, QChar c2, bool forward, QTextBlock 
 		else
 			block = block.previous();
 	}
-	return -1;
-}
-
-QsvBlockData* QsvTextEdit::getPrivateBlockData( QTextBlock block, bool createIfNotExisting )
-{
-#if 1
-	if (m_highlighter == NULL)
-		return NULL;
-	QsvBlockData  *data = m_highlighter->blockDataProxy(block);
-	if (data)
-		return data;
-	if (!data && createIfNotExisting) {
-		data = new QsvBlockData;
-		m_highlighter->setBlockDataProxy(block,data);
-	}
-	return data;
-#else
-	QTextBlockUserData  *d1   = block.userData();
-	QsvBlockData *data = dynamic_cast<QsvBlockData*>(d1);
-
-	// a user data has been defined, and it's not our structure
-	if (d1 && !data)
-		return NULL;
-	if (!data && createIfNotExisting) {
-		data = new QsvBlockData;
-		block.setUserData(data);
-	}
-	return data;
 #endif
+	return -1;
 }
 
 QTextEdit::ExtraSelection QsvTextEdit::getSelectionForBlock( QTextCursor &cursor, QTextCharFormat &format )
@@ -1110,19 +1071,17 @@ QTextEdit::ExtraSelection QsvTextEdit::getSelectionForBlock( QTextCursor &cursor
 
 void	QsvTextEdit::resetExtraSelections()
 {
+	if (m_highlighter==NULL) {
+		displayBannerMessage(tr("DEBUG: Please use a proper QsvSyntaxHighlighter"));
+		return;
+	}
+	
 	QTextBlock  block = document()->firstBlock();
 	int i = 0;
 	
 	m_selections.clear();
 	while (block.isValid()){
-		QsvBlockData *data = getPrivateBlockData(block,false);
-		if (!data){
-			block = block.next();
-			i++;
-			continue;
-		}
-		
-		if (data->m_flags.testFlag(QsvBlockData::Bookmark)){
+		if (m_highlighter->getBlockFlags(block).testFlag(QsvBlockData::Bookmark)) {
 			QTextCursor cursor = textCursor();
 			QTextCharFormat format;
 			format.setBackground(m_bookmarkColor);
@@ -1255,23 +1214,15 @@ void	QsvTextEdit::gotoNextBookmark()
 {
 	QTextCursor c = textCursor();
 	QTextBlock  b = c.block().next();
-	int i;
 	
 	while(b.isValid()){
-		QsvBlockData *data = getPrivateBlockData(b,false);
-		i = b.blockNumber();
-		if (!data)
-			goto SKIP;
-		if (!data->m_flags.testFlag(QsvBlockData::Bookmark))
-			goto SKIP;
-		
-		// fount it
-		c.setPosition(b.position());
-		setTextCursor(c);
-		return;
-	SKIP:
+		// found it
+		if (m_highlighter->isBlockBookmarked(b)) {
+			c.setPosition(b.position());
+			setTextCursor(c);
+			return;
+		}
 		b = b.next();
-		continue;
 	}
 }
 
@@ -1281,19 +1232,13 @@ void	QsvTextEdit::gotoPrevBookmark()
 	QTextBlock  b = c.block().previous();
 	
 	while(b.isValid()){
-		QsvBlockData *data = getPrivateBlockData(b,false);
-		if (!data)
-			goto SKIP;
-		if (!data->m_flags.testFlag(QsvBlockData::Bookmark))
-			goto SKIP;
-		
-		// fount it
-		c.setPosition(b.position());
-		setTextCursor(c);
-		return;
-	SKIP:
+		// found it
+		if (m_highlighter->isBlockBookmarked(b)) {
+			c.setPosition(b.position());
+			setTextCursor(c);
+			return;
+		}
 		b = b.previous();
-		continue;
 	}
 }
 
@@ -1334,13 +1279,10 @@ void	QsvTextEdit::paintPanel(QPaintEvent*e)
 		else
 			p.drawText( 0, y, w-5, h, Qt::AlignRight, s );
 
-		QsvBlockData *data = getPrivateBlockData(block,false);
-		if (data) {
-//			if (data->m_isBookmark)
-//				p.drawPixmap( 2, y, m_panel->m_bookMarkImage );
-			if (data->m_isModified)
-				p.fillRect( w-3, y, 2, h, m_modifiedColor );
-		}
+//		if (m_highlighter->isBlockBookmarked(block))
+//			p.drawPixmap( 2, y, m_panel->m_bookMarkImage );
+		if (m_highlighter->isBlockModified(block))
+			p.fillRect( w-3, y, 2, h, m_modifiedColor );
 		y += blockBoundingRect(block).height();
 		block = block.next();
 		l ++;

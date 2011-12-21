@@ -23,24 +23,66 @@ public:
 		QsvSyntaxHighlighterBase::highlightBlock(text);
 	}
 	
-	virtual QsvBlockData* currentBlockUserDataProxy() 
+	virtual void toggleBookmark(QTextBlock &block)
 	{
-		return dynamic_cast<QsvBlockData*>(currentBlockUserData());
+		QsvBlockData *data = getBlockData(block);
+		if (data == NULL)
+			return;
+		data->toggleBookmark();
 	}
 
-	virtual void setCurrentBlockUserDataProxy(QsvBlockData * data)
+	virtual void removeModification(QTextBlock &block)
 	{
-		setCurrentBlockUserData(data);
+		QsvBlockData *data = getBlockData(block);
+		if (data == NULL)
+			return;
+		data->m_isModified = false;
 	}
 
-	virtual QsvBlockData* blockDataProxy(QTextBlock &block)
+	virtual void setBlockModified(QTextBlock &block, bool on)
 	{
-		return dynamic_cast<QsvBlockData*>(block.userData());
+		QsvBlockData *data = getBlockData(block);
+		if (data == NULL)
+			return;
+		data->m_isModified =  true;
 	}
 
-	virtual void setBlockDataProxy(QTextBlock &block, QTextBlockUserData *data)
+	virtual bool isBlockModified(QTextBlock &block)
 	{
-		block.setUserData(data);
+		QsvBlockData *data = getBlockData(block);
+		if (data == NULL)
+			false;
+		return data->m_isModified;
+	}
+
+	virtual bool isBlockBookmarked(QTextBlock &block)
+	{
+		QsvBlockData *data = getBlockData(block);
+		if (data == NULL)
+			return false;
+		return data->isBookmark();
+	}
+
+	virtual QsvBlockData::LineFlags getBlockFlags(QTextBlock &block)
+	{
+		QsvBlockData *data = getBlockData(block);
+		if (data == NULL)
+			return false;
+		return data->m_flags;
+	}
+	
+	QsvBlockData *getBlockData(QTextBlock &block)
+	{
+		QTextBlockUserData *userData  = block.userData();
+		QsvBlockData       *blockData = NULL;
+		
+		if (userData == NULL){
+			blockData =  new QsvBlockData();
+			block.setUserData(blockData);
+		} else {
+			blockData = dynamic_cast<QsvBlockData*>(userData);
+		}
+		return blockData;
 	}
 };
 
