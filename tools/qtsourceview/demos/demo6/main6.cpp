@@ -23,24 +23,39 @@
 class MyHighlighter: public TextEditor::Internal::Highlighter, public QsvSyntaxHighlighterBase
 {
 public:
-	MyHighlighter( QTextDocument *parent=NULL) : TextEditor::Internal::Highlighter(parent)
+	MyHighlighter(QTextDocument *parent): TextEditor::Internal::Highlighter(parent)
 	{
-		setMatchBracketList("()[]''\"\"");
+		setMatchBracketList("{}()[]''\"\"");
 	}
 
 	void highlightBlock(const QString &text)
 	{
 		QsvSyntaxHighlighterBase::highlightBlock(text);
+		TextEditor::Internal::Highlighter::highlightBlock(text);
 	}
 
-	virtual QsvBlockData* currentBlockUserDataProxy()
+	virtual void toggleBookmark(QTextBlock &block)
 	{
-		return dynamic_cast<QsvBlockData*>(currentBlockUserData());
 	}
 
-	virtual void setCurrentBlockUserDataProxy(QsvBlockData * data)
+	virtual void removeModification(QTextBlock &block)
 	{
-		setCurrentBlockUserData(data);
+	}
+
+	virtual void setBlockModified(QTextBlock &block, bool on)
+	{
+	}
+
+	virtual bool isBlockModified(QTextBlock &block)
+	{
+	}
+
+	virtual bool isBlockBookmarked(QTextBlock &block)
+	{
+	}
+
+	virtual QsvBlockData::LineFlags getBlockFlags(QTextBlock &block)
+	{
 	}
 };
 
