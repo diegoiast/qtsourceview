@@ -124,7 +124,11 @@ QStringList HighlightDefinitionManager::definitionsPaths() const
         l.append("C:\\QtSDK\\QtCreator\\share\\qtcreator\\generic-highlighter\\");
         l.append(QDir::homePath() + "\\AppData\\Roaming\\Nokia\\qtcreator\\generic-highlighter\\");
 #else
+	// ubuntu/debian
         l.append("/usr/share/kde4/apps/katepart/syntax/");
+	// arch
+	l.append("/usr/share/apps/katepart/syntax/");
+	// user instaled dirs
         l.append("~/.kde/share/apps/katepart/syntax/");
         l.append("~/.kde4/share/apps/katepart/syntax/");
 #endif
