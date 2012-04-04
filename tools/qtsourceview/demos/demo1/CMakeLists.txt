@@ -4,9 +4,9 @@ PROJECT(demo1)
 CMAKE_MINIMUM_REQUIRED(VERSION 2.4.0)
 
 # input files
-SET( demo1_UIS		mainwindow1.ui )
-SET( demo1_SRCS		mainwindow1.cpp main1.cpp )
-SET( demo1_MOC_HDRS	mainwindow1.h )
+SET( demo1_UIS		 )
+SET( demo1_SRCS		main1.cpp )
+SET( demo1_MOC_HDRS	 )
 
 # verbose - on
 # SET( CMAKE_VERBOSE_MAKEFILE  ON )
@@ -28,4 +28,5 @@ QT4_AUTOMOC		( ${demo1_SRCS}					)
 # build the file
 INCLUDE_DIRECTORIES	( ${QT_INCLUDE_DIR} ${CMAKE_BINARY_DIR} ../../src  )
 ADD_EXECUTABLE		( demo1	${demo1_SRCS} ${demo1_UIS_H} ${demo1_MOC_SRCS} ${demo1_UIS} )
-TARGET_LINK_LIBRARIES	( demo1	${QT_LIBRARIES} qtsourceview )
+TARGET_LINK_LIBRARIES	( demo1	${QT_LIBRARIES} qsvsh -L../../src/ )
+#SET(RUNTIME_OUTPUT_DIRECTORY ../../)
