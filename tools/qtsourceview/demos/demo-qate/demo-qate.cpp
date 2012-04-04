@@ -5,6 +5,8 @@
 #include <QIODevice>
 #include <QDir>
 
+#include <unistd.h>
+
 #include "context.h"
 #include "highlighter.h"
 #include "highlightdefinition.h"

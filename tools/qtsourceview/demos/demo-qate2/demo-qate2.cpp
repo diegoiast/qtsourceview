@@ -1,3 +1,4 @@
+#include <unistd.h>
 #include <QApplication>
 #include "demo-qate2.h"
 
