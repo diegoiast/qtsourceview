@@ -97,10 +97,14 @@ HighlightDefinitionManager *HighlightDefinitionManager::instance()
 }
 
 QString HighlightDefinitionManager::definitionIdByName(const QString &name) const
-{ return m_idByName.value(name); }
+{
+	return m_idByName.contains(name) ? m_idByName.value(name) : QString();
+}
 
 QString HighlightDefinitionManager::definitionIdByMimeType(const QString &mimeType) const
-{ return m_idByMimeType.value(mimeType); }
+{
+	return m_idByMimeType.contains(mimeType) ? m_idByMimeType.value(mimeType) : QString();
+}
 
 QString HighlightDefinitionManager::definitionIdByAnyMimeType(const QStringList &mimeTypes) const
 {
@@ -167,7 +171,9 @@ QSharedPointer<HighlightDefinitionMetaData> HighlightDefinitionManager::definiti
 { return m_definitionsMetaData.value(id); }
 
 bool HighlightDefinitionManager::isBuildingDefinition(const QString &id) const
-{ return m_isBuilding.contains(id); }
+{
+	return m_isBuilding.contains(id);
+}
 
 void HighlightDefinitionManager::registerMimeTypes()
 {
