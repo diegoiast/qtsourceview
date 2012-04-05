@@ -6,6 +6,14 @@ set(QATE_SOVERSION "0")
 # $Id$
 # definitions for the project
 # SET( CMAKE_VERBOSE_MAKEFILE  ON )
+
+# http://www.cmake.org/Wiki/CMake_FAQ#How_can_I_change_the_default_build_mode_and_see_it_reflected_in_the_GUI.3F
+IF(NOT CMAKE_BUILD_TYPE)
+  SET(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING
+      "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
+      FORCE)
+ENDIF(NOT CMAKE_BUILD_TYPE)
+
 SET( QT_USE_QTXML TRUE )
 SET( QT_USE_QTGUI TRUE )
 SET( QT_USE_QTNETWORK TRUE )
@@ -69,6 +77,8 @@ ADD_EXECUTABLE(DEMO_QATE ../../demos/demo-qate/demo-qate.cpp)
 TARGET_LINK_LIBRARIES(DEMO_QATE QATE_STATIC ${QT_LIBRARIES} )
 SET_TARGET_PROPERTIES(DEMO_QATE PROPERTIES OUTPUT_NAME qate-demo)
 
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/../../demos/demo-qate2/demo-qate2.h
+    ${CMAKE_CURRENT_BINARY_DIR}/demo-qate2.h COPYONLY)
 QT4_WRAP_CPP(DEMO_QATE2_MOC ../../demos/demo-qate2/demo-qate2.h )
 ADD_EXECUTABLE(DEMO_QATE2 ../../demos/demo-qate2/demo-qate2.cpp ${DEMO_QATE2_MOC})
 TARGET_LINK_LIBRARIES(DEMO_QATE2 QATE_STATIC ${QT_LIBRARIES} )
