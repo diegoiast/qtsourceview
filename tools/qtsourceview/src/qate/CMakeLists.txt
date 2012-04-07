@@ -53,9 +53,10 @@ QT4_AUTOMOC       ( ${QATE_SRCS} )
 QT4_WRAP_CPP      ( QATE_MOC_SRCS ${QATE_MOC_HDRS} )
 #QT4_ADD_RESOURCES ( QATE_RC_SRCS ${QATE_RCS} )
 
-# build the file
-INCLUDE_DIRECTORIES	( ../ .)
+# build the libraries
+INCLUDE_DIRECTORIES( ../ . ${CMAKE_BINARY_DIR} )
 ADD_LIBRARY( QATE_STATIC STATIC ${QATE_SRCS} ${QATE_MOC_SRCS}  )
+IF(false)
 ADD_LIBRARY( QATE_SHARED SHARED ${QATE_SRCS} ${QATE_MOC_SRCS} ${QATE_RC_SRCS} )
 SET_TARGET_PROPERTIES(
   QATE_SHARED
@@ -71,15 +72,43 @@ else()
 	set_target_properties(QATE_STATIC PROPERTIES OUTPUT_NAME qsvsh)
  	set_target_properties(QATE_SHARED PROPERTIES OUTPUT_NAME qsvsh)
 endif()
+endif()
 
 
+# demo 1 - a simple qate window
 ADD_EXECUTABLE(DEMO_QATE ../../demos/demo-qate/demo-qate.cpp)
 TARGET_LINK_LIBRARIES(DEMO_QATE QATE_STATIC ${QT_LIBRARIES} )
 SET_TARGET_PROPERTIES(DEMO_QATE PROPERTIES OUTPUT_NAME qate-demo)
 
+# demo 2 - a main window using qate
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/../../demos/demo-qate2/demo-qate2.h
     ${CMAKE_CURRENT_BINARY_DIR}/demo-qate2.h COPYONLY)
 QT4_WRAP_CPP(DEMO_QATE2_MOC ../../demos/demo-qate2/demo-qate2.h )
 ADD_EXECUTABLE(DEMO_QATE2 ../../demos/demo-qate2/demo-qate2.cpp ${DEMO_QATE2_MOC})
 TARGET_LINK_LIBRARIES(DEMO_QATE2 QATE_STATIC ${QT_LIBRARIES} )
 SET_TARGET_PROPERTIES(DEMO_QATE2 PROPERTIES OUTPUT_NAME qate-demo2)
+
+# demo 3 - the text editor control
+#INCLUDE_DIRECTORIES( ../ . ../../demos/demo-qate2/)
+QT4_WRAP_UI( DEMO_QATE3_UI
+	../../demos/demo4/bannermessage.ui
+	../../demos/demo4/replaceform.ui
+	../../demos/demo4/searchform.ui
+)
+QT4_WRAP_CPP( DEMO_QATE3_MOC
+	../../demos/demo4/qsvtextedit.h
+	../../demos/demo4/qsvtextoperationswidget.h
+	../../demos/demo4/qsvdefaulthighlighter.h
+	../../demos/demo4/mainwindow4.h
+)
+ADD_EXECUTABLE( DEMO_QATE3
+	../../demos/demo4/demo4.cpp
+	../../demos/demo4/qsvsyntaxhighlighterbase.cpp
+	../../demos/demo4/qsvdefaulthighlighter.cpp
+	../../demos/demo4/qsvtextedit.cpp
+	../../demos/demo4/qsvtextoperationswidget.cpp
+	${DEMO_QATE3_MOC}
+	${DEMO_QATE3_UI}
+)
+TARGET_LINK_LIBRARIES(DEMO_QATE3 QATE_STATIC ${QT_LIBRARIES} )
+SET_TARGET_PROPERTIES(DEMO_QATE3 PROPERTIES OUTPUT_NAME qate-demo2)
