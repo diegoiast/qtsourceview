@@ -1,4 +1,5 @@
 #include <QApplication>
+#include <QAction>
 #include "demo-qate2.h"
 
 Demo2MainWindow::Demo2MainWindow(QWidget *parent) : QMainWindow(parent), pdummyContext(&dummyContext)
@@ -17,14 +18,16 @@ Demo2MainWindow::Demo2MainWindow(QWidget *parent) : QMainWindow(parent), pdummyC
 void Demo2MainWindow::createMainGUI()
 {
 	QToolBar *b = addToolBar("main");
-	QAction  *a;
 
-	b->setMovable(false);
-	a = b->addAction(tr("&New") , this, SLOT(onNew()));
-	a = b->addAction(tr("&Open"), this, SLOT(onOpen()));
-	a = b->addAction(tr("&Save"), this, SLOT(onSave()));
+    b->setMovable(false);
+    b->addAction(tr("&New") , this, SLOT(onNew()))
+     ->setShortcut(QKeySequence("Ctrl+N"));
+	b->addAction(tr("&Open"), this, SLOT(onOpen()))
+     ->setShortcut(QKeySequence("Ctrl+O"));
+	b->addAction(tr("&Save"), this, SLOT(onSave()))
+     ->setShortcut(QKeySequence("Ctrl+S"));
 	b->addSeparator();
-	a = b->addAction(tr("&Quit"), this, SLOT(onQuit()));
+	b->addAction(tr("&Quit"), this, SLOT(onQuit()));
 
 	textEditor = new QPlainTextEdit;
 	textEditor->setFont(QFont("Courier",10));
