@@ -5,8 +5,8 @@ MOC_DIR		=	../../tmp/
 OBJECTS_DIR	=	../../tmp/
 DESTDIR		=	../../
 
-QT		=	gui core xml
-CONFIG		+=	qt warn_on silent
+QT		=	gui core xml widgets
+CONFIG		+=	qt warn_on silent  gui
 TEMPLATE	=	app
 SOURCES		=	main2.cpp   mainwindow2.cpp
 FORMS		=	mainwindow2.ui

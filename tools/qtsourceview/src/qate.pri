@@ -9,8 +9,8 @@ EDITOR_DIR = $$QTCREATOR_DIR/src/plugins/texteditor/generichighlighter
 COREPLUGIN_DIR = $$QTCREATOR_DIR/src/plugins/coreplugin
 
 EDITOR_DIR	=	$$QATE_SRC_DIR/qate
-QT		+=	xml network
-DEFINES		+=	CORE_EXPORT=Q_DECL_EXPORT
+QT		+=	widgets xml network concurrent
+DEFINES		+=	CORE_EXPORT=Q_DECL_EXPORT QTCONCURRENT_EXPORT=
 
 SOURCES +=  \
 	$$EDITOR_DIR/context.cpp \

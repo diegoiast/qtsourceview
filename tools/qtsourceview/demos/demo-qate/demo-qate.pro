@@ -10,7 +10,7 @@ DESTDIR		=	../../
 #QATE_SRC_DIR=../../src/
 #include(../../src/qate.pri)
 CONFIG		+=	qt warn_on
-QT              +=      xml network
+QT              +=      xml network widgets concurrent
 TARGET		=	demo-qate
 SOURCES		+=	demo-qate.cpp
 

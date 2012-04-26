@@ -38,15 +38,15 @@
 
 #include <qate/mimedatabase.h>
 
-#include <QtCore/QString>
-#include <QtCore/QStringList>
-#include <QtCore/QHash>
-#include <QtCore/QSet>
-#include <QtCore/QUrl>
-#include <QtCore/QList>
-#include <QtCore/QSharedPointer>
-#include <QtCore/QFutureWatcher>
-#include <QtNetwork/QNetworkAccessManager>
+#include <QString>
+#include <QStringList>
+#include <QHash>
+#include <QSet>
+#include <QUrl>
+#include <QList>
+#include <QSharedPointer>
+#include <QFutureWatcher>
+#include <QNetworkAccessManager>
 
 QT_BEGIN_NAMESPACE
 class QFileInfo;

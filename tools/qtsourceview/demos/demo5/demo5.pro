@@ -10,7 +10,7 @@ DESTDIR		=	../../
 INCLUDEPATH	=	../../src .
 LIBS		=	-L../../ -lqtsourceview
 
-QT		=	gui core xml
+QT		=	gui core xml widgets
 
 
 CONFIG		+=	qt warn_on silent

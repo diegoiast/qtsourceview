@@ -150,7 +150,7 @@ void MainWindow2::update_syntax_color()
 	    p.setColor( QPalette::Base, dsNormal.getBackground() );
 	p.setColor( QPalette::Text, dsNormal.getColor() );
 	textEdit->setPalette( p );
-	textEdit->setTextColor( dsNormal.getColor() );
+//	textEdit->setTextColor( dsNormal.getColor() );
 	
         defLang   = new QsvLangDef( dataPath + "/data/langs/" + comboBox_syntax->currentText() );
 	highlight = new QsvSyntaxHighlighter( textEdit, defColors, defLang );

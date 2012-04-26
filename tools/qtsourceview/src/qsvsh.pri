@@ -1,4 +1,4 @@
-QT      += xml core  gui
+QT      += xml core gui widgets
 
 RESOURCES	+=	$$QTSOURCEVIEW_SRC_DIR/qsvsh/qtsourceview.qrc
 

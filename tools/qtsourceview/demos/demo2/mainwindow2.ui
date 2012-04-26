@@ -109,7 +109,7 @@
      </widget>
     </item>
     <item>
-     <widget class="QTextEdit" name="textEdit" >
+     <widget class="QPlainTextEdit" name="textEdit" >
       <property name="font" >
        <font>
         <family>FreeMono</family>
@@ -126,12 +126,6 @@
       </property>
       <property name="lineWidth" >
        <number>0</number>
-      </property>
-      <property name="lineWrapMode" >
-       <enum>QTextEdit::NoWrap</enum>
-      </property>
-      <property name="acceptRichText" >
-       <bool>false</bool>
       </property>
      </widget>
     </item>
