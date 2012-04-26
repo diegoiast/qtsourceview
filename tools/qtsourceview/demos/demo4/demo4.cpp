@@ -1,4 +1,6 @@
+#include "qsvtextoperationswidget.h"
 #include "qsvdefaulthighlighter.h"
+#include "qsvtextedit.h"
 #include "mainwindow4.h"
 
 MainWindow4::MainWindow4( const QString &file )

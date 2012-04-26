@@ -54,7 +54,7 @@ QsvBlockData::LineFlags DefaultHighlighter::getBlockFlags(QTextBlock &block)
 {
 	QsvBlockData *data = getBlockData(block);
 	if (data == NULL)
-		return false;
+		return 0;
 	return data->m_flags;
 }
 
