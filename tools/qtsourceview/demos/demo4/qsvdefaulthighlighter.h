@@ -1,15 +1,5 @@
-#include <QObject>
 #include <QSyntaxHighlighter>
-#include <QApplication>
-#include <QAction>
-#include <QToolBar>
-#include <QTimer>
-#include <QMainWindow>
-#include <QFileDialog>
-
-#include "qsvtextedit.h"
 #include "qsvsyntaxhighlighterbase.h"
-#include "qsvtextoperationswidget.h"
 
 class DefaultHighlighter: public QSyntaxHighlighter, public QsvSyntaxHighlighterBase
 {
