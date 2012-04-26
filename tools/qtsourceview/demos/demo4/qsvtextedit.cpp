@@ -649,6 +649,7 @@ void	QsvTextEdit::on_textDocument_contentsChange( int position, int charsRemoved
 	QTextBlock  block;
 	if (charsAdded < 2) {
 		block = this->textCursor().block();
+        if (m_highlighter)
 		m_highlighter->setBlockModified(block, true);
 	}
 	else {
@@ -659,6 +660,7 @@ void	QsvTextEdit::on_textDocument_contentsChange( int position, int charsRemoved
 		while ( (remaining+1 < charsAdded) && (oldRemaining != remaining) ){
 			oldRemaining = remaining;
 			block = cursor.block();
+            if (m_highlighter)
 			m_highlighter->setBlockModified(block, true);
 			cursor.movePosition( QTextCursor::NextBlock );
 			remaining = cursor.position() - position;
@@ -1281,7 +1283,7 @@ void	QsvTextEdit::paintPanel(QPaintEvent*e)
 
 //		if (m_highlighter->isBlockBookmarked(block))
 //			p.drawPixmap( 2, y, m_panel->m_bookMarkImage );
-		if (m_highlighter->isBlockModified(block))
+		if (m_highlighter && m_highlighter->isBlockModified(block))
 			p.fillRect( w-3, y, 2, h, m_modifiedColor );
 		y += blockBoundingRect(block).height();
 		block = block.next();
