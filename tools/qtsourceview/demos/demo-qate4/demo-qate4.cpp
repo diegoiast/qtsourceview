@@ -11,49 +11,49 @@
 
 Demo4MainWindow::Demo4MainWindow(QWidget *parent) : QMainWindow(parent)
 {
-    highlightReady = false;
-    mimes       = new Qate::MimeDatabase();
-    hl_manager = Qate::HighlightDefinitionManager::instance();
-    connect(hl_manager,SIGNAL(mimeTypesRegistered()), this, SLOT(onDefinitionsMetaDataReady()));
-    hl_manager->setMimeDatabase(mimes);
-    hl_manager->registerMimeTypes();
+	highlightReady = false;
+	mimes       = new Qate::MimeDatabase();
+	hl_manager = Qate::HighlightDefinitionManager::instance();
+	connect(hl_manager,SIGNAL(mimeTypesRegistered()), this, SLOT(onDefinitionsMetaDataReady()));
+	hl_manager->setMimeDatabase(mimes);
+	hl_manager->registerMimeTypes();
 	createMainGUI();
-
-    textEditor->displayBannerMessage(tr("Click open if you dare"));
+	textEditor->displayBannerMessage(tr("Click open if you dare"));
 }
 
 void Demo4MainWindow::createMainGUI()
 {
 	QToolBar *b = addToolBar("main");
 
-    textEditor = new QsvTextEdit;
-    textEditor->setFont(QFont("Courier",10));
-    textEditor->setFrameStyle(QFrame::NoFrame);
+	textEditor = new QsvTextEdit;
+	textEditor->setFont(QFont("Courier",10));
+	textEditor->setFrameStyle(QFrame::NoFrame);
+	textEditor->setMatchBracket(true);
 
-    highlighter = new QateHighlighter;
-    Qate::DefaultColors::ApplyToHighlighter(highlighter);
-    highlighter->setDocument(textEditor->document());
-    textEditor->setHighlighter(highlighter);
-    setCentralWidget(textEditor);
-    QsvTextOperationsWidget *textOpetations = new QsvTextOperationsWidget(textEditor);
+	highlighter = new QateHighlighter;
+	Qate::DefaultColors::ApplyToHighlighter(highlighter);
+	highlighter->setDocument(textEditor->document());
+	textEditor->setHighlighter(highlighter);
+	setCentralWidget(textEditor);
+	QsvTextOperationsWidget *textOpetations = new QsvTextOperationsWidget(textEditor);
 
 	b->setMovable(false);
 	b->addAction(tr("&New") , this, SLOT(onNew()))
-     ->setShortcut(QKeySequence("Ctrl+N"));
+	 ->setShortcut(QKeySequence("Ctrl+N"));
 	b->addAction(tr("&Open"), this, SLOT(onOpen()))
-     ->setShortcut(QKeySequence("Ctrl+O"));
+	 ->setShortcut(QKeySequence("Ctrl+O"));
 	b->addAction(tr("&Save"), this, SLOT(onSave()))
-     ->setShortcut(QKeySequence("Ctrl+S"));
+	 ->setShortcut(QKeySequence("Ctrl+S"));
 	b->addSeparator();
-    b->addAction(tr("&Find"), textOpetations, SLOT(showSearch()))
-     ->setShortcut(QKeySequence("Ctrl+F"));
-    b->addAction(tr("&Replace"),textOpetations, SLOT(showReplace()))
-     ->setShortcut(QKeySequence("Ctrl+R"));
-    b->addAction( tr("Find &next"), textOpetations, SLOT(searchNext()))
-	  ->setShortcut(QKeySequence("F3"));
+	b->addAction(tr("&Find"), textOpetations, SLOT(showSearch()))
+	 ->setShortcut(QKeySequence("Ctrl+F"));
+	b->addAction(tr("&Replace"),textOpetations, SLOT(showReplace()))
+	 ->setShortcut(QKeySequence("Ctrl+R"));
+	b->addAction( tr("Find &next"), textOpetations, SLOT(searchNext()))
+	 ->setShortcut(QKeySequence("F3"));
 	b->addAction( tr("Find &prev"), textOpetations, SLOT(searchPrev()))
-	  ->setShortcut(QKeySequence("Shift+F3"));
-    b->addSeparator();
+	 ->setShortcut(QKeySequence("Shift+F3"));
+	b->addSeparator();
 	b->addAction(tr("&Quit"), this, SLOT(onQuit()));
 
 	loadTextFile("demos/demo-qate4.h");
@@ -124,14 +124,14 @@ void Demo4MainWindow::loadTextFile(QString fileName)
 {
 	QFile f(fileName);
 
-    if (!f.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        textEditor->displayBannerMessage(tr("Could not open file: %1").arg(fileName));
+	if (!f.open(QIODevice::ReadOnly | QIODevice::Text)) {
+		textEditor->displayBannerMessage(tr("Could not open file: %1").arg(fileName));
 		return;
-    }
+	}
 	QString s = f.readAll();
 	textEditor->clear();
 	textEditor->setLineWrapMode(QPlainTextEdit::NoWrap);
-    textEditor->setHighlighter(NULL);
+	textEditor->setHighlighter(NULL);
 	if (highlightReady) {
 		Qate::MimeType m = mimes->findByFile(fileName);
 
@@ -148,7 +148,7 @@ void Demo4MainWindow::loadTextFile(QString fileName)
 				highlighter->setDefaultContext(highlight_definition->initialContext());
 			} else {
 				delete highlighter;
-                highlighter = new QateHighlighter;
+				highlighter = new QateHighlighter;
 				Qate::DefaultColors::ApplyToHighlighter(highlighter);
 				qDebug("Error loading %s", qPrintable(definitionId));
 			}
@@ -161,25 +161,24 @@ void Demo4MainWindow::loadTextFile(QString fileName)
 		highlighter->setDocument(textEditor->document());
 	}
 
-    textEditor->setPlainText(s);
-    textEditor->setHighlighter(highlighter);
-    textEditor->removeModifications();
-    textEditor->displayBannerMessage(tr("File loaded"), 5);
+	textEditor->setHighlighter(highlighter);
+	textEditor->removeModifications();
+	textEditor->setPlainText(s);
 }
 
 QString Demo4MainWindow::findDefinitionId(const Qate::MimeType &mimeType, bool considerParents) const
 {
-    QString definitionId = hl_manager->definitionIdByAnyMimeType(mimeType.aliases());
-    if (definitionId.isEmpty() && considerParents) {
-	definitionId = hl_manager->definitionIdByAnyMimeType(mimeType.subClassesOf());
-	if (definitionId.isEmpty()) {
-	    foreach (const QString &parent, mimeType.subClassesOf()) {
-		const Qate::MimeType &parentMimeType =  mimes->findByType(parent);
-		definitionId = findDefinitionId(parentMimeType, considerParents);
-	    }
+	QString definitionId = hl_manager->definitionIdByAnyMimeType(mimeType.aliases());
+	if (definitionId.isEmpty() && considerParents) {
+		definitionId = hl_manager->definitionIdByAnyMimeType(mimeType.subClassesOf());
+		if (definitionId.isEmpty()) {
+			foreach (const QString &parent, mimeType.subClassesOf()) {
+				const Qate::MimeType &parentMimeType =  mimes->findByType(parent);
+				definitionId = findDefinitionId(parentMimeType, considerParents);
+			}
+		}
 	}
-    }
-    return definitionId;
+	return definitionId;
 }
 
 Qate::MimeType Demo4MainWindow::getMimeByExt(const QString &fileName)
