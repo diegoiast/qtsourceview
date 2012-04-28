@@ -29,6 +29,7 @@ void Demo4MainWindow::createMainGUI()
 	textEditor->setFont(QFont("Courier",10));
 	textEditor->setFrameStyle(QFrame::NoFrame);
 	textEditor->setMatchBracket(true);
+	textEditor->setMatchBracketList("[]{}()\"\"''");
 
 	highlighter = new QateHighlighter;
 	Qate::DefaultColors::ApplyToHighlighter(highlighter);

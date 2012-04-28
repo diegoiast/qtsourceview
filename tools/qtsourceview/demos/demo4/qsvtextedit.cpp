@@ -1160,7 +1160,10 @@ void QsvTextEdit::setHighlighter(QsvSyntaxHighlighterBase *s)
 	if (m_highlighter)
 		m_highlighter->setTextDocument(NULL);
 	m_highlighter = s;
-	m_highlighter->setTextDocument(document());
+	if (m_highlighter) {
+		m_highlighter->setTextDocument(document());
+		m_highlighter->setMatchBracketList(m_config.matchBracketsList);
+	}
 }
 
 QsvSyntaxHighlighterBase* QsvTextEdit::getHighlighter() const
