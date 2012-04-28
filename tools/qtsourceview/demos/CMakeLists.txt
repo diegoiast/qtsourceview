@@ -55,6 +55,7 @@ TARGET_LINK_LIBRARIES(DEMO_QATE3 QATE_STATIC ${QT_LIBRARIES} )
 SET_TARGET_PROPERTIES(DEMO_QATE3 PROPERTIES OUTPUT_NAME qate-demo3)
 
 # demo 4 - text editor using the qate syntax highlighter
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/demo-qate4/demo-qate4.h  ${CMAKE_CURRENT_BINARY_DIR}/demo-qate4.h COPYONLY)
 QT4_WRAP_CPP( DEMO_QATE4_MOC
 	demo4/qsvtextedit.h
 	demo4/qsvtextoperationswidget.h

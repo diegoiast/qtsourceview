@@ -56,12 +56,11 @@ void Demo4MainWindow::createMainGUI()
     b->addSeparator();
 	b->addAction(tr("&Quit"), this, SLOT(onQuit()));
 
-	loadTextFile("demo-qate2.h");
+	loadTextFile("demos/demo-qate4.h");
 }
 
 void Demo4MainWindow::onDefinitionsMetaDataReady()
 {
-	/*
 	const char* FILE = "C++";
 	highlight_definition = hl_manager->definition(hl_manager->definitionIdByName(FILE));
 	if (highlight_definition.isNull()) {
@@ -70,10 +69,7 @@ void Demo4MainWindow::onDefinitionsMetaDataReady()
 	}
 	highlighter->setDefaultContext(highlight_definition->initialContext());
 	highlighter->setDocument(textEditor->document());
-	*/
-	highlightReady = false;
 	highlightReady = true;
-	loadTextFile("demo-qagte2.h");
 }
 
 void Demo4MainWindow::onNew()
@@ -129,7 +125,7 @@ void Demo4MainWindow::loadTextFile(QString fileName)
 	QFile f(fileName);
 
     if (!f.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        textEditor->displayBannerMessage(tr("Could not open file: %s").arg(fileName));
+        textEditor->displayBannerMessage(tr("Could not open file: %1").arg(fileName));
 		return;
     }
 	QString s = f.readAll();
