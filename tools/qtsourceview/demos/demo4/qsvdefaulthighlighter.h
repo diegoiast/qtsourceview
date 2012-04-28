@@ -11,7 +11,7 @@ public:
 	virtual void setBlockModified(QTextBlock &block, bool on);
 	virtual bool isBlockModified(QTextBlock &block);
 	virtual bool isBlockBookmarked(QTextBlock &block);
-	virtual QsvBlockData::LineFlags getBlockFlags(QTextBlock &block);
-	QsvBlockData *getBlockData(QTextBlock &block);
+	virtual Qate::BlockData::LineFlags getBlockFlags(QTextBlock &block);
+	Qate::BlockData *getBlockData(QTextBlock &block);
 };
 

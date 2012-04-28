@@ -12,7 +12,7 @@ void DefaultHighlighter::highlightBlock(const QString &text)
 
 void DefaultHighlighter::toggleBookmark(QTextBlock &block)
 {
-	QsvBlockData *data = getBlockData(block);
+	Qate::BlockData *data = getBlockData(block);
 	if (data == NULL)
 		return;
 	data->toggleBookmark();
@@ -20,7 +20,7 @@ void DefaultHighlighter::toggleBookmark(QTextBlock &block)
 
 void DefaultHighlighter::removeModification(QTextBlock &block)
 {
-	QsvBlockData *data = getBlockData(block);
+	Qate::BlockData *data = getBlockData(block);
 	if (data == NULL)
 		return;
 	data->m_isModified = false;
@@ -28,7 +28,7 @@ void DefaultHighlighter::removeModification(QTextBlock &block)
 
 void DefaultHighlighter::setBlockModified(QTextBlock &block, bool on)
 {
-	QsvBlockData *data = getBlockData(block);
+	Qate::BlockData *data = getBlockData(block);
 	if (data == NULL)
 		return;
 	data->m_isModified =  true;
@@ -36,7 +36,7 @@ void DefaultHighlighter::setBlockModified(QTextBlock &block, bool on)
 
 bool DefaultHighlighter::isBlockModified(QTextBlock &block)
 {
-	QsvBlockData *data = getBlockData(block);
+	Qate::BlockData *data = getBlockData(block);
 	if (data == NULL)
 		false;
 	return data->m_isModified;
@@ -44,30 +44,30 @@ bool DefaultHighlighter::isBlockModified(QTextBlock &block)
 
 bool DefaultHighlighter::isBlockBookmarked(QTextBlock &block)
 {
-	QsvBlockData *data = getBlockData(block);
+	Qate::BlockData *data = getBlockData(block);
 	if (data == NULL)
 		return false;
 	return data->isBookmark();
 }
 
-QsvBlockData::LineFlags DefaultHighlighter::getBlockFlags(QTextBlock &block)
+Qate::BlockData::LineFlags DefaultHighlighter::getBlockFlags(QTextBlock &block)
 {
-	QsvBlockData *data = getBlockData(block);
+	Qate::BlockData *data = getBlockData(block);
 	if (data == NULL)
 		return 0;
 	return data->m_flags;
 }
 
-QsvBlockData* DefaultHighlighter::getBlockData(QTextBlock &block)
+Qate::BlockData *DefaultHighlighter::getBlockData(QTextBlock &block)
 {
 	QTextBlockUserData *userData  = block.userData();
-	QsvBlockData       *blockData = NULL;
+	Qate::BlockData       *blockData = NULL;
 
 	if (userData == NULL){
-		blockData =  new QsvBlockData();
+		blockData =  new Qate::BlockData();
 		block.setUserData(blockData);
 	} else {
-		blockData = dynamic_cast<QsvBlockData*>(userData);
+		blockData = dynamic_cast<Qate::BlockData*>(userData);
 	}
 	return blockData;
 }

@@ -577,7 +577,7 @@ void	QsvTextEdit::updateExtraSelections()
 	int cursorPosition;
 	int relativePosition;
 	QChar currentChar;
-	QsvBlockData *data;
+	Qate::BlockData *data;
 	
 	selections = m_selections;
 	
@@ -1083,7 +1083,7 @@ void	QsvTextEdit::resetExtraSelections()
 	
 	m_selections.clear();
 	while (block.isValid()){
-		if (m_highlighter->getBlockFlags(block).testFlag(QsvBlockData::Bookmark)) {
+		if (m_highlighter->getBlockFlags(block).testFlag(Qate::BlockData::Bookmark)) {
 			QTextCursor cursor = textCursor();
 			QTextCharFormat format;
 			format.setBackground(m_bookmarkColor);

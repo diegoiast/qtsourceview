@@ -33,11 +33,12 @@
 #ifndef BASETEXTDOCUMENTLAYOUT_H
 #define BASETEXTDOCUMENTLAYOUT_H
 
-#include <QtGui/QTextBlockUserData>
+#include <QTextBlockUserData>
+#include "qate/qateblockdata.h"
 
 // Replaces the "real" basetextdocumentlayout.h file.
 
-struct TextBlockUserData : QTextBlockUserData
+struct TextBlockUserData : Qate::BlockData
 {
     virtual ~TextBlockUserData(){}
 

@@ -16,6 +16,7 @@
 #include "qsvsh/qsvlangdeffactory.h"
 #include "qsvsh/qsvsyntaxhighlighter.h"
 
+#include "qate/qateblockdata.h"
 #include "qsvtextedit.h"
 #include "qsvsyntaxhighlighterbase.h"
 #include "qsvtextoperationswidget.h"
@@ -36,7 +37,7 @@ public:
 	
 	virtual void toggleBookmark(QTextBlock &block)
 	{
-		QsvBlockData *data = getBlockData(block);
+		Qate::BlockData *data = getBlockData(block);
 		if (data == NULL)
 			return;
 		data->toggleBookmark();
@@ -44,7 +45,7 @@ public:
 
 	virtual void removeModification(QTextBlock &block)
 	{
-		QsvBlockData *data = getBlockData(block);
+		Qate::BlockData *data = getBlockData(block);
 		if (data == NULL)
 			return;
 		data->m_isModified = false;
@@ -52,7 +53,7 @@ public:
 
 	virtual void setBlockModified(QTextBlock &block, bool on)
 	{
-		QsvBlockData *data = getBlockData(block);
+		Qate::BlockData *data = getBlockData(block);
 		if (data == NULL)
 			return;
 		data->m_isModified =  true;
@@ -60,38 +61,38 @@ public:
 
 	virtual bool isBlockModified(QTextBlock &block)
 	{
-		QsvBlockData *data = getBlockData(block);
+		Qate::BlockData *data = getBlockData(block);
 		if (data == NULL)
-			false;
+			return false;
 		return data->m_isModified;
 	}
 
 	virtual bool isBlockBookmarked(QTextBlock &block)
 	{
-		QsvBlockData *data = getBlockData(block);
+		Qate::BlockData *data = getBlockData(block);
 		if (data == NULL)
-			return false;
+			return 0;
 		return data->isBookmark();
 	}
 
-	virtual QsvBlockData::LineFlags getBlockFlags(QTextBlock &block)
+	virtual Qate::BlockData::LineFlags getBlockFlags(QTextBlock &block)
 	{
-		QsvBlockData *data = getBlockData(block);
+		Qate::BlockData *data = getBlockData(block);
 		if (data == NULL)
-			return false;
+			return 0;
 		return data->m_flags;
 	}
 	
-	QsvBlockData *getBlockData(QTextBlock &block)
+	Qate::BlockData *getBlockData(QTextBlock &block)
 	{
 		QTextBlockUserData *userData  = block.userData();
-		QsvBlockData       *blockData = NULL;
+		Qate::BlockData       *blockData = NULL;
 		
 		if (userData == NULL){
-			blockData =  new QsvBlockData();
+			blockData =  new Qate::BlockData();
 			block.setUserData(blockData);
 		} else {
-			blockData = dynamic_cast<QsvBlockData*>(userData);
+			blockData = dynamic_cast<Qate::BlockData*>(userData);
 		}
 		return blockData;
 	}

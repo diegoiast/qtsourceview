@@ -9,7 +9,6 @@
 
 class QsvSyntaxHighlighterBase;
 class QsvEditorPanel;
-class QsvBlockData;
 class QFileSystemWatcher;
 class QLabel;
 
