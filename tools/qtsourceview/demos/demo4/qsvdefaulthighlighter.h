@@ -12,6 +12,12 @@ public:
 	virtual bool isBlockModified(QTextBlock &block);
 	virtual bool isBlockBookmarked(QTextBlock &block);
 	virtual Qate::BlockData::LineFlags getBlockFlags(QTextBlock &block);
+	virtual void clearMatchData(QTextBlock &block);
+	virtual void addMatchData(QTextBlock &block, Qate::MatchData);
+	virtual QList<Qate::MatchData> getMatches(QTextBlock &block);
+
+	virtual QTextBlock getCurrentBlockProxy();
+
 	Qate::BlockData *getBlockData(QTextBlock &block);
 };
 

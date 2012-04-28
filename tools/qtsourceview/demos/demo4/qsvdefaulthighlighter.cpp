@@ -58,6 +58,35 @@ Qate::BlockData::LineFlags DefaultHighlighter::getBlockFlags(QTextBlock &block)
 	return data->m_flags;
 }
 
+void DefaultHighlighter::clearMatchData(QTextBlock &block)
+{
+	Qate::BlockData *data = getBlockData(block);
+	if (data == NULL)
+		return;
+	data->matches.clear();
+}
+
+void DefaultHighlighter::addMatchData(QTextBlock &block, Qate::MatchData m)
+{
+	Qate::BlockData *data = getBlockData(block);
+	if (data == NULL)
+		return;
+	data->matches << m;
+}
+
+QList<Qate::MatchData> DefaultHighlighter::getMatches(QTextBlock &block)
+{
+	Qate::BlockData *data = getBlockData(block);
+	if (data == NULL)
+		return QList<Qate::MatchData>();
+	return data->matches;
+}
+
+QTextBlock DefaultHighlighter::getCurrentBlockProxy()
+{
+	return currentBlock();
+}
+
 Qate::BlockData *DefaultHighlighter::getBlockData(QTextBlock &block)
 {
 	QTextBlockUserData *userData  = block.userData();

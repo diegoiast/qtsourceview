@@ -16,15 +16,11 @@ QsvSyntaxHighlighterBase::~QsvSyntaxHighlighterBase()
 
 void QsvSyntaxHighlighterBase::highlightBlock(const QString &text)
 {
-#warning - port QsvSyntaxHighlighterBase::highlightBlock() to new API
-#if 0
-	QsvBlockData *data = currentBlockUserDataProxy();
-	if (data)
-		data->matches.clear();
-
 	if (text.isEmpty())
 		return;
 
+	QTextBlock b = getCurrentBlockProxy();
+	clearMatchData(b);
 	// look up for each of our machting bracket list
 	for ( int bracketIndex=0; bracketIndex<m_matchBracketsList.length(); bracketIndex++ )
 	{
@@ -33,19 +29,13 @@ void QsvSyntaxHighlighterBase::highlightBlock(const QString &text)
 
 		while ( bracketPosition != -1 )
 		{
-			// lazy creation, only for needed blocks
-			if (!data) data = new QsvBlockData;
-
-			MatchData m;
+			Qate::MatchData m;
 			m.matchedChar = m_matchBracketsList[bracketIndex];
 			m.position    = bracketPosition;
-			data->matches << m;
-
+			addMatchData(b,m);
 			bracketPosition = text.indexOf(bracket, bracketPosition+1);
 		}
 	}
-	setCurrentBlockUserDataProxy(data);
-#endif
 }
 
 void QsvSyntaxHighlighterBase::setTextDocument(QTextDocument *document)

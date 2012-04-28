@@ -1,6 +1,7 @@
 #ifndef QSVSYNTAXHIGHLIGHTERBASE_H
 #define QSVSYNTAXHIGHLIGHTERBASE_H
 
+#include <QList>
 #include "qate/qateblockdata.h"
 
 class QsvSyntaxHighlighterBase
@@ -15,6 +16,10 @@ public:
 	virtual bool isBlockModified(QTextBlock &block) = 0;
 	virtual bool isBlockBookmarked(QTextBlock &block) = 0;
 	virtual Qate::BlockData::LineFlags getBlockFlags(QTextBlock &block) = 0;
+	virtual void clearMatchData(QTextBlock &block) = 0;
+	virtual void addMatchData(QTextBlock &block, Qate::MatchData) = 0;
+	virtual QTextBlock getCurrentBlockProxy() = 0;
+	virtual QList<Qate::MatchData> getMatches(QTextBlock &block) = 0;
 
 	void setMatchBracketList( const QString &m );
 	const QString getMatchBracketList();

@@ -4,20 +4,20 @@
 QateHighlighter::QateHighlighter(QTextDocument *parent) :
     Highlighter(parent)
 {
-    setMatchBracketList("()[]''\"\"");
+	setMatchBracketList("()[]''\"\"");
 }
 
 
 void QateHighlighter::highlightBlock(const QString &text)
 {
-    QsvSyntaxHighlighterBase::highlightBlock(text);
-    Highlighter::highlightBlock(text);
+	Highlighter::highlightBlock(text);
+	QsvSyntaxHighlighterBase::highlightBlock(text);
 }
 
 
 void QateHighlighter::toggleBookmark(QTextBlock &block)
 {
-    Qate::BlockData *data = getBlockData(block);
+	Qate::BlockData *data = getBlockData(block);
 	if (data == NULL)
 		return;
 	data->toggleBookmark();
@@ -26,25 +26,24 @@ void QateHighlighter::toggleBookmark(QTextBlock &block)
 
 void QateHighlighter::removeModification(QTextBlock &block)
 {
-    Qate::BlockData *data = getBlockData(block);
+	Qate::BlockData *data = getBlockData(block);
 	if (data == NULL)
 		return;
-    data->m_isModified = false;
+	data->m_isModified = false;
 }
 
 
 void QateHighlighter::setBlockModified(QTextBlock &block, bool on)
 {
-    Qate::BlockData *data = getBlockData(block);
+	Qate::BlockData *data = getBlockData(block);
 	if (data == NULL)
 		return;
 	data->m_isModified = on;
-
 }
 
 bool QateHighlighter::isBlockModified(QTextBlock &block)
 {
-    Qate::BlockData *data = getBlockData(block);
+	Qate::BlockData *data = getBlockData(block);
 	if (data == NULL)
 		return false;
 	return data->m_isModified;
@@ -53,7 +52,7 @@ bool QateHighlighter::isBlockModified(QTextBlock &block)
 
 bool QateHighlighter::isBlockBookmarked(QTextBlock &block)
 {
-    Qate::BlockData *data = getBlockData(block);
+	Qate::BlockData *data = getBlockData(block);
 	if (data == NULL)
 		return false;
 	return data->isBookmark();
@@ -62,20 +61,49 @@ bool QateHighlighter::isBlockBookmarked(QTextBlock &block)
 
 Qate::BlockData::LineFlags QateHighlighter::getBlockFlags(QTextBlock &block)
 {
-    Qate::BlockData *data = getBlockData(block);
+	Qate::BlockData *data = getBlockData(block);
 	if (data == NULL)
 		return 0;
 	return data->m_flags;
 }
 
+void QateHighlighter::clearMatchData(QTextBlock &block)
+{
+	Qate::BlockData *data = getBlockData(block);
+	if (data == NULL)
+		return;
+	data->matches.clear();
+}
+
+void QateHighlighter::addMatchData(QTextBlock &block, Qate::MatchData m)
+{
+	Qate::BlockData *data = getBlockData(block);
+	if (data == NULL)
+		return;
+	data->matches << m;
+}
+
+QList<Qate::MatchData> QateHighlighter::getMatches(QTextBlock &block)
+{
+	Qate::BlockData *data = getBlockData(block);
+	if (data == NULL)
+		return QList<Qate::MatchData>();
+	return data->matches;
+}
+
+QTextBlock QateHighlighter::getCurrentBlockProxy()
+{
+	return currentBlock();
+}
 
 Qate::BlockData *QateHighlighter::getBlockData(QTextBlock &block)
 {
-    QTextBlockUserData *userData  = block.userData();
-	Qate::BlockData    *blockData = NULL;
-
-    return dynamic_cast<Qate::BlockData*>(userData);
-    /*
+	QTextBlockUserData *userData  = block.userData();
+	if (userData==NULL)
+		return NULL;
+	Qate::BlockData *blockData = dynamic_cast<Qate::BlockData*>(userData);
+	return blockData;
+/*
 	if (userData == NULL){
 		blockData =  new QsvBlockData();
 		block.setUserData(blockData);
@@ -83,5 +111,5 @@ Qate::BlockData *QateHighlighter::getBlockData(QTextBlock &block)
 		blockData = dynamic_cast<QsvBlockData*>(userData);
 	}
 	return blockData;
-    */
+*/
 }

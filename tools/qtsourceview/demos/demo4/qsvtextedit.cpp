@@ -526,8 +526,7 @@ void	QsvTextEdit::transformBlockCase()
 void	QsvTextEdit::gotoMatchingBracket()
 {
 	/*
-	  WARNING:
-	  code duplication between this method and on_cursor_positionChanged();
+	  WARNING: code duplication between this method and on_cursor_positionChanged();
 	  this needs to be refactored
 	 */
 	
@@ -578,9 +577,8 @@ void	QsvTextEdit::updateExtraSelections()
 	int relativePosition;
 	QChar currentChar;
 	Qate::BlockData *data;
-	
+
 	selections = m_selections;
-	
 	if (m_config.markCurrentLine) {
 		QTextCharFormat format;
 		format.setBackground(m_currentLineBackground);
@@ -588,23 +586,23 @@ void	QsvTextEdit::updateExtraSelections()
 	}
 	
 	/*
-	  WARNING:
-	  code duplication between this method and gotoMatchingBracket();
+	  WARNING: code duplication between this method and gotoMatchingBracket()
 	  this needs to be refactored
 	 */
 	
 	if (!m_config.matchBrackets)
 		goto NO_MATCHES;
-#warning QsvTextEdit::updateExtraSelections() - port to new API
-#if 0
 	block             = cursor.block();
 	blockPosition     = block.position();
 	cursorPosition    = cursor.position();
 	relativePosition  = cursorPosition - blockPosition;
 	currentChar       = block.text()[relativePosition];
+	data              = dynamic_cast<Qate::BlockData*>(block.userData());
+	if (data==NULL)
+		return;
 
 	for ( int k=0; k<data->matches.length(); k++) {
-		MatchData m = data->matches.at(k);
+		Qate::MatchData m = data->matches.at(k);
 		if (m.position != relativePosition)
 			continue;
 
@@ -625,7 +623,6 @@ void	QsvTextEdit::updateExtraSelections()
 			j = findMatchingChar( m_config.matchBracketsList[j], m_config.matchBracketsList[j+1], true , block, cursorPosition );
 		appendExtraSelection(selections, j, this,m_matchesFormat);
 	}
-#endif
 NO_MATCHES:
 	setExtraSelections(selections);
 }
@@ -1025,16 +1022,14 @@ QString	QsvTextEdit::updateIndentation( QString s, int indentation )
 
 int	QsvTextEdit::findMatchingChar( QChar c1, QChar c2, bool forward, QTextBlock &block, int from )
 {
-#warning QsvTextEdit::findMatchingChar() - port to new API
-#if 0
 	int i = 1;
 	while (block.isValid())
 	{
-		QsvBlockData *data = getPrivateBlockData(block,false);
-		for( int k=0; (data) && (k<data->matches.length()); k++)
+		QList<Qate::MatchData> matches = m_highlighter->getMatches(block);;
+		for( int k=0; k<matches.length(); k++)
 		{
-			int j = forward? k : data->matches.length() - k - 1;
-			MatchData m = data->matches.at(j);
+			int j = forward? k : matches.length() - k - 1;
+			Qate::MatchData m = matches.at(j);
 			int globalPosition = m.position + block.position();
 			if (forward) {
 				if (globalPosition <= from) continue;
@@ -1055,7 +1050,6 @@ int	QsvTextEdit::findMatchingChar( QChar c1, QChar c2, bool forward, QTextBlock 
 		else
 			block = block.previous();
 	}
-#endif
 	return -1;
 }
 
