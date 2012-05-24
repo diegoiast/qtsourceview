@@ -14,7 +14,7 @@ INCLUDE_DIRECTORIES(
 	${CMAKE_CURRENT_SOURCE_DIR}/../src/ .
 	${CMAKE_CURRENT_SOURCE_DIR}/../src/qate
 	${CMAKE_CURRENT_SOURCE_DIR}/demo4
-	${CMAKE_BINARY_DIR}/demos
+	${CMAKE_CURRENT_BINARY_DIR}
 )
 
 # demo 1 - a simple qate window
@@ -31,7 +31,6 @@ SET_TARGET_PROPERTIES(DEMO_QATE2 PROPERTIES OUTPUT_NAME qate-demo2)
 
 # demo 3 - the text editor control
 #INCLUDE_DIRECTORIES( ../ . ${CMAKE_BINARY_DIR}/../../demos/demo4/)
-SET( ${cmake_include_path} ${CMAKE_BINARY_DIR}/demos )
 QT4_WRAP_UI( DEMO_QATE3_UI
 	demo4/bannermessage.ui
 	demo4/replaceform.ui
