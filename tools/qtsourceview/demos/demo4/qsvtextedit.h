@@ -79,7 +79,7 @@ public:
 	void setHighlighter(QsvSyntaxHighlighterBase *s);
 	QsvSyntaxHighlighterBase* getHighlighter() const;
 	static void setDefaultConfig( QsvEditorConfigData *config );
-	
+    QString getFileName(){ return m_fileName; }
 	
 	QTextCursor getCurrentTextCursor();
 	void paintPanel(QPaintEvent *e);
