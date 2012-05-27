@@ -60,7 +60,7 @@ INCLUDE_DIRECTORIES( ../ . ${CMAKE_BINARY_DIR} )
 ADD_LIBRARY( QATE_STATIC STATIC ${QATE_SRCS} ${QATE_MOC_SRCS}  )
 set_target_properties(QATE_STATIC PROPERTIES OUTPUT_NAME qate)
 
-#IF(false)
+IF(false)
 ADD_LIBRARY( QATE_SHARED SHARED ${QATE_SRCS} ${QATE_MOC_SRCS} ${QATE_RC_SRCS} )
 SET_TARGET_PROPERTIES(
   QATE_SHARED
@@ -71,10 +71,10 @@ SET_TARGET_PROPERTIES(
 
 if(MSVC)
 	set_target_properties(QATE_STATIC PROPERTIES OUTPUT_NAME qate_static)
- 	set_target_properties(QATE_SHARED PROPERTIES OUTPUT_NAME qte)
+ 	set_target_properties(QATE_SHARED PROPERTIES OUTPUT_NAME qate)
 else()
 	set_target_properties(QATE_STATIC PROPERTIES OUTPUT_NAME qate)
  	set_target_properties(QATE_SHARED PROPERTIES OUTPUT_NAME qate)
 endif()
-#endif()
+endif()
 
