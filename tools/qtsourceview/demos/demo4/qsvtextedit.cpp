@@ -630,6 +630,7 @@ NO_MATCHES:
 void	QsvTextEdit::removeModifications()
 {
 	int i = 1;
+    if (m_highlighter!=NULL)
 	for ( QTextBlock block = document()->begin(); block.isValid(); block = block.next() ) {
 		m_highlighter->removeModification(block);
 		i ++;
