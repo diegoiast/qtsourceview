@@ -91,6 +91,7 @@ QsvTextEdit::QsvTextEdit( QWidget *parent, QsvSyntaxHighlighterBase *s ):
 	setMatchBracketList(m_config.matchBracketsList);
 	setFont(m_config.currentFont);
 	setLineWrapMode(QPlainTextEdit::NoWrap);
+	setFrameStyle(QPlainTextEdit::NoFrame);
 }
 
 void	QsvTextEdit::setupActions()

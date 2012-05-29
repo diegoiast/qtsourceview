@@ -90,7 +90,15 @@ void QsvTextOperationsWidget::initReplaceWidget()
 
 	connect(replaceFormUi->moreButton,SIGNAL(clicked()),this,SLOT(adjustBottomWidget()));
 	connect(replaceFormUi->findText,SIGNAL(textChanged(QString)),this,SLOT(on_replaceText_modified(QString)));
-	connect(replaceFormUi->closeButton,SIGNAL(clicked()),this, SLOT(showReplace()));
+    connect(replaceFormUi->closeButton,SIGNAL(clicked()),this, SLOT(showReplace()));
+}
+
+void QsvTextOperationsWidget::initGotoLineWidget()
+{
+	m_gotoLine = new QWidget( (QWidget*) parent() );
+	m_gotoLine->setObjectName("m_gotoLine");
+	m_gotoLine->adjustSize();
+	m_gotoLine->hide();
 }
 
 void	QsvTextOperationsWidget::searchNext()
@@ -415,9 +423,25 @@ void	QsvTextOperationsWidget::showReplace()
 	showBottomWidget(m_replace);
 }
 
+void QsvTextOperationsWidget::showGotoLine()
+{
+	if (!m_gotoLine)
+	initGotoLineWidget();
+
+	QWidget *parent = qobject_cast<QWidget*>(this->parent());
+	if (m_gotoLine->isVisible()) {
+		m_gotoLine->hide();
+		if (parent)
+			parent->setFocus();
+		return;
+	}
+
+	showBottomWidget(m_gotoLine);
+}
+
 void	QsvTextOperationsWidget::showBottomWidget(QWidget* w)
 {
-	if (!w) {
+	if (w == NULL) {
 		if (m_replace && m_replace->isVisible())
 			w = m_replace;
 		else if (m_search && m_search->isVisible())
@@ -437,11 +461,11 @@ void	QsvTextOperationsWidget::showBottomWidget(QWidget* w)
 
 	r = parent->rect();
 	w->adjustSize();
-        r.adjust(10, 0, -10, 0);
+	r.adjust(10, 0, -10, 0);
 	r.setHeight(w->height());
 	r.moveBottom(parent->rect().height()-10);
 
-        r.moveLeft(parent->pos().x() + 10);
+	r.moveLeft(parent->pos().x() + 10);
 	w->setGeometry(r);
 	w->show();
 }

@@ -33,17 +33,19 @@ public:
 	QsvTextOperationsWidget( QWidget *parent );
 	void initSearchWidget();
 	void initReplaceWidget();
+	void initGotoLineWidget();
 
 	QFlags<QTextDocument::FindFlag> getSearchFlags();
 	QFlags<QTextDocument::FindFlag> getReplaceFlags();
 
 	virtual QTextCursor getTextCursor();
 	virtual void setTextCursor(QTextCursor c);
-        virtual QTextDocument* getTextDocument();
+	virtual QTextDocument* getTextDocument();
 
 public slots:
 	void showSearch();
 	void showReplace();
+	void showGotoLine();
 	void showBottomWidget(QWidget* w=NULL);
 	void on_searchText_modified(QString s);
 	void on_replaceText_modified(QString s);
@@ -73,7 +75,6 @@ public:
 	QWidget *m_gotoLine;
 	QColor searchFoundColor;
 	QColor searchNotFoundColor;
-
 	
 	Ui::searchForm *searchFormUi;
 	Ui::replaceForm *replaceFormUi;
