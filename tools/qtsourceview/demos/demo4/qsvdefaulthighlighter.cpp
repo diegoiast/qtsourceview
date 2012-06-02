@@ -38,7 +38,7 @@ bool DefaultHighlighter::isBlockModified(QTextBlock &block)
 {
 	Qate::BlockData *data = getBlockData(block);
 	if (data == NULL)
-		false;
+		return false;
 	return data->m_isModified;
 }
 
