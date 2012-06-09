@@ -88,6 +88,7 @@ QsvTextEdit::QsvTextEdit( QWidget *parent, QsvSyntaxHighlighterBase *s ):
 
 	setDefaultConfig();
 	setupActions();
+	updateMargins();
 	setMatchBracketList(m_config.matchBracketsList);
 	setFont(m_config.currentFont);
 	setLineWrapMode(QPlainTextEdit::NoWrap);
