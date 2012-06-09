@@ -18,8 +18,10 @@ void QateHighlighter::highlightBlock(const QString &text)
 void QateHighlighter::toggleBookmark(QTextBlock &block)
 {
 	Qate::BlockData *data = getBlockData(block);
-	if (data == NULL)
+	if (data == NULL) {
+		qDebug("Warning - block uas not QateData, broken highlighter?");
 		return;
+	}
 	data->toggleBookmark();
 }
 
@@ -99,17 +101,13 @@ QTextBlock QateHighlighter::getCurrentBlockProxy()
 Qate::BlockData *QateHighlighter::getBlockData(QTextBlock &block)
 {
 	QTextBlockUserData *userData  = block.userData();
-	if (userData==NULL)
-		return NULL;
-	Qate::BlockData *blockData = dynamic_cast<Qate::BlockData*>(userData);
-	return blockData;
-/*
+	Qate::BlockData *blockData;
+
 	if (userData == NULL){
-		blockData =  new QsvBlockData();
+		blockData =  new Qate::BlockData();
 		block.setUserData(blockData);
 	} else {
-		blockData = dynamic_cast<QsvBlockData*>(userData);
+		blockData = dynamic_cast<Qate::BlockData*>(userData);
 	}
 	return blockData;
-*/
 }
