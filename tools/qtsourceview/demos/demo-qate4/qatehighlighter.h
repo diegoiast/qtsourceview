@@ -6,7 +6,7 @@
 //#include "qsvtextedit.h"
 #include "../demo4/qsvsyntaxhighlighterbase.h"
 #include "../demo4/qsvtextoperationswidget.h"
-#include "highlighter.h"
+#include "qate/highlighter.h"
 
 class QateHighlighter: public TextEditor::Internal::Highlighter, public QsvSyntaxHighlighterBase
 {
