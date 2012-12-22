@@ -107,7 +107,7 @@ void	QsvTextOperationsWidget::searchNext()
 		return;
 	issue_search( searchFormUi->searchText->text(), 
 		getTextCursor(), 
-		getSearchFlags() & !QTextDocument::FindBackward, 
+		getSearchFlags() & ~QTextDocument::FindBackward,
 		searchFormUi->searchText,
 		true
 	);
