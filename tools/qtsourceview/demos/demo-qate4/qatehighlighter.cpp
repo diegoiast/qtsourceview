@@ -101,11 +101,13 @@ QTextBlock QateHighlighter::getCurrentBlockProxy()
 Qate::BlockData *QateHighlighter::getBlockData(QTextBlock &block)
 {
 	QTextBlockUserData *userData  = block.userData();
-	Qate::BlockData *blockData;
+	Qate::BlockData *blockData = NULL;
 
 	if (userData == NULL){
-		blockData =  new Qate::BlockData();
-		block.setUserData(blockData);
+//		WTF WTF WTF!!!
+//		The block data must be Hightligher::BlockData!!!
+//		blockData =  new Qate::BlockData();
+//		block.setUserData(blockData);
 	} else {
 		blockData = dynamic_cast<Qate::BlockData*>(userData);
 	}
