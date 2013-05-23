@@ -90,7 +90,8 @@ void QsvTextOperationsWidget::initReplaceWidget()
 
 	connect(replaceFormUi->moreButton,SIGNAL(clicked()),this,SLOT(adjustBottomWidget()));
 	connect(replaceFormUi->findText,SIGNAL(textChanged(QString)),this,SLOT(on_replaceText_modified(QString)));
-    connect(replaceFormUi->closeButton,SIGNAL(clicked()),this, SLOT(showReplace()));
+	connect(replaceFormUi->replaceButton,SIGNAL(clicked()),this,SLOT(on_replaceOldText_returnPressed()));
+	connect(replaceFormUi->closeButton,SIGNAL(clicked()),this, SLOT(showReplace()));
 }
 
 void QsvTextOperationsWidget::initGotoLineWidget()
