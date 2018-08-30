@@ -18,7 +18,7 @@ MainWindow3::MainWindow3( QMainWindow *parent )
 :QMainWindow( parent )
 {
 	setupUi( this );
-	QString dataPath  = QApplication::applicationDirPath();
+	QString dataPath  = QDir::currentPath();
 	
 	// setup the mime types definitions
 	QsvLangDefFactory::getInstanse()->loadDirectory( dataPath + "/data/langs/" );

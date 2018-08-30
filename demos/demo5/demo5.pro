@@ -4,6 +4,7 @@ UI_DIR		=	../../tmp/
 MOC_DIR		=	../../tmp/
 OBJECTS_DIR	=	../../tmp/
 DESTDIR		=	../../
+DEFINES		+=	Q_CONCURRENT_EXPORT= CORE_EXPORT=Q_DECL_EXPORT
 
 # set the Qate source dir, and include the pri file
 # then add your sources and that's it

@@ -12,6 +12,7 @@
 #include <QSyntaxHighlighter>
 #include "qorderedmap.h"
 
+class QTextEdit;
 class QTextCharFormat;
 class QPlainTextEdit;
 class QsvLangDef;

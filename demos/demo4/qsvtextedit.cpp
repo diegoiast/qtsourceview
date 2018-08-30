@@ -12,6 +12,7 @@
 #include <QLabel>
 #include <QFileSystemWatcher>
 #include <QFileDialog>
+#include <QStyle>
 
 #include "qsvtextedit.h"
 #include "qsvsyntaxhighlighterbase.h"

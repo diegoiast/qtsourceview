@@ -24,7 +24,7 @@ MainWindow2::MainWindow2( QMainWindow *parent )
 	highlight  = NULL;
 		
 //	dataPath  = QApplication::applicationDirPath() + "/../../";	
-	dataPath  = QApplication::applicationDirPath();
+	dataPath  = QDir::currentPath();
 	setupUi( this );
         statusBar()->showMessage(tr("Welcome, the default syntax is C++"), 10000);
 	QTimer::singleShot( 0, this, SLOT(fillComboBoxes()));

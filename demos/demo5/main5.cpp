@@ -83,6 +83,28 @@ public:
 		return data->m_flags;
 	}
 	
+	virtual void clearMatchData(QTextBlock &block) override {
+		Qate::BlockData *data = getBlockData(block);
+		if (data == NULL)
+			return;
+	}
+
+	virtual void addMatchData(QTextBlock &block, Qate::MatchData) override {
+		Qate::BlockData *data = getBlockData(block);
+		if (data == NULL)
+			return;
+	}
+
+	virtual QTextBlock getCurrentBlockProxy() override {
+		return currentBlock();
+	}
+
+	virtual QList<Qate::MatchData> getMatches(QTextBlock &block) override {
+		QList<Qate::MatchData> matches;
+		return matches;
+	}
+
+
 	Qate::BlockData *getBlockData(QTextBlock &block)
 	{
 		QTextBlockUserData *userData  = block.userData();
@@ -98,7 +120,7 @@ public:
 	}
 };
 
-class MainWindow : QMainWindow
+class MainWindow : public QMainWindow
 {
 	Q_OBJECT
 	QsvTextEdit *editor;
@@ -110,7 +132,7 @@ class MainWindow : QMainWindow
 public:
 	MainWindow( const QString &file )
 	{
-		QString dataPath  = QApplication::applicationDirPath();
+		QString dataPath  = QDir::currentPath();
 		//QsvLangDefFactory::getInstanse()->addMimeTypes( "data/mime.types" );
 		QsvLangDefFactory::getInstanse()->loadDirectory( "data/langs/" );
 		editor           = new QsvTextEdit(this, NULL);

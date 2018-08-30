@@ -11,6 +11,7 @@
 #include <QPlainTextEdit>
 #include <QTextDocument>
 #include <QMessageBox>
+#include <QStyle>
 
 #include <QDebug>
 
