@@ -1,7 +1,7 @@
-QATE_SRC_DIR=./
-include(qate.pri)
+QTSOURCEVIEW_SRC_DIR=./
+include(qsvte.pri)
 
-TARGET		=	qate
+TARGET		=	qste
 DESTDIR		=	../
 TEMPLATE	=	lib
 CONFIG		+=	static lib warn_on silent

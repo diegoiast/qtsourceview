@@ -34,11 +34,11 @@
 #define QTCONCURRENT_GLOBAL_H
 
 #include <QtCore/qglobal.h>
-
+/*
 #if defined(BUILD_QTCONCURRENT)
 #  define QTCONCURRENT_EXPORT Q_DECL_EXPORT
 #else
 #  define QTCONCURRENT_EXPORT Q_DECL_IMPORT
 #endif
-
+*/
 #endif // QTCONCURRENT_GLOBAL_H

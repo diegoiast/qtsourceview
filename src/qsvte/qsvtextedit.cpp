@@ -31,7 +31,8 @@ public:
 private:
 	void paintEvent(QPaintEvent*e)
 	{
-		((QsvTextEdit*)parent())->paintPanel(e);
+		QsvTextEdit *te = dynamic_cast<QsvTextEdit*>(parent());
+		te->paintPanel(e);
 	}
 friend class QsvTextEdit;
 };
@@ -50,8 +51,8 @@ QsvTextEdit::QsvTextEdit( QWidget *parent, QsvSyntaxHighlighterBase *s ):
 	m_banner->setObjectName("banner");
 	ui_banner = new Ui::BannerMessage;
 	ui_banner->setupUi(m_banner);
-	m_topWidget = NULL;
-	m_bottomWidget = NULL;
+	m_topWidget = nullptr;
+	m_bottomWidget = nullptr;
 	if (ui_banner->frame->style()->inherits("QWindowsStyle"))
 		ui_banner->frame->setFrameStyle(QFrame::StyledPanel);
 	m_selectionTimer.setSingleShot(true);
@@ -79,13 +80,13 @@ QsvTextEdit::QsvTextEdit( QWidget *parent, QsvSyntaxHighlighterBase *s ):
 	m_modifiedColor           = QColor(0x00,0xff,0x00,0xff);
 	m_panelColor              = QColor(0xff,0xff,0xd0,0xff);
 	
-	actionCapitalize          = NULL;
-	actionLowerCase           = NULL;
-	actionChangeCase          = NULL;
-	actionFindMatchingBracket = NULL;
-	actionToggleBookmark      = NULL;
-	actionNextBookmark        = NULL;
-	actionPrevBookmark        = NULL;
+	actionCapitalize          = nullptr;
+	actionLowerCase           = nullptr;
+	actionChangeCase          = nullptr;
+	actionFindMatchingBracket = nullptr;
+	actionToggleBookmark      = nullptr;
+	actionNextBookmark        = nullptr;
+	actionPrevBookmark        = nullptr;
 
 	setDefaultConfig();
 	setupActions();
@@ -297,8 +298,8 @@ int	QsvTextEdit::loadFile(const QString &fileName)
 			return -1;
 		
 //		QTextCodec *c = m_config.textCodec;
-		QTextCodec *c = NULL;
-		if (c == NULL)
+		QTextCodec *c = nullptr;
+		if (c == nullptr)
 			c = QTextCodec::codecForLocale();
 
 		QTextStream textStream(&file);
@@ -339,9 +340,9 @@ int	QsvTextEdit::saveFile(const QString &fileName)
 	if (!file.open(QIODevice::WriteOnly))
 		return false;
 
-	QTextCodec *c = NULL;
+	QTextCodec *c = nullptr;
 	//	QTextCodec *c = textCodec;
-	if (c == NULL)
+	if (c == nullptr)
 		c = QTextCodec::codecForLocale();
 
 	QTextStream textStream(&file);
@@ -399,7 +400,7 @@ void	QsvTextEdit::hideBannerMessage()
 	// sometimes the top widget is displayed, lets workaround this
 	// TODO: find WTF this is happening
 	if (m_topWidget == m_banner)
-		m_topWidget = NULL;
+		m_topWidget = nullptr;
 }
 
 int	QsvTextEdit::saveFile()
@@ -506,9 +507,9 @@ void	QsvTextEdit::transformBlockCase()
 	QTextCursor cursor = getCurrentTextCursor();
 	QString s_before   = cursor.selectedText();
 	QString s_after    = s_before;
-	uint s_len = s_before.length();
+	int s_len = s_before.length();
 	
-	for( uint i=0; i< s_len; i++ ) {
+	for (int i=0; i< s_len; i++ ) {
 		QChar c = s_after[i];
 		if (c.isLower())
 			c = c.toUpper();
@@ -601,7 +602,7 @@ void	QsvTextEdit::updateExtraSelections()
 	relativePosition  = cursorPosition - blockPosition;
 	currentChar       = block.text()[relativePosition];
 	data              = dynamic_cast<Qate::BlockData*>(block.userData());
-	if (data==NULL)
+	if (data == nullptr)
 		return;
 
 	for ( int k=0; k<data->matches.length(); k++) {
@@ -633,10 +634,11 @@ NO_MATCHES:
 void	QsvTextEdit::removeModifications()
 {
 	int i = 1;
-    if (m_highlighter!=NULL)
-	for ( QTextBlock block = document()->begin(); block.isValid(); block = block.next() ) {
-		m_highlighter->removeModification(block);
-		i ++;
+	if (m_highlighter != nullptr) {
+		for ( QTextBlock block = document()->begin(); block.isValid(); block = block.next() ) {
+			m_highlighter->removeModification(block);
+			i ++;
+		}
 	}
 	m_panel->update();
 }
@@ -661,8 +663,8 @@ void	QsvTextEdit::on_textDocument_contentsChange( int position, int charsRemoved
 		while ( (remaining+1 < charsAdded) && (oldRemaining != remaining) ){
 			oldRemaining = remaining;
 			block = cursor.block();
-            if (m_highlighter)
-			m_highlighter->setBlockModified(block, true);
+			if (m_highlighter)
+				m_highlighter->setBlockModified(block, true);
 			cursor.movePosition( QTextCursor::NextBlock );
 			remaining = cursor.position() - position;
 		}
@@ -745,7 +747,7 @@ void	QsvTextEdit::on_fileMessage_clicked(const QString &s)
 void	QsvTextEdit::paintEvent(QPaintEvent *e)
 {
 	if (m_config.showMargins) {
-		uint position = fontMetrics().width(' ') * m_config.marginsWidth;
+		int position = fontMetrics().width(' ') * m_config.marginsWidth;
 		QPainter p(viewport());
 		QPen     pen = p.pen();
 		QColor   c = pen.color();
@@ -812,7 +814,7 @@ void	QsvTextEdit::keyPressEvent(QKeyEvent *e)
 			if (m_config.tabIndents)
 				if (handleIndentEvent(false))
 					return;
-
+			break;
 		case Qt::Key_Home:
 		case Qt::Key_End:
 			if (!m_config.smartHome || QApplication::keyboardModifiers().testFlag(Qt::ControlModifier) )
@@ -1071,7 +1073,7 @@ QTextEdit::ExtraSelection QsvTextEdit::getSelectionForBlock( QTextCursor &cursor
 
 void	QsvTextEdit::resetExtraSelections()
 {
-	if (m_highlighter==NULL) {
+	if (m_highlighter==nullptr) {
 		displayBannerMessage(tr("DEBUG: Please use a proper QsvSyntaxHighlighter"));
 		return;
 	}
@@ -1109,7 +1111,7 @@ bool	QsvTextEdit::getShowMargins() const
 	return m_config.showMargins;
 }
 
-void	QsvTextEdit::setMarginsWidth( uint i )
+void	QsvTextEdit::setMarginsWidth(uint i)
 {
 	if (m_config.marginsWidth == i)
 		return;
@@ -1126,7 +1128,8 @@ uint	QsvTextEdit::getMarginsWidth() const
 void	QsvTextEdit::setTabSize( int size )
 {
 	m_config.tabSize = size;
-	setTabStopWidth(fontMetrics().width(" ")*size);
+//	setTabStopWidth(fontMetrics().width(" ")*size);
+	setTabStopDistance(QFontMetricsF(font()).width(' ') * 4);
 }
 
 int	QsvTextEdit::getTabSize() const
@@ -1162,7 +1165,7 @@ void QsvTextEdit::setDefaultConfig()
 void QsvTextEdit::setHighlighter(QsvSyntaxHighlighterBase *s)
 {
 	if (m_highlighter)
-		m_highlighter->setTextDocument(NULL);
+		m_highlighter->setTextDocument(nullptr);
 	m_highlighter = s;
 	if (m_highlighter) {
 		m_highlighter->setTextDocument(document());

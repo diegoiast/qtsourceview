@@ -46,7 +46,7 @@ class QsvTextEdit : public QPlainTextEdit
 {
 	Q_OBJECT
 public:
-	QsvTextEdit( QWidget *parent = 0, QsvSyntaxHighlighterBase *s = 0 );
+	QsvTextEdit( QWidget *parent = nullptr, QsvSyntaxHighlighterBase *s = nullptr);
 	void setupActions();
 
 	void setMarkCurrentLine( bool on );
