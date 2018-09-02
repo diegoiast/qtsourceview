@@ -21,98 +21,89 @@
 #include "qsvsyntaxhighlighterbase.h"
 #include "qsvtextoperationswidget.h"
 
-class MyHighlighter: public QsvSyntaxHighlighter, public QsvSyntaxHighlighterBase
-{
+class MyHighlighter: public QsvSyntaxHighlighter, public QsvSyntaxHighlighterBase {
 public:
-	MyHighlighter(QTextDocument *parent): QsvSyntaxHighlighter(parent)
-	{
+	MyHighlighter(QTextDocument *parent): QsvSyntaxHighlighter(parent) {
 		setMatchBracketList("{}()[]''\"\"");
 	}
 
-	void highlightBlock(const QString &text)
-	{
+	virtual void highlightBlock(const QString &text) override {
 		QsvSyntaxHighlighterBase::highlightBlock(text);
 		QsvSyntaxHighlighter::highlightBlock(text);
 	}
 	
-	virtual void toggleBookmark(QTextBlock &block)
-	{
+	virtual void toggleBookmark(QTextBlock &block) override {
 		Qate::BlockData *data = getBlockData(block);
-		if (data == NULL)
+		if (data == nullptr)
 			return;
 		data->toggleBookmark();
 	}
 
-	virtual void removeModification(QTextBlock &block)
-	{
+	virtual void removeModification(QTextBlock &block) override {
 		Qate::BlockData *data = getBlockData(block);
-		if (data == NULL)
+		if (data == nullptr)
 			return;
 		data->m_isModified = false;
 	}
 
-	virtual void setBlockModified(QTextBlock &block, bool on)
-	{
+	virtual void setBlockModified(QTextBlock &block, bool on) override {
 		Qate::BlockData *data = getBlockData(block);
-		if (data == NULL)
+		if (data == nullptr)
 			return;
-		data->m_isModified =  true;
+		data->m_isModified =  on;
 	}
 
-	virtual bool isBlockModified(QTextBlock &block)
-	{
+	virtual bool isBlockModified(QTextBlock &block) override {
 		Qate::BlockData *data = getBlockData(block);
-		if (data == NULL)
+		if (data == nullptr)
 			return false;
 		return data->m_isModified;
 	}
 
-	virtual bool isBlockBookmarked(QTextBlock &block)
-	{
+	virtual bool isBlockBookmarked(QTextBlock &block) override {
 		Qate::BlockData *data = getBlockData(block);
-		if (data == NULL)
+		if (data == nullptr)
 			return 0;
 		return data->isBookmark();
 	}
 
-	virtual Qate::BlockData::LineFlags getBlockFlags(QTextBlock &block)
-	{
+	virtual Qate::BlockData::LineFlags getBlockFlags(QTextBlock &block) override {
 		Qate::BlockData *data = getBlockData(block);
-		if (data == NULL)
+		if (data == nullptr)
 			return 0;
 		return data->m_flags;
 	}
 	
 	virtual void clearMatchData(QTextBlock &block) override {
 		Qate::BlockData *data = getBlockData(block);
-		if (data == NULL)
+		if (data == nullptr)
 			return;
 	}
 
-	virtual void addMatchData(QTextBlock &block, Qate::MatchData) override {
+	virtual void addMatchData(QTextBlock &block, Qate::MatchData m) override {
 		Qate::BlockData *data = getBlockData(block);
-		if (data == NULL)
+		if (data == nullptr)
 			return;
+		data->matches << m;
 	}
 
+	virtual QList<Qate::MatchData> getMatches(QTextBlock &block) override {
+		Qate::BlockData *data = getBlockData(block);
+		if (data == nullptr)
+			return QList<Qate::MatchData>();
+		return data->matches;
+	}
 	virtual QTextBlock getCurrentBlockProxy() override {
 		return currentBlock();
 	}
 
-	virtual QList<Qate::MatchData> getMatches(QTextBlock &block) override {
-		QList<Qate::MatchData> matches;
-		return matches;
-	}
-
-
-	Qate::BlockData *getBlockData(QTextBlock &block)
-	{
+	Qate::BlockData *getBlockData(QTextBlock &block) {
 		QTextBlockUserData *userData  = block.userData();
-		Qate::BlockData       *blockData = NULL;
+		Qate::BlockData    *blockData = nullptr;
 		
-		if (userData == NULL){
-			blockData =  new Qate::BlockData();
-			block.setUserData(blockData);
+		if (userData == nullptr){
+//			blockData =  new Qate::BlockData();
+//			block.setUserData(blockData);
 		} else {
 			blockData = dynamic_cast<Qate::BlockData*>(userData);
 		}
@@ -135,7 +126,7 @@ public:
 		QString dataPath  = QDir::currentPath();
 		//QsvLangDefFactory::getInstanse()->addMimeTypes( "data/mime.types" );
 		QsvLangDefFactory::getInstanse()->loadDirectory( "data/langs/" );
-		editor           = new QsvTextEdit(this, NULL);
+		editor           = new QsvTextEdit(this, nullptr);
 		defColors        = new QsvColorDefFactory( "data/colors/kate.xml" );
 		langDefinition   = QsvLangDefFactory::getInstanse()->getHighlight("1.cpp");
 		highlight        = new MyHighlighter(editor->document());

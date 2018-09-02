@@ -9,7 +9,7 @@ DEFINES         +=      CORE_EXPORT=Q_DECL_EXPORT
 LIBS		=	-L../../ -lqate
 INCLUDEPATH	=	../../src ../../src/qate
 TARGET		=	demo6-qate
-QT		+=	gui core xml  network
+QT		+=	gui core xml  network widgets
 
 
 CONFIG		+=	qt warn_on silent

@@ -9,6 +9,8 @@
 #include <QPushButton>
 #include <QDebug>
 #include <QCommonStyle>
+#include <QTextDocument>
+#include <QTextBlock>
 
 #include "context.h"
 #include "highlighter.h"
@@ -60,7 +62,7 @@ public:
 };
 
 
-class MainWindow : QMainWindow
+class MainWindow :public  QMainWindow
 {
 	Q_OBJECT
 	QsvTextEdit *editor;

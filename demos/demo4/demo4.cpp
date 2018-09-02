@@ -5,7 +5,7 @@
 
 MainWindow4::MainWindow4( const QString &file )
 {
-	DefaultHighlighter *s = new DefaultHighlighter;
+	DefaultHighlighter *s = new DefaultHighlighter(this);
 	QsvTextEdit *e = new QsvTextEdit(this, s);
 	QsvTextOperationsWidget *textOpetations = new QsvTextOperationsWidget(e);
 
