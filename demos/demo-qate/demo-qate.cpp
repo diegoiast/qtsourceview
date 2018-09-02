@@ -7,9 +7,9 @@
 
 #include <unistd.h>
 
-#include "context.h"
-#include "highlighter.h"
-#include "highlightdefinition.h"
+#include "qate/context.h"
+#include "qate/highlighter.h"
+#include "qate/highlightdefinition.h"
 #include "qate/highlightdefinitionmanager.h"
 #include "qate/defaultcolors.h"
 

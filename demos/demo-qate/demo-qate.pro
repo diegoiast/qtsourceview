@@ -11,6 +11,6 @@ SOURCES		+=	demo-qate.cpp
 #   right now this will not work, because of include path not set correctly
 DEFINES         +=      CORE_EXPORT=Q_DECL_EXPORT
 LIBS		=	-L../../ -lqate
-INCLUDEPATH	=	../../src ../../src/qate
+INCLUDEPATH	=	../../src
 TARGET		=	demo6-qate
 
