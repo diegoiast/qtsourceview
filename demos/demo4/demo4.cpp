@@ -1,6 +1,6 @@
-#include "qsvtextoperationswidget.h"
-#include "qsvdefaulthighlighter.h"
-#include "qsvtextedit.h"
+#include "qsvte/qsvtextoperationswidget.h"
+#include "qsvte/qsvdefaulthighlighter.h"
+#include "qsvte/qsvtextedit.h"
 #include "mainwindow4.h"
 
 MainWindow4::MainWindow4( const QString &file )
@@ -34,7 +34,7 @@ MainWindow4::MainWindow4( const QString &file )
 		loadFile(file);
 	else {
 		setWindowTitle("QtSourceView demo4");
-		QFile f(":/qedit/readme.txt");
+		QFile f("demos/demo4/readme.txt");
 		if (!f.open(QIODevice::ReadOnly | QIODevice::Text))
 			return;
 		e->setPlainText(f.readAll());

@@ -7,10 +7,6 @@
 #include <QMainWindow>
 #include <QFileDialog>
 
-#include "qsvtextedit.h"
-#include "qsvsyntaxhighlighterbase.h"
-#include "qsvtextoperationswidget.h"
-
 class MainWindow4 : public QMainWindow
 {
 	Q_OBJECT

@@ -1,7 +1,7 @@
 QTSOURCEVIEW_SRC_DIR=./
 include(qsvte.pri)
 
-TARGET		=	qste
+TARGET		=	qsvte
 DESTDIR		=	../
 TEMPLATE	=	lib
 CONFIG		+=	static lib warn_on silent

@@ -10,6 +10,9 @@ replacement for Notepad.exe, or Notepad on steroids. This application
 just shows how to use the text editor widget, which does not include a 
 syntax highlighter.
 
+The app consists of a single QsvTextEdit. This is a drop in replacement for 
+Q[Plain]TextEdit, with extra features needed for code editing.
+
 [NIY] = not implemented yet
 
 Shortcuts:
