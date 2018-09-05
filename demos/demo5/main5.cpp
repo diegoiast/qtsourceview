@@ -17,9 +17,9 @@
 #include "qsvsh/qsvsyntaxhighlighter.h"
 
 #include "qate/qateblockdata.h"
-#include "qsvtextedit.h"
-#include "qsvsyntaxhighlighterbase.h"
-#include "qsvtextoperationswidget.h"
+#include "qsvte/qsvtextedit.h"
+#include "qsvte/qsvtextoperationswidget.h"
+#include "qsvte/qsvsyntaxhighlighterbase.h"
 
 class MyHighlighter: public QsvSyntaxHighlighter, public QsvSyntaxHighlighterBase {
 public:
@@ -178,7 +178,7 @@ public:
 			loadFile(file);
 		else {
 			setWindowTitle("QtSourceView demo5 - qedit");
-			QFile f(":/qedit/readme.txt");
+			QFile f("demos/demo5/readme.txt");
 			if (!f.open(QIODevice::ReadOnly | QIODevice::Text))
 				return;
 			editor->setPlainText(f.readAll());
