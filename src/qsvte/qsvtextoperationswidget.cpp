@@ -19,12 +19,12 @@ QsvTextOperationsWidget::QsvTextOperationsWidget( QWidget *parent )
 	: QObject(parent)
 {
 	setObjectName("QsvTextOperationWidget");
-	m_gotoLine    = NULL;
-	m_search      = NULL;
-	m_replace     = NULL;
-	m_document    = NULL;
-	searchFormUi  = NULL;
-	replaceFormUi = NULL;
+	m_gotoLine    = nullptr;
+	m_search      = nullptr;
+	m_replace     = nullptr;
+	m_document    = nullptr;
+	searchFormUi  = nullptr;
+	replaceFormUi = nullptr;
 	searchFoundColor	= QColor( "#DDDDFF" ); //QColor::fromRgb( 220, 220, 255)
 	searchNotFoundColor	= QColor( "#FFAAAA" ); //QColor::fromRgb( 255, 102, 102) "#FF6666"
 	
@@ -129,7 +129,7 @@ void	QsvTextOperationsWidget::searchPrevious()
 
 void	QsvTextOperationsWidget::adjustBottomWidget()
 {
-	showBottomWidget(NULL);
+	showBottomWidget(nullptr);
 }
 
 void	 QsvTextOperationsWidget::updateSearchInput()
@@ -298,7 +298,7 @@ QTextDocument* QsvTextOperationsWidget::getTextDocument()
 			return pt->document();
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 void QsvTextOperationsWidget::showSearch()
@@ -400,7 +400,7 @@ void	QsvTextOperationsWidget::on_replaceAll_clicked()
 	// replaceWidget->setWidgetTransparency( 0.8 );
 	m_replace->show();
 
-	QMessageBox::information( 0, tr("Replace all"), tr("%1 replacement(s) made").arg(replaceCount) );
+	QMessageBox::information( nullptr, tr("Replace all"), tr("%1 replacement(s) made").arg(replaceCount) );
 }
 
 void	QsvTextOperationsWidget::showReplace()
@@ -443,7 +443,7 @@ void QsvTextOperationsWidget::showGotoLine()
 
 void	QsvTextOperationsWidget::showBottomWidget(QWidget* w)
 {
-	if (w == NULL) {
+	if (w == nullptr) {
 		if (m_replace && m_replace->isVisible())
 			w = m_replace;
 		else if (m_search && m_search->isVisible())
