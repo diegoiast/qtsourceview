@@ -13,17 +13,13 @@
 #include "qsvsh/qsvsyntaxhighlighter.h"
 #include "mainwindow2.h"
 
-//	QString dataPath  = QApplication::applicationDirPath();
-QString dataPath;
-
 MainWindow2::MainWindow2( QMainWindow *parent )
 :QMainWindow( parent )
 {
-	defColors = NULL;
-	defLang  = NULL;
-	highlight  = NULL;
+	defColors = nullptr;
+	defLang  = nullptr;
+	highlight  = nullptr;
 		
-//	dataPath  = QApplication::applicationDirPath() + "/../../";	
 	dataPath  = QDir::currentPath();
 	setupUi( this );
         statusBar()->showMessage(tr("Welcome, the default syntax is C++"), 10000);
@@ -46,10 +42,20 @@ void MainWindow2::fillComboBoxes()
 	comboBox_colors->addItems( colorFiles );
 
 	disable_combo_updates = false;
-	// now set the default language to c++, and use kate color definitions
-//	comboBox_syntax->setCurrentIndex( comboBox_syntax->findText("test_.lang" ) );
+	// by the default language to c++, and use kate color definitions
 	comboBox_syntax->setCurrentIndex( comboBox_syntax->findText("cpp.lang" ) );
 	comboBox_colors->setCurrentIndex( comboBox_colors->findText("kate.xml" ) );
+	
+	if (syntaxFiles.isEmpty() || colorFiles.isEmpty()) {
+		QMessageBox::information(textEdit, 
+			textEdit->tr("Read documentation"),
+			textEdit->tr("Cannot find color or language definition.\n\n"
+			"Are you running the app from the top dir?\n"
+			"If running from QtCreator, set up working directory to %{sourceDir}\n"
+			"See documentation in main1.cpp"
+		));
+	}
+	
 }
 
 void MainWindow2::on_action_New_triggered()

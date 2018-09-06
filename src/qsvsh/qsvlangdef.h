@@ -73,14 +73,15 @@ public:
 
 	bool	load( QString fileName );
 	bool	load( QDomDocument doc );
+	bool	isValid() const;
 
-	QString getVersion();
-	QString	getName();
-	QString getSection();
-	QStringList getMimeTypes();	
+	QString getVersion() const;
+	QString	getName() const;
+	QString getSection() const;
+	QStringList getMimeTypes() const;	
 	
+	static bool isTrue( QString s );
 private:
-	bool	isTrue( QString s );
 
 	bool	loadEntity(QDomNode node, QsvEntityDef &entity );
 	bool	loadLineComments( QDomNodeList nodes );

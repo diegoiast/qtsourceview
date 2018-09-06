@@ -1,5 +1,5 @@
-#ifndef __QSV_SYNTAXHIGHLIGHTER__
-#define __QSV_SYNTAXHIGHLIGHTER__
+#ifndef QSV_SYNTAXHIGHLIGHTER_HEADER
+#define QSV_SYNTAXHIGHLIGHTER_HEADER
 
 /**
  * \file qsvsyntaxhighlighter.h
@@ -29,12 +29,12 @@ class QsvSyntaxHighlighter: public QSyntaxHighlighter
 {
 public:
 	QsvSyntaxHighlighter( QsvColorDefFactory *colors, QsvLangDef *lang );
-	QsvSyntaxHighlighter( QTextDocument *parent = 0, QsvColorDefFactory *colors=0, QsvLangDef *lang=0 );
-	QsvSyntaxHighlighter( QTextEdit *parent = 0, QsvColorDefFactory *colors=0, QsvLangDef *lang=0 );
-	QsvSyntaxHighlighter( QPlainTextEdit *parent = 0, QsvColorDefFactory *colors=0, QsvLangDef *lang=0 );
+	QsvSyntaxHighlighter( QTextDocument *parent = nullptr, QsvColorDefFactory *colors=nullptr, QsvLangDef *lang=nullptr );
+	QsvSyntaxHighlighter( QTextEdit *parent = nullptr, QsvColorDefFactory *colors=nullptr, QsvLangDef *lang=nullptr );
+	QsvSyntaxHighlighter( QPlainTextEdit *parent = nullptr, QsvColorDefFactory *colors=nullptr, QsvLangDef *lang=nullptr );
 	~QsvSyntaxHighlighter();
-	void setHighlight( QsvLangDef *newLang=0 );
-	void setColorsDef( QsvColorDefFactory *newColors=0 );
+	void setHighlight( QsvLangDef *newLang=nullptr );
+	void setColorsDef( QsvColorDefFactory *newColors=nullptr );
 
 protected:
 	void highlightBlock(const QString &text);
@@ -52,4 +52,4 @@ private:
 	QOrderedMap<QString,QsvLanguageEntity> mappings;
 };
 
-#endif  // __QSV_SYNTAXHIGHLIGHTER__
+#endif  // QSV_SYNTAXHIGHLIGHTER_HEADER

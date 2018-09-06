@@ -1,5 +1,5 @@
-#ifndef __MAINWINDOW2_H__
-#define __MAINWINDOW2_H__
+#ifndef MAINWINDOW2_H
+#define MAINWINDOW2_H
 
 #include <QMainWindow>
 #include "ui_mainwindow2.h"
@@ -13,7 +13,7 @@ class MainWindow2: public QMainWindow, private Ui::MainWindow2
 {
 	Q_OBJECT
 public:	
-	MainWindow2( QMainWindow *parent=0 ); 
+	MainWindow2( QMainWindow *parent=nullptr ); 
 	
 public slots:
 	void fillComboBoxes();
@@ -25,7 +25,6 @@ public slots:
 	void on_actionE_xit_triggered();
 	void on_comboBox_colors_currentIndexChanged( const QString & text );
 	void on_comboBox_syntax_currentIndexChanged( const QString & text );
-	
 	void update_syntax_color();
 	
 private:
@@ -33,8 +32,8 @@ private:
 	QsvLangDef		*defLang;
 	QsvSyntaxHighlighter	*highlight;
 	QStringList		colorFiles, syntaxFiles;
-	
+	QString			dataPath;
 	bool disable_combo_updates;
 };
 
-#endif //__MAINWINDOW2_H__
+#endif // MAINWINDOW2_H

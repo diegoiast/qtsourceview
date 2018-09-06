@@ -1,8 +1,8 @@
-DESTDIR		=	../../
-
+TEMPLATE	=	app
 QT		=	gui core xml widgets
 CONFIG		+=	qt warn_on silent
-TEMPLATE	=	app
-SOURCES		=	main1.cpp  
+DESTDIR		=	../../
 INCLUDEPATH	=	../../src .
 LIBS		=	-L../../ -lqvshl
+TARGET          =       demo1
+SOURCES		=	main1.cpp  

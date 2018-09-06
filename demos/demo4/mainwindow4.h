@@ -1,3 +1,6 @@
+#ifndef MAINWINDOW_4_H
+#define MAINWINDOW_4_H
+
 #include <QObject>
 #include <QSyntaxHighlighter>
 #include <QApplication>
@@ -16,3 +19,5 @@ public slots:
 	void loadFile( QString filename ="" );
 private:
 };
+
+#endif // MAINWINDOW_4_H

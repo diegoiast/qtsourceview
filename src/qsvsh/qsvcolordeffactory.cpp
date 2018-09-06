@@ -13,6 +13,7 @@
 #include <QBrush>
 #include <QTextCharFormat>
 #include <QColor>
+#include <QDomDocument>
 
 #include "qsvcolordef.h"
 #include "qsvcolordeffactory.h"
@@ -165,6 +166,27 @@ bool	QsvColorDefFactory::load( QString fileName )
 }
 
 /**
+ * @brief QsvColorDefFactory::isValid checks if the definition is valid
+ * @return true if a valid definition has been loaded
+ * 
+ * When loading a definition using \see load() you get a return value
+ * mentioning if the color definition factory has been loaded. However
+ * when mentioning the filename to load from constructor, you don't get such
+ * indication (yes, this class can thow an exception, but this is not how Qt
+ * works, and not how this library works). Instead you can query this method.
+ */
+bool QsvColorDefFactory::isValid() const
+{
+	if (fileName.isEmpty()) 
+		return false;
+	if (name.isEmpty())
+		return false;
+	if (colorDefs.isEmpty()) 
+		return false;
+	return true;
+}
+
+/**
  * \brief query the factory and return a color definition
  * \param name the color class to match
  * \return the color definition which matches the input
@@ -180,7 +202,7 @@ bool	QsvColorDefFactory::load( QString fileName )
  * \see QsvColorDef
  * \see QsvColorDef::getStyleNum()
  */
-QsvColorDef QsvColorDefFactory::getColorDef( QString name )
+QsvColorDef QsvColorDefFactory::getColorDef( QString name ) const
 {
 #ifdef __DEBUG_NO_ITEM_FOUND
 	qDebug( "%s %d", __FILE__, __LINE__ );

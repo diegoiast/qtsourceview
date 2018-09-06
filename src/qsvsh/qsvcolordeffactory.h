@@ -1,5 +1,5 @@
-#ifndef __KATE_ITEM_DATA_MANAGER__
-#define __KATE_ITEM_DATA_MANAGER__
+#ifndef KATE_ITEM_DATA_MANAGER_HEADER
+#define KATE_ITEM_DATA_MANAGER_HEADER
 
 /**
  * \file qsvcolordeffactory.h
@@ -9,11 +9,10 @@
  * \see QsvColorDefFactory
  */
 
-#include <QDomDocument>
 #include <QString>
 #include <QList>
 
-//#include "qsvcolordef.h"
+class QDomDocument;
 class QsvColorDef;
 
 class QsvColorDefFactory
@@ -22,11 +21,12 @@ public:
 	QsvColorDefFactory();
 	QsvColorDefFactory( QDomDocument doc );
 	QsvColorDefFactory( QString fileName );
-	virtual ~QsvColorDefFactory();
+	~QsvColorDefFactory();
 
 	bool load( QDomDocument doc );
 	bool load( QString fileName );
-	QsvColorDef getColorDef( QString name );
+	bool isValid() const;
+	QsvColorDef getColorDef( QString name ) const;
 public:
 	QList<QsvColorDef> colorDefs;
 	QString fileName;
@@ -36,4 +36,4 @@ public:
 	QString author;
 };
 
-#endif // __KATE_ITEM_DATA_MANAGER__
+#endif // KATE_ITEM_DATA_MANAGER_HEADER

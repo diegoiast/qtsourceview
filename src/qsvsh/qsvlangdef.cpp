@@ -201,6 +201,35 @@ bool	QsvLangDef::load( QDomDocument doc )
 		return false;
 
 	return true;
+}
+
+/**
+ * @brief QsvLangDef::isValid checks if the definition is valid
+ * @return true if a valid definition has been loaded
+ * 
+ * When loading a definition using \see load() you get a return value
+ * mentioning if the color definition factory has been loaded. However
+ * when mentioning the filename to load from constructor, you don't get such
+ * indication (yes, this class can thow an exception, but this is not how Qt
+ * works, and not how this library works). Instead you can query this method.
+ */
+bool QsvLangDef::isValid() const {
+	bool valid = false;	
+	if (!escapeChar.isEmpty())
+		valid |= true;
+	if (!stringsDefs.isEmpty())
+		valid |= true;
+	if (!lineCommentsDefs.isEmpty())
+		valid |= true;
+	if (!blockCommentsDefs.isEmpty())
+		valid |= true;
+	if (!keywordListDefs.isEmpty())
+		valid |= true;
+	if (!patternItems.isEmpty())
+		valid |= true;
+	if (!syntaxItemDefs.isEmpty())
+		valid |= true;
+	return valid;
 };
 
 /**
@@ -210,8 +239,7 @@ bool	QsvLangDef::load( QDomDocument doc )
  * file for this syntax. You can use it for displaying the in GUIs instead 
  * of the file name.
  */
-QString QsvLangDef::getVersion()
-{
+QString QsvLangDef::getVersion() const {
 	return attributes["_version"];
 }
 
@@ -221,8 +249,7 @@ QString QsvLangDef::getVersion()
  * This return a descriptive name for this syntax. You can use it for displaying 
  * the in GUIs instead of the file name.
  */
-QString	QsvLangDef::getName()
-{
+QString	QsvLangDef::getName() const {
 	return attributes["_name"];
 }
 
@@ -233,8 +260,7 @@ QString	QsvLangDef::getName()
  *
  * \see getMimeTypes()
  */
-QString QsvLangDef::getSection()
-{
+QString QsvLangDef::getSection() const {
 	return attributes["_section"];
 }
 
@@ -249,8 +275,7 @@ QString QsvLangDef::getSection()
  * It's up to an upper level API to match file names into mime types, and
  * this class does not take 
  */
-QStringList QsvLangDef::getMimeTypes()
-{
+QStringList QsvLangDef::getMimeTypes() const {
 	return mimeTypes;
 }
 

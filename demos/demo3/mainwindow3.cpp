@@ -32,6 +32,17 @@ MainWindow3::MainWindow3( QMainWindow *parent )
 	// assign to it the new syntax highlighter, with the default colors and language
 	highlight = new QsvSyntaxHighlighter( textEdit, defColors, langDefinition );
 	
+	if (!defColors->isValid() || !langDefinition->isValid()) {
+		QMessageBox::information(textEdit, 
+			textEdit->tr("Read documentation"),
+			textEdit->tr("Cannot find color or language definition.\n\n"
+			"Are you running the app from the top dir?\n"
+			"If running from QtCreator, set up working directory to %{sourceDir}\n"
+			"See documentation in main1.cpp"
+		));
+	}
+	
+	
 	statusBar()->showMessage(tr("Welcome, the default syntax is C++"), MessageTimeOut );
 }
 
@@ -66,6 +77,17 @@ void MainWindow3::on_action_Open_triggered()
 	textEdit->clear();
 	langDefinition = QsvLangDefFactory::getInstanse()->getHighlight( fileName );
 	highlight->setHighlight( langDefinition );
+	
+	
+	if (!langDefinition->isValid()) {
+		QMessageBox::information(textEdit, 
+			textEdit->tr("Read documentation"),
+			textEdit->tr("Cannot find color or language definition.\n\n"
+			"Are you running the app from the top dir?\n"
+			"If running from QtCreator, set up working directory to %{sourceDir}\n"
+			"See documentation in main1.cpp"
+		));
+	}
 	
 	QTextStream in(&file);
 	QApplication::setOverrideCursor(Qt::WaitCursor);
