@@ -29,14 +29,14 @@ public:
 	}
 
 private:
-	void paintEvent(QPaintEvent*e)
-	{
-		QsvTextEdit *te = dynamic_cast<QsvTextEdit*>(parent());
-		te->paintPanel(e);
-	}
-friend class QsvTextEdit;
+	void paintEvent(QPaintEvent*e);
+	friend class QsvTextEdit;
 };
 
+void	QsvEditorPanel::paintEvent(QPaintEvent *e) {
+	QsvTextEdit *te = dynamic_cast<QsvTextEdit*>(parent());
+	te->paintPanel(e);
+}
 
 QsvTextEdit::QsvTextEdit( QWidget *parent, QsvSyntaxHighlighterBase *s ):
 	QPlainTextEdit(parent)
