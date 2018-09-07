@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>610</width>
-    <height>173</height>
+    <height>208</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -24,12 +24,21 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_5">
    <property name="spacing">
-    <number>-1</number>
+    <number>6</number>
    </property>
    <property name="sizeConstraint">
     <enum>QLayout::SetMaximumSize</enum>
    </property>
-   <property name="margin">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
     <number>0</number>
    </property>
    <item>
@@ -227,15 +236,15 @@
    <sender>moreButton</sender>
    <signal>toggled(bool)</signal>
    <receiver>optionsGroupBox</receiver>
-   <slot>setShown(bool)</slot>
+   <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>530</x>
-     <y>77</y>
+     <x>566</x>
+     <y>80</y>
     </hint>
     <hint type="destinationlabel">
-     <x>532</x>
-     <y>146</y>
+     <x>501</x>
+     <y>120</y>
     </hint>
    </hints>
   </connection>
@@ -243,15 +252,15 @@
    <sender>moreButton</sender>
    <signal>toggled(bool)</signal>
    <receiver>optionsGroupBox</receiver>
-   <slot>setEnabled(bool)</slot>
+   <slot>setVisible(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>508</x>
-     <y>86</y>
+     <x>526</x>
+     <y>67</y>
     </hint>
     <hint type="destinationlabel">
-     <x>501</x>
-     <y>120</y>
+     <x>304</x>
+     <y>145</y>
     </hint>
    </hints>
   </connection>
