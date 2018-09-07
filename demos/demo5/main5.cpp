@@ -9,6 +9,7 @@
 #include <QPushButton>
 #include <QDebug>
 #include <QCommonStyle>
+#include <QMessageBox>
 
 #include "qsvsh/qsvcolordef.h"
 #include "qsvsh/qsvcolordeffactory.h"
@@ -27,95 +28,120 @@ public:
 		setMatchBracketList("{}()[]''\"\"");
 	}
 
-	virtual void highlightBlock(const QString &text) override {
-		QsvSyntaxHighlighterBase::highlightBlock(text);
-		QsvSyntaxHighlighter::highlightBlock(text);
-	}
+	virtual void highlightBlock(const QString &text) override;
 	
-	virtual void toggleBookmark(QTextBlock &block) override {
-		Qate::BlockData *data = getBlockData(block);
-		if (data == nullptr)
-			return;
-		data->toggleBookmark();
-	}
+	virtual void toggleBookmark(QTextBlock &block) override;
 
-	virtual void removeModification(QTextBlock &block) override {
-		Qate::BlockData *data = getBlockData(block);
-		if (data == nullptr)
-			return;
-		data->m_isModified = false;
-	}
+	virtual void removeModification(QTextBlock &block) override;
 
-	virtual void setBlockModified(QTextBlock &block, bool on) override {
-		Qate::BlockData *data = getBlockData(block);
-		if (data == nullptr)
-			return;
-		data->m_isModified =  on;
-	}
+	virtual void setBlockModified(QTextBlock &block, bool on) override;
 
-	virtual bool isBlockModified(QTextBlock &block) override {
-		Qate::BlockData *data = getBlockData(block);
-		if (data == nullptr)
-			return false;
-		return data->m_isModified;
-	}
+	virtual bool isBlockModified(QTextBlock &block) override;
 
-	virtual bool isBlockBookmarked(QTextBlock &block) override {
-		Qate::BlockData *data = getBlockData(block);
-		if (data == nullptr)
-			return 0;
-		return data->isBookmark();
-	}
+	virtual bool isBlockBookmarked(QTextBlock &block) override;
 
-	virtual Qate::BlockData::LineFlags getBlockFlags(QTextBlock &block) override {
-		Qate::BlockData *data = getBlockData(block);
-		if (data == nullptr)
-			return 0;
-		return data->m_flags;
-	}
+	virtual Qate::BlockData::LineFlags getBlockFlags(QTextBlock &block) override;
 	
-	virtual void clearMatchData(QTextBlock &block) override {
-		Qate::BlockData *data = getBlockData(block);
-		if (data == nullptr)
-			return;
-	}
+	virtual void clearMatchData(QTextBlock &block) override;
 
-	virtual void addMatchData(QTextBlock &block, Qate::MatchData m) override {
-		Qate::BlockData *data = getBlockData(block);
-		if (data == nullptr)
-			return;
-		data->matches << m;
-	}
+	virtual void addMatchData(QTextBlock &block, Qate::MatchData m) override;
 
-	virtual QList<Qate::MatchData> getMatches(QTextBlock &block) override {
-		Qate::BlockData *data = getBlockData(block);
-		if (data == nullptr)
-			return QList<Qate::MatchData>();
-		return data->matches;
-	}
-	virtual QTextBlock getCurrentBlockProxy() override {
-		return currentBlock();
-	}
+	virtual QList<Qate::MatchData> getMatches(QTextBlock &block) override;
+	
+	virtual QTextBlock getCurrentBlockProxy() override;
 
-	Qate::BlockData *getBlockData(QTextBlock &block) {
-		QTextBlockUserData *userData  = block.userData();
-		Qate::BlockData    *blockData = nullptr;
-		
-		if (userData == nullptr){
-//			blockData =  new Qate::BlockData();
-//			block.setUserData(blockData);
-		} else {
-			blockData = dynamic_cast<Qate::BlockData*>(userData);
-		}
-		return blockData;
-	}
+	Qate::BlockData *getBlockData(QTextBlock &block);
 };
+
+void MyHighlighter::highlightBlock(const QString &text) {
+	QsvSyntaxHighlighterBase::highlightBlock(text);
+	QsvSyntaxHighlighter::highlightBlock(text);
+}
+
+void MyHighlighter::toggleBookmark(QTextBlock &block) {
+	Qate::BlockData *data = getBlockData(block);
+	if (data == nullptr)
+		return;
+	data->toggleBookmark();
+}
+
+void MyHighlighter::removeModification(QTextBlock &block) {
+	Qate::BlockData *data = getBlockData(block);
+	if (data == nullptr)
+		return;
+	data->m_isModified = false;
+}
+
+void MyHighlighter::setBlockModified(QTextBlock &block, bool on) {
+	Qate::BlockData *data = getBlockData(block);
+	if (data == nullptr)
+		return;
+	data->m_isModified =  on;
+}
+
+bool MyHighlighter::isBlockModified(QTextBlock &block) {
+	Qate::BlockData *data = getBlockData(block);
+	if (data == nullptr)
+		return false;
+	return data->m_isModified;
+}
+
+bool MyHighlighter::isBlockBookmarked(QTextBlock &block) {
+	Qate::BlockData *data = getBlockData(block);
+	if (data == nullptr)
+		return 0;
+	return data->isBookmark();
+}
+
+Qate::BlockData::LineFlags MyHighlighter::getBlockFlags(QTextBlock &block) {
+	Qate::BlockData *data = getBlockData(block);
+	if (data == nullptr)
+		return Qate::BlockData::LineFlag::Empty;
+	return data->m_flags;
+}
+
+void MyHighlighter::clearMatchData(QTextBlock &block) {
+	Qate::BlockData *data = getBlockData(block);
+	if (data == nullptr)
+		return;
+}
+
+void MyHighlighter::addMatchData(QTextBlock &block, Qate::MatchData m) {
+	Qate::BlockData *data = getBlockData(block);
+	if (data == nullptr)
+		return;
+	data->matches << m;
+}
+
+QList<Qate::MatchData> MyHighlighter::getMatches(QTextBlock &block) {
+	Qate::BlockData *data = getBlockData(block);
+	if (data == nullptr)
+		return QList<Qate::MatchData>();
+	return data->matches;
+}
+
+QTextBlock MyHighlighter::getCurrentBlockProxy() {
+	return currentBlock();
+}
+
+Qate::BlockData *MyHighlighter::getBlockData(QTextBlock &block) {
+	QTextBlockUserData *userData  = block.userData();
+	Qate::BlockData    *blockData = nullptr;
+	
+	if (userData == nullptr){
+		blockData =  new Qate::BlockData();
+		block.setUserData(blockData);
+	} else {
+		blockData = dynamic_cast<Qate::BlockData*>(userData);
+	}
+	return blockData;
+}
+
 
 class MainWindow : public QMainWindow
 {
 	Q_OBJECT
 	QsvTextEdit *editor;
-	QsvSyntaxHighlighterBase * syntax;
 	QsvColorDefFactory 	 * defColors;
 	QsvLangDef 		 * langDefinition;
 	MyHighlighter    	 * highlight;
@@ -131,6 +157,17 @@ public:
 		langDefinition   = QsvLangDefFactory::getInstanse()->getHighlight("1.cpp");
 		highlight        = new MyHighlighter(editor->document());
 		textOpetations = new QsvTextOperationsWidget(editor);
+		
+		if (!defColors->isValid() || !langDefinition->isValid()) {
+			QMessageBox::information(this, 
+				tr("Read documentation"),
+				tr("Cannot find color or language definition.\n\n"
+				"Are you running the app from the top dir?\n"
+				"If running from QtCreator, set up working directory to %{sourceDir}\n"
+				"See documentation in main1.cpp"
+			));
+		}
+		
 
 		highlight->setColorsDef(defColors);
 		highlight->setHighlight(langDefinition);
@@ -186,14 +223,14 @@ public:
 		}
 
 #if 0
-		e->setMarkCurrentLine(false);
 		// tests for defaults
-		e->setShowLineNumbers(true);
-		e->setShowMargins(true);
-		e->setTabSize(8);
-		e->setTabIndents(true);
-		e->setInsertSpacesInsteadOfTabs(true);
-		e->setShowWhiteSpace(true);
+		editor->setMarkCurrentLine(false);
+		editor->setShowLineNumbers(true);
+		editor->setShowMargins(true);
+		editor->setTabSize(8);
+		editor->setTabIndents(true);
+		editor->setInsertSpacesInsteadOfTabs(true);
+		editor->setShowWhiteSpace(true);
 #endif
 	}
 	
@@ -207,8 +244,8 @@ public slots:
 				return;
 		}
 //		TODO
-//		if (e->isModified){
-//			e->save();
+//		if (editor->isModified()){
+//			editor->save();
 //		}
 		
 		editor->clear();

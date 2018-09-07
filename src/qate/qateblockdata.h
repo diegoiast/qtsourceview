@@ -16,7 +16,8 @@ public:
 
 class BlockData : public QTextBlockUserData {
 public:
-	enum LineFlag{
+	enum LineFlag {
+                Empty = 0,
 		Bookmark = 1,
 		Debug = 2,
 		Executing = 4,
@@ -33,7 +34,7 @@ public:
 
 	BlockData(){
 		m_isModified = false;
-		m_flags      = 0;
+		m_flags      = LineFlag::Empty;
 	}
 
 	void setFlag( LineFlags f, bool on)
