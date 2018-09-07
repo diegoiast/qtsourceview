@@ -54,7 +54,6 @@ int main(int argc, char *argv[])
 			"If running from QtCreator, set up working directory to %{sourceDir}\n"
 			"See documentation in main1.cpp"
 		));
-//		return a.exec();
 	}
 	
 	// new syntax highlighter, with the default colors and language
