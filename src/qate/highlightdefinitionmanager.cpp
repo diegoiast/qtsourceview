@@ -136,6 +136,7 @@ QStringList HighlightDefinitionManager::definitionsPaths() const
         l.append("~/.kde/share/apps/katepart/syntax/");
         l.append("~/.kde4/share/apps/katepart/syntax/");
 #endif
+	l.append("data/qate/");
 	return l;
 }
 

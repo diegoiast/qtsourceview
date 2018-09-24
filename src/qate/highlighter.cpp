@@ -90,6 +90,10 @@ Highlighter::KateFormatMap::KateFormatMap()
     m_ids.insert(QLatin1String("dsFunction"), Highlighter::Function);
     m_ids.insert(QLatin1String("dsRegionMarker"), Highlighter::RegionMarker);
     m_ids.insert(QLatin1String("dsError"), Highlighter::Error);
+
+    m_ids.insert(QLatin1String("dsPreprocessor"), Highlighter::Others);
+    m_ids.insert(QLatin1String("dsImport"), Highlighter::String);
+    m_ids.insert(QLatin1String("dsControlFlow"), Highlighter::Keyword);
 }
 
 void Highlighter::configureFormat(TextFormatId id, const QTextCharFormat &format)

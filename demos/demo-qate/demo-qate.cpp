@@ -15,11 +15,13 @@
 
 #ifdef __WIN32
 #   include <windows.h>
-#   define LANGUAGE  QDir::homePath() + "\\AppData\\Roaming\\Nokia\\qtcreator\\generic-highlighter\\cpp.xml"
 #else
-#   define LANGUAGE  "/usr/share/kde4/apps/katepart/syntax/cpp.xml"
 #endif
-#define TEST_FILE "demos/demo6/demo6.cpp"
+
+#define DATA_DIR "data/qate/"
+#define LANGUAGE  DATA_DIR "c.xml"
+#define TEST_FILE "demos/demo-qate/demo-qate.cpp"
+#define LANG_NAME "C"
 
 /* some examples for different formats inside comments */
 // fixme todo  ###
@@ -81,14 +83,14 @@ int main( int argc, char* argv[] )
         // in  real life, you should the the highlight when the signal
         // definitionsMetaDataReady() is emmited
         // this code just waits "up to" a second for the HL to be available
-        int timeout = 1000;
+	int timeout = 1000;
         while (timeout != 0) {
         #ifdef __WIN32
             SleepEx(1,true);
         #else
-            usleep(1000);
+	    usleep(1000);
         #endif
-            highlight_definition = hl_manager->definition( hl_manager->definitionIdByName("C++") );
+	    highlight_definition = hl_manager->definition( hl_manager->definitionIdByName(LANG_NAME) );
             if (!highlight_definition.isNull())
                 break;
             timeout --;
@@ -97,7 +99,11 @@ int main( int argc, char* argv[] )
         if (!highlight_definition.isNull())
 		highlighter->setDefaultContext(highlight_definition->initialContext());
 
-	load_text(argv[1], text_editor);
+	if (argc == 1) {
+		load_text(TEST_FILE, text_editor);
+	} else {
+		load_text(argv[1], text_editor);
+	}
 	main_window->setWindowTitle("Kate syntax highter test");
 	main_window->setCentralWidget(text_editor);
 	main_window->show();

@@ -1,16 +1,12 @@
-# shared temp dir for all projects
+TEMPLATE	=	app
+QT		=	gui core xml widgets network
+CONFIG		+=	qt warn_on silent
 DESTDIR		=	../../
-
-CONFIG		+=	qt warn_on
-QT              +=      xml network widgets concurrent
-TARGET		=	demo-qate
-SOURCES		+=	demo-qate.cpp
-
-# TODO
-#   in the future, the correct syntax should be
-#   right now this will not work, because of include path not set correctly
-DEFINES         +=      CORE_EXPORT=Q_DECL_EXPORT
+INCLUDEPATH	=	../../src .
 LIBS		=	-L../../ -lqate
-INCLUDEPATH	=	../../src
-TARGET		=	demo6-qate
+TARGET          =       demo6-qate
+SOURCES		=	demo-qate.cpp
 
+
+# TODO - this should be removed
+DEFINES         +=      CORE_EXPORT=Q_DECL_EXPORT
