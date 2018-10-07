@@ -44,10 +44,10 @@ namespace TextEditor{
 
 namespace Qate {
 
-class DefaultColors
+class QateColors
 {
 public:
-    static DefaultColors &instance();
+    static QateColors &defaultColors();
 
     const QTextCharFormat &keywordFormat() const { return m_keywordFormat; }
     const QTextCharFormat &dataTypeFormat() const { return m_dataTypeFormat; }
@@ -64,11 +64,10 @@ public:
     const QTextCharFormat &othersFormat() const { return m_othersFormat; }
 
     QString name(const QTextCharFormat &format) const;
-	static void ApplyToHighlighter(TextEditor::Internal::Highlighter *hl);
+    void applyToHighlighter(TextEditor::Internal::Highlighter *hl);
 
 private:
-    DefaultColors();
-    Q_DISABLE_COPY(DefaultColors);
+    QateColors();
 
     QTextCharFormat m_keywordFormat;
     QTextCharFormat m_dataTypeFormat;

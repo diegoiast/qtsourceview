@@ -37,10 +37,11 @@
 
 using namespace Qate;
 
-DefaultColors::DefaultColors()
+QateColors::QateColors()
 {
-	m_keywordFormat.setForeground(Qt::black);
+    m_keywordFormat.setForeground(Qt::black);
 	m_keywordFormat.setFontWeight(75);
+    m_keywordFormat.setFontItalic(true);
 	
 	m_dataTypeFormat.setForeground(Qt::blue);
 	
@@ -68,16 +69,16 @@ DefaultColors::DefaultColors()
 	
 	m_regionMarkerFormat.setForeground(Qt::green);
 	
-        m_othersFormat.setForeground(Qt::darkBlue);
+m_othersFormat.setForeground(Qt::darkBlue);
 }
 
-DefaultColors &DefaultColors::instance()
+QateColors &QateColors::defaultColors()
 {
-    static DefaultColors DefaultColors;
-    return DefaultColors;
+	static QateColors sDefaultColors;
+	return sDefaultColors;
 }
 
-QString DefaultColors::name(const QTextCharFormat &format) const
+QString QateColors::name(const QTextCharFormat &format) const
 {
     if (format == QTextCharFormat())
         return "Default format";
@@ -112,22 +113,22 @@ QString DefaultColors::name(const QTextCharFormat &format) const
 }
 
 using namespace TextEditor::Internal;
-void DefaultColors::ApplyToHighlighter(TextEditor::Internal::Highlighter *hl)
+void QateColors::applyToHighlighter(TextEditor::Internal::Highlighter *hl)
 {
-//	hl->configureFormat(Highlighter::Normal,           instance().m_othersFormat       );
-//	hl->configureFormat(Highlighter::VisualWhitespace, instance().m_othersFormat       );
-	hl->configureFormat(Highlighter::Keyword,          instance().m_keywordFormat      );
-	hl->configureFormat(Highlighter::DataType,         instance().m_dataTypeFormat     );
-	hl->configureFormat(Highlighter::Decimal,          instance().m_decimalFormat      );
-	hl->configureFormat(Highlighter::BaseN,            instance().m_baseNFormat        );
-	hl->configureFormat(Highlighter::Float,            instance().m_floatFormat        );
-	hl->configureFormat(Highlighter::Char,             instance().m_charFormat         );
-	hl->configureFormat(Highlighter::String,           instance().m_stringFormat       );
-	hl->configureFormat(Highlighter::Comment,          instance().m_commentFormat      );
-	hl->configureFormat(Highlighter::Alert,            instance().m_alertFormat        );
-	hl->configureFormat(Highlighter::Error,            instance().m_errorFormat        );
-	hl->configureFormat(Highlighter::Function,         instance().m_functionFormat     );
-	hl->configureFormat(Highlighter::RegionMarker,     instance().m_regionMarkerFormat );
-	hl->configureFormat(Highlighter::Others,           instance().m_othersFormat       );
+//	hl->configureFormat(Highlighter::Normal,           m_othersFormat       );
+//	hl->configureFormat(Highlighter::VisualWhitespace, m_othersFormat       );
+    hl->configureFormat(Highlighter::Keyword,          m_keywordFormat      );
+    hl->configureFormat(Highlighter::DataType,         m_dataTypeFormat     );
+    hl->configureFormat(Highlighter::Decimal,          m_decimalFormat      );
+    hl->configureFormat(Highlighter::BaseN,            m_baseNFormat        );
+    hl->configureFormat(Highlighter::Float,            m_floatFormat        );
+    hl->configureFormat(Highlighter::Char,             m_charFormat         );
+    hl->configureFormat(Highlighter::String,           m_stringFormat       );
+    hl->configureFormat(Highlighter::Comment,          m_commentFormat      );
+    hl->configureFormat(Highlighter::Alert,            m_alertFormat        );
+    hl->configureFormat(Highlighter::Error,            m_errorFormat        );
+    hl->configureFormat(Highlighter::Function,         m_functionFormat     );
+    hl->configureFormat(Highlighter::RegionMarker,     m_regionMarkerFormat );
+    hl->configureFormat(Highlighter::Others,           m_othersFormat       );
 }
 
