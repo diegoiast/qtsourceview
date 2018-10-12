@@ -3,6 +3,7 @@
 #include <QToolBar>
 #include <QTimer>
 #include <QMainWindow>
+#include <QWindow>
 #include <QFileDialog>
 #include <QSyntaxHighlighter>
 #include <QToolButton>
@@ -12,15 +13,19 @@
 #include <QTextDocument>
 #include <QTextBlock>
 
-#include "context.h"
-#include "highlighter.h"
-#include "highlightdefinition.h"
+#include "qate/context.h"
+#include "qate/highlighter.h"
+#include "qate/highlightdefinition.h"
 #include "qate/highlightdefinitionmanager.h"
 #include "qate/defaultcolors.h"
+#include "qate/qateblockdata.h"
+#include "qate/mimedatabase.h"
 
-#include "qsvtextedit.h"
-#include "qsvsyntaxhighlighterbase.h"
-#include "qsvtextoperationswidget.h"
+//#include "qate/qateblockdata.h"
+#include "qsvte/qsvtextedit.h"
+#include "qsvte/qsvtextoperationswidget.h"
+#include "qsvte/qsvsyntaxhighlighterbase.h"
+
 
 class MyHighlighter: public TextEditor::Internal::Highlighter, public QsvSyntaxHighlighterBase
 {
@@ -30,70 +35,172 @@ public:
 		setMatchBracketList("{}()[]''\"\"");
 	}
 
-	void highlightBlock(const QString &text)
-	{
-		QsvSyntaxHighlighterBase::highlightBlock(text);
-		TextEditor::Internal::Highlighter::highlightBlock(text);
-	}
+	virtual void highlightBlock(const QString &text) override;
 
-	virtual void toggleBookmark(QTextBlock &block)
-	{
-	}
+	virtual void toggleBookmark(QTextBlock &block) override;
 
-	virtual void removeModification(QTextBlock &block)
-	{
-	}
+	virtual void removeModification(QTextBlock &block) override;
 
-	virtual void setBlockModified(QTextBlock &block, bool on)
-	{
-	}
+	virtual void setBlockModified(QTextBlock &block, bool on) override;
 
-	virtual bool isBlockModified(QTextBlock &block)
-	{
-	}
+	virtual bool isBlockModified(QTextBlock &block) override;
 
-	virtual bool isBlockBookmarked(QTextBlock &block)
-	{
-	}
+	virtual bool isBlockBookmarked(QTextBlock &block) override;
 
-	virtual QsvBlockData::LineFlags getBlockFlags(QTextBlock &block)
-	{
-	}
+	virtual Qate::BlockData::LineFlags getBlockFlags(QTextBlock &block) override;
+
+	virtual void clearMatchData(QTextBlock &block) override;
+
+	virtual void addMatchData(QTextBlock &block, Qate::MatchData m) override;
+
+	virtual QList<Qate::MatchData> getMatches(QTextBlock &block) override;
+
+	virtual QTextBlock getCurrentBlockProxy() override;
+
+	Qate::BlockData *getBlockData(QTextBlock &block);
 };
 
+void MyHighlighter::highlightBlock(const QString &text) {
+	QsvSyntaxHighlighterBase::highlightBlock(text);
+	TextEditor::Internal::Highlighter::highlightBlock(text);
+}
 
+void MyHighlighter::toggleBookmark(QTextBlock &block) {
+	Qate::BlockData *data = getBlockData(block);
+	if (data == nullptr)
+		return;
+	data->toggleBookmark();
+}
+
+void MyHighlighter::removeModification(QTextBlock &block) {
+	Qate::BlockData *data = getBlockData(block);
+	if (data == nullptr)
+		return;
+	data->m_isModified = false;
+}
+
+void MyHighlighter::setBlockModified(QTextBlock &block, bool on) {
+	Qate::BlockData *data = getBlockData(block);
+	if (data == nullptr)
+		return;
+	data->m_isModified =  on;
+}
+
+bool MyHighlighter::isBlockModified(QTextBlock &block) {
+	Qate::BlockData *data = getBlockData(block);
+	if (data == nullptr)
+		return false;
+	return data->m_isModified;
+}
+
+bool MyHighlighter::isBlockBookmarked(QTextBlock &block) {
+	Qate::BlockData *data = getBlockData(block);
+	if (data == nullptr)
+		return 0;
+	return data->isBookmark();
+}
+
+Qate::BlockData::LineFlags MyHighlighter::getBlockFlags(QTextBlock &block) {
+	Qate::BlockData *data = getBlockData(block);
+	if (data == nullptr)
+		return Qate::BlockData::LineFlag::Empty;
+	return data->m_flags;
+}
+
+void MyHighlighter::clearMatchData(QTextBlock &block) {
+	Qate::BlockData *data = getBlockData(block);
+	if (data == nullptr)
+		return;
+}
+
+void MyHighlighter::addMatchData(QTextBlock &block, Qate::MatchData m) {
+	Qate::BlockData *data = getBlockData(block);
+	if (data == nullptr)
+		return;
+	data->matches << m;
+}
+
+QList<Qate::MatchData> MyHighlighter::getMatches(QTextBlock &block) {
+	Qate::BlockData *data = getBlockData(block);
+	if (data == nullptr)
+		return QList<Qate::MatchData>();
+	return data->matches;
+}
+
+QTextBlock MyHighlighter::getCurrentBlockProxy() {
+	return currentBlock();
+}
+
+Qate::BlockData *MyHighlighter::getBlockData(QTextBlock &block) {
+	QTextBlockUserData *userData  = block.userData();
+	Highlighter::BlockData  *blockData = nullptr;
+
+	if (userData == nullptr){
+		blockData =  new Highlighter::BlockData;
+		block.setUserData(blockData);
+	} else {
+		blockData = dynamic_cast<Highlighter::BlockData*>(userData);
+	}
+	return blockData;
+}
+
+
+void ApplyTheme(const Qate::Theme &theme, QsvTextEdit *editor, TextEditor::Internal::Highlighter *highlight) {
+	theme.applyToHighlighter(highlight);
+	theme.applyToEditor(editor);
+
+	QColor c;
+	c = theme.getEditorColor(Qate::EditorCodeFolding);
+	if (c.isValid())
+		editor->setPanelColor(c);
+	c = theme.getEditorColor(Qate::EditorCurrentLine);
+	if (c.isValid())
+		editor->setCurrentLineBackground(c);
+	c = theme.getEditorColor(Qate::EditorModifiedLines);
+	if (c.isValid())
+		editor->setModifiedColor(c);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//
 class MainWindow :public  QMainWindow
 {
 	Q_OBJECT
 	QsvTextEdit *editor;
-	QsvSyntaxHighlighterBase * syntax;
-	QsvTextOperationsWidget  * textOpetations;
+	QsvTextOperationsWidget  *textOpetations;
 
+	Qate::Theme theme;
 	Qate::MimeDatabase                                        *mimes;
 	Qate::HighlightDefinitionManager                          *hl_manager;
-	TextEditor::Internal::Highlighter                         *highlight;
-	MyHighlighter                                             *highlightEx;
+	MyHighlighter                                             *highlight;
 	QSharedPointer<TextEditor::Internal::HighlightDefinition>  highlight_definition;
 
 public:
 	MainWindow( const QString &file )
 	{
-		editor     = new QsvTextEdit(this, NULL);
-		highlightEx  = new MyHighlighter(editor->document());
-		editor->setHighlighter(highlightEx);
+		editor     = new QsvTextEdit(this, nullptr);
+		highlight  = new MyHighlighter(editor->document());
+		editor->setHighlighter(highlight);
 		editor->setFrameStyle(QFrame::NoFrame);
 		editor->displayBannerMessage(tr("Click \"Open\" if you dare"), 3);
+		editor->setFont( QFont("Courier new",14) );
+		theme.setupDefaultColors();
+//		theme.load("data/colors/default.theme");
+		theme.load("data/colors/solarized-light.theme");
+//		theme.load("data/colors/solarized-dark.theme");
+//		theme.load("data/colors/breeze-dark.theme");
+		ApplyTheme(theme, editor, highlight);
 
 		mimes      = new Qate::MimeDatabase();
-//		highlight  = new TextEditor::Internal::Highlighter(editor->document());
-		highlight = highlightEx;
 		hl_manager = Qate::HighlightDefinitionManager::instance();
 		hl_manager->setMimeDatabase(mimes);
 		hl_manager->registerMimeTypes();
-		Qate::DefaultColors::ApplyToHighlighter(highlight);
+
+//		loadFile("demos/demo6/main6.cpp");
+
 		connect(hl_manager,SIGNAL(mimeTypesRegistered()),this,SLOT(setCPPHighlight()));
 
-		textOpetations   = new QsvTextOperationsWidget(editor);
+		textOpetations = new QsvTextOperationsWidget(editor);
 		textOpetations->initSearchWidget();
 		textOpetations->initReplaceWidget();
 		setCentralWidget(editor);
@@ -104,11 +211,7 @@ public:
 			loadFile(file);
 		else {
 			setWindowTitle("QtSourceView/qate demo6 - qedit");
-			QFile f(":/qedit/readme.txt");
-			if (!f.open(QIODevice::ReadOnly | QIODevice::Text))
-				return;
-			editor->setPlainText(f.readAll());
-			editor->removeModifications();
+			loadFile("tests/highlight.pas");
 		}
 #if 0
 		e->setMarkCurrentLine(false);
@@ -142,11 +245,21 @@ public slots:
 		editor->loadFile(filename);
 		editor->removeModifications();
 		setWindowTitle(filename);
+
+		Qate::MimeType aa = mimes->findByFile(filename);
+		QString a1 = aa.type();
+		QString a2 = hl_manager->definitionIdByMimeType(a1);
+		highlight_definition = hl_manager->definition(a2);
+		if (highlight_definition != nullptr)
+			highlight->setDefaultContext(highlight_definition->initialContext());
+//		else
+//			highlight->setDefaultContext(nulptr);
 	}
 
 	void setCPPHighlight()
 	{
-		highlight_definition = hl_manager->definition( hl_manager->definitionIdByName("C++") );
+		highlight_definition = hl_manager->definition( hl_manager->definitionIdByName("Pascal") );
+//		highlight_definition = hl_manager->definition( hl_manager->definitionIdByName("C++") );
 		if (highlight_definition.isNull()) {
 			editor->displayBannerMessage("No C++ highlight definition is found. If you are using QtCreator's defintion, please download also C++");
 			return;

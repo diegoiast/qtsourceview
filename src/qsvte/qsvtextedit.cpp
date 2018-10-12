@@ -743,6 +743,25 @@ void	QsvTextEdit::on_fileMessage_clicked(const QString &s)
 	}
 }
 
+void QsvTextEdit::setPanelColor(const QColor &color)
+{
+	m_panelColor = color;
+}
+
+void QsvTextEdit::setLineModifiedColor(const QColor &color)
+{
+	m_modifiedColor = color;
+}
+
+void QsvTextEdit::setCurrentLineBackground(const QColor &color)
+{
+	m_currentLineBackground = color;
+}
+
+void QsvTextEdit::setModifiedColor(const QColor &color)
+{
+	m_modifiedColor = color;
+}
 
 void	QsvTextEdit::paintEvent(QPaintEvent *e)
 {

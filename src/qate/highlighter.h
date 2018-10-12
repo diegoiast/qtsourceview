@@ -67,7 +67,7 @@ public:
     enum TextFormatId {
         Normal,
         VisualWhitespace,
-        Keyword,
+	Keyword,
         DataType,
         Decimal,
         BaseN,
@@ -140,6 +140,7 @@ private:
     static const KateFormatMap m_kateFormats;
     QHash<TextFormatId, QTextCharFormat> m_creatorFormats;
 
+public:
     struct BlockData : TextBlockUserData
     {
         BlockData();
@@ -152,7 +153,7 @@ private:
     };
     BlockData *initializeBlockData();
     static BlockData *blockData(QTextBlockUserData *userData);
-
+private:
     // Block states are composed by the region depth (used for code folding) and what I call
     // observable states. Observable states occupy the 12 least significant bits. They might have
     // the following values:

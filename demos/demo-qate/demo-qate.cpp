@@ -37,6 +37,7 @@ int main( int argc, char* argv[] )
 	QMainWindow    *main_window = new QMainWindow;
 	QPlainTextEdit *text_editor;
 
+	Qate::Theme theme;
 	Qate::MimeDatabase                                        *mimes;
 	Qate::HighlightDefinitionManager                          *hl_manager;
 	TextEditor::Internal::Highlighter                         *highlighter;
@@ -45,7 +46,9 @@ int main( int argc, char* argv[] )
 	// create the main widget
 	text_editor = new QPlainTextEdit(main_window);
 	highlighter   = new TextEditor::Internal::Highlighter(text_editor->document());
-	Qate::QateColors::defaultColors().applyToHighlighter(highlighter);
+
+	theme.setupDefaultColors();
+	theme.applyToHighlighter(highlighter);
 	text_editor->setFont( QFont("Courier new",10) );
 	
 	// create the highlighters manager

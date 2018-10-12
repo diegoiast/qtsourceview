@@ -111,6 +111,11 @@ public slots:
 	void adjustBottomAndTopWidget();
 	void on_fileChanged(const QString &filename);
 	void on_fileMessage_clicked(const QString &s);
+
+	void setPanelColor(const QColor &color);
+	void setLineModifiedColor(const QColor &color);
+	void setCurrentLineBackground(const QColor &color);
+	void setModifiedColor(const QColor &color);
 	
 signals:
 	void widgetResized();

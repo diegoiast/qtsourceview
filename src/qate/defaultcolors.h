@@ -33,7 +33,8 @@
 #ifndef QATE_DEFAULT_COLORS_H
 #define QATE_DEFAULT_COLORS_H
 
-#include <QtGui/QTextCharFormat>
+#include <QTextCharFormat>
+#include <QMap>
 
 namespace TextEditor{
 	namespace Internal {
@@ -41,47 +42,76 @@ namespace TextEditor{
 	}
 }
 
+class QTextEdit;
+class QPlainTextEdit;
 
 namespace Qate {
 
-class QateColors
+const char* FormatNormal       = "Normal";
+const char* FormatKeyword      = "Keyword";
+const char* FormatDataType     = "DataType";
+const char* FormatDecimal      = "DecVal";
+const char* FormatBaseN        = "BaseN";
+const char* FormatFloat        = "Float";
+const char* FormatChar         = "Char";
+const char* FormatString       = "String";
+const char* FormatComment      = "Comment";
+const char* FormatAlert        = "Alert";
+const char* FormatError        = "Error";
+const char* FormatFunction     = "Function";
+const char* FormatRegionMarker = "RegionMarker";
+const char* FormatOthers       = "Others";
+
+const char* EditorBackgroundColor             = "background-color";
+const char* EditorCodeFolding                 = "code-folding";
+const char* EditorBracketMatching             = "bracket-matching";
+const char* EditorCurrentLine                 = "current-line";
+const char* EditorIconBorder                  = "icon-border";
+const char* EditorIndentationLine             = "indentation-line";
+const char* EditorLineNumbers                 = "line-numbers";
+const char* EditorCurrentLineNumber           = "current-line-number";
+const char* EditorMarkBookmark                = "mark-bookmark";
+const char* EditorMarkBreakpointActive        = "mark-breakpoint-active";
+const char* EditorMarkBreakpointReached       = "mark-breakpoint-reached";
+const char* EditorMarkBreakpointDisabled      = "mark-breakpoint-disabled";
+const char* EditorMarkExecution               = "mark-execution";
+const char* EditorMarkWarning                 = "mark-warning";
+const char* EditorMarkError                   = "mark-error";
+const char* EditorModifiedLines               = "modified-lines";
+const char* EditorReplaceHighlight            = "replace-highlight";
+const char* EditorSavedLines                 = "saved-lines";
+const char* EditorSearchHighlight             = "search-highlight";
+const char* EditorSelection                   = "selection";
+const char* EditorSeparator                   = "separator";
+const char* EditorSpellChecking               = "spell-checking";
+const char* EditorTabMarker                   = "tab-marker";
+const char* EditorTemplateBackground          = "template-background";
+const char* EditorTemplatePlaceholder         = "template-placeholder";
+const char* EditorTemplateFocusedPlaceholder  = "template-focused-placeholder";
+const char* EditorTemplateReadOnlyPlaceholder = "template-read-only-placeholder";
+const char *EditorWordWrapMarker              = "word-wrap-marker";
+
+class Theme
 {
-public:
-    static QateColors &defaultColors();
-
-    const QTextCharFormat &keywordFormat() const { return m_keywordFormat; }
-    const QTextCharFormat &dataTypeFormat() const { return m_dataTypeFormat; }
-    const QTextCharFormat &decimalFormat() const { return m_decimalFormat; }
-    const QTextCharFormat &baseNFormat() const { return m_baseNFormat; }
-    const QTextCharFormat &floatFormat() const { return m_floatFormat; }
-    const QTextCharFormat &charFormat() const { return m_charFormat; }
-    const QTextCharFormat &stringFormat() const { return m_stringFormat; }
-    const QTextCharFormat &commentFormat() const { return m_commentFormat; }
-    const QTextCharFormat &alertFormat() const { return m_alertFormat; }
-    const QTextCharFormat &errorFormat() const { return m_errorFormat; }
-    const QTextCharFormat &functionFormat() const { return m_functionFormat; }
-    const QTextCharFormat &regionMarketFormat() const { return m_regionMarkerFormat; }
-    const QTextCharFormat &othersFormat() const { return m_othersFormat; }
-
-    QString name(const QTextCharFormat &format) const;
-    void applyToHighlighter(TextEditor::Internal::Highlighter *hl);
-
 private:
-    QateColors();
+	QMap<QString, QTextCharFormat> mFormats;
+	QMap<QString, QColor> mEditorColors;
+	QTextCharFormat mDefault;
 
-    QTextCharFormat m_keywordFormat;
-    QTextCharFormat m_dataTypeFormat;
-    QTextCharFormat m_decimalFormat;
-    QTextCharFormat m_baseNFormat;
-    QTextCharFormat m_floatFormat;
-    QTextCharFormat m_charFormat;
-    QTextCharFormat m_stringFormat;
-    QTextCharFormat m_commentFormat;
-    QTextCharFormat m_alertFormat;
-    QTextCharFormat m_errorFormat;
-    QTextCharFormat m_functionFormat;
-    QTextCharFormat m_regionMarkerFormat;
-    QTextCharFormat m_othersFormat;
+public:
+    static Theme &defaultColors();
+
+    void load(const QString &fileName);
+    void loadTextStyles(const QJsonObject &textStyles);
+    void loadTextColors(const QJsonObject &editorColors);
+    void applyToHighlighter(TextEditor::Internal::Highlighter *hl) const;
+    void applyToEditor(QPlainTextEdit* editor) const;
+
+    inline QColor getEditorColor(const char* name) const { return  mEditorColors.value(name); }
+    inline QTextCharFormat getFormat( const char* name) const { return  mFormats.value(name, mDefault); }
+
+    Theme();
+    void setupDefaultColors();
 };
 
 }

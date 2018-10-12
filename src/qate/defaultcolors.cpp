@@ -34,51 +34,64 @@
 
 #include <QtCore/Qt>
 #include "highlighter.h"
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QPlainTextEdit>
 
 using namespace Qate;
 
-QateColors::QateColors()
+Theme::Theme()
 {
-    m_keywordFormat.setForeground(Qt::black);
-	m_keywordFormat.setFontWeight(75);
-    m_keywordFormat.setFontItalic(true);
-	
-	m_dataTypeFormat.setForeground(Qt::blue);
-	
-	m_decimalFormat.setForeground(Qt::darkYellow);
-
-	m_baseNFormat.setForeground(Qt::darkYellow);
-	
-	m_floatFormat.setForeground(Qt::darkYellow);
-	
-	m_charFormat.setForeground(Qt::red);
-	
-	m_stringFormat.setForeground(Qt::red);
-	
-	m_commentFormat.setForeground(QColor(0x60,0x60,0x60));
-	
-	m_alertFormat.setForeground(Qt::red);
-	m_alertFormat.setFontUnderline(true);
-	m_alertFormat.setUnderlineStyle(QTextCharFormat::WaveUnderline);
-	
-	m_errorFormat.setForeground(Qt::red);
-	m_errorFormat.setFontUnderline(true);
-	m_errorFormat.setUnderlineStyle(QTextCharFormat::DashUnderline);
-	
-	m_functionFormat.setForeground(Qt::cyan);
-	
-	m_regionMarkerFormat.setForeground(Qt::green);
-	
-m_othersFormat.setForeground(Qt::darkBlue);
+//	setupDefaultColors();
 }
 
-QateColors &QateColors::defaultColors()
+void Theme::setupDefaultColors()
 {
-	static QateColors sDefaultColors;
+	mDefault = QTextCharFormat();
+	mDefault.setForeground(Qt::black);
+
+	mFormats[FormatKeyword].setForeground(Qt::black);
+	mFormats[FormatKeyword].setFontWeight(75);
+	mFormats[FormatKeyword].setFontItalic(true);
+
+	mFormats[FormatDataType].setForeground(Qt::blue);
+
+	mFormats[FormatDecimal].setForeground(Qt::darkYellow);
+
+	mFormats[FormatBaseN].setForeground(Qt::darkYellow);
+
+	mFormats[FormatFloat].setForeground(Qt::darkYellow);
+
+	mFormats[FormatChar].setForeground(Qt::red);
+
+	mFormats[FormatString].setForeground(Qt::red);
+
+	mFormats[FormatComment].setForeground(Qt::gray); // #606060
+
+	mFormats[FormatAlert].setForeground(Qt::red);
+	mFormats[FormatAlert].setFontUnderline(true);
+	mFormats[FormatAlert].setUnderlineStyle(QTextCharFormat::WaveUnderline);
+
+	mFormats[FormatError].setForeground(Qt::red);
+	mFormats[FormatError].setFontUnderline(true);
+	mFormats[FormatError].setUnderlineStyle(QTextCharFormat::DashUnderline);
+
+	mFormats[FormatFunction].setForeground(Qt::cyan);
+
+	mFormats[FormatRegionMarker].setForeground(Qt::green);
+
+	mFormats[FormatOthers].setForeground(Qt::darkBlue);
+}
+
+Theme &Theme::defaultColors()
+{
+	static Theme sDefaultColors;
 	return sDefaultColors;
 }
 
-QString QateColors::name(const QTextCharFormat &format) const
+/*
+QString Theme::name(const QTextCharFormat &format) const
 {
     if (format == QTextCharFormat())
         return "Default format";
@@ -111,24 +124,118 @@ QString QateColors::name(const QTextCharFormat &format) const
     else
         return "Unidentified format";
 }
+*/
 
 using namespace TextEditor::Internal;
-void QateColors::applyToHighlighter(TextEditor::Internal::Highlighter *hl)
+
+QTextCharFormat textCharFormatFromJson(QJsonObject obj) {
+	QTextCharFormat tcf;
+
+	QJsonValue v;
+
+	v = obj.value("text-color");
+	if (!v.isNull()) {
+		QColor color(v.toString());
+		tcf.setForeground(color);
+	}
+	v = obj.value("selected-text-color");
+	if (!v.isNull()) {
+		QColor color(v.toString());
+//		TODO?
+//		tcf.setForeground(color);
+	}
+	v = obj.value("background-color");
+	if (!v.isNull() && !v.toString().isEmpty()) {
+		QColor color(v.toString());
+		tcf.setBackground(color);
+	}
+	v = obj.value("bold");
+	if (!v.isNull()) {
+		if (v.toBool()) {
+			tcf.setFontWeight(QFont::Bold);
+		} else {
+			tcf.setFontWeight(QFont::Normal);
+		}
+	}
+	v = obj.value("italic");
+	if (!v.isNull()) {
+		tcf.setFontItalic(v.toBool());
+	}
+	v = obj.value("underline");
+	if (!v.isNull()) {
+		tcf.setFontUnderline(v.toBool());
+	}
+	v = obj.value("strike-through");
+	if (!v.isNull()) {
+		tcf.setFontStrikeOut(v.toBool());
+	}
+
+
+	return  tcf;
+}
+
+
+void Theme::load(const QString &fileName)
+{
+	QFile file(fileName);
+	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+		 return;
+	QByteArray data = file.readAll();
+	QJsonDocument doc = QJsonDocument::fromJson(data);
+	QJsonObject mainObj = doc.object();
+
+	loadTextStyles(mainObj["text-styles"].toObject());
+	loadTextColors(mainObj["editor-colors"].toObject());
+}
+
+void Theme::loadTextStyles(const QJsonObject &textStyles)
+{
+	mFormats.clear();
+	for (QString s: textStyles.keys()) {
+		mFormats[s] = textCharFormatFromJson(textStyles[s].toObject());
+	}
+	// TODO - should we assert if this is not available?
+	if (mFormats.contains(FormatNormal)) {
+		mDefault = mFormats[FormatNormal];
+	}
+}
+
+void Theme::loadTextColors(const QJsonObject &editorColors)
+{
+	mEditorColors.clear();
+	for (QString s: editorColors.keys()) {
+		QString colorRGBA = editorColors[s].toString();
+		mEditorColors[s] = QColor(colorRGBA);
+	}
+}
+
+void Theme::applyToHighlighter(TextEditor::Internal::Highlighter *hl) const
 {
 //	hl->configureFormat(Highlighter::Normal,           m_othersFormat       );
 //	hl->configureFormat(Highlighter::VisualWhitespace, m_othersFormat       );
-    hl->configureFormat(Highlighter::Keyword,          m_keywordFormat      );
-    hl->configureFormat(Highlighter::DataType,         m_dataTypeFormat     );
-    hl->configureFormat(Highlighter::Decimal,          m_decimalFormat      );
-    hl->configureFormat(Highlighter::BaseN,            m_baseNFormat        );
-    hl->configureFormat(Highlighter::Float,            m_floatFormat        );
-    hl->configureFormat(Highlighter::Char,             m_charFormat         );
-    hl->configureFormat(Highlighter::String,           m_stringFormat       );
-    hl->configureFormat(Highlighter::Comment,          m_commentFormat      );
-    hl->configureFormat(Highlighter::Alert,            m_alertFormat        );
-    hl->configureFormat(Highlighter::Error,            m_errorFormat        );
-    hl->configureFormat(Highlighter::Function,         m_functionFormat     );
-    hl->configureFormat(Highlighter::RegionMarker,     m_regionMarkerFormat );
-    hl->configureFormat(Highlighter::Others,           m_othersFormat       );
+
+	hl->configureFormat(Highlighter::Keyword,          mFormats.value(FormatKeyword, mDefault));
+	hl->configureFormat(Highlighter::DataType,         mFormats.value(FormatDataType, mDefault));
+	hl->configureFormat(Highlighter::Decimal,          mFormats.value(FormatDecimal, mDefault));
+	hl->configureFormat(Highlighter::BaseN,            mFormats.value(FormatBaseN, mDefault));
+	hl->configureFormat(Highlighter::Float,            mFormats.value(FormatFloat, mDefault));
+	hl->configureFormat(Highlighter::Char,             mFormats.value(FormatChar, mDefault));
+	hl->configureFormat(Highlighter::String,           mFormats.value(FormatString, mDefault));
+	hl->configureFormat(Highlighter::Comment,          mFormats.value(FormatComment, mDefault));
+	hl->configureFormat(Highlighter::Alert,            mFormats.value(FormatAlert, mDefault));
+	hl->configureFormat(Highlighter::Error,            mFormats.value(FormatError, mDefault));
+	hl->configureFormat(Highlighter::Function,         mFormats.value(FormatFunction, mDefault));
+	hl->configureFormat(Highlighter::RegionMarker,     mFormats.value(FormatRegionMarker, mDefault));
+	hl->configureFormat(Highlighter::Others,           mFormats.value(FormatOthers, mDefault));
 }
 
+void Theme::applyToEditor(QPlainTextEdit *editor) const
+{
+	QPalette p( editor->palette() );
+	if (mEditorColors.contains(EditorBackgroundColor)) {
+		p.setColor( QPalette::Base, mEditorColors[EditorBackgroundColor] );
+		p.setColor( QPalette::Text, mDefault.foreground().color() );
+		editor->setPalette(p);
+	}
+	editor->setCurrentCharFormat(mDefault);
+}
