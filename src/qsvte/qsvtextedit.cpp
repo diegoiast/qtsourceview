@@ -1147,8 +1147,11 @@ uint	QsvTextEdit::getMarginsWidth() const
 void	QsvTextEdit::setTabSize( int size )
 {
 	m_config.tabSize = size;
-//	setTabStopWidth(fontMetrics().width(" ")*size);
-	setTabStopDistance(QFontMetricsF(font()).width(' ') * 4);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
+        setTabStopDistance(QFontMetricsF(font()).width(' ') * 4);
+#else
+        setTabStopWidth(fontMetrics().width(" ")*size);
+#endif
 }
 
 int	QsvTextEdit::getTabSize() const
