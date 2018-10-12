@@ -150,13 +150,13 @@ void ApplyTheme(const Qate::Theme &theme, QsvTextEdit *editor, TextEditor::Inter
 	theme.applyToEditor(editor);
 
 	QColor c;
-	c = theme.getEditorColor(Qate::EditorCodeFolding);
+        c = theme.getEditorColor(/*Qate::*/EditorCodeFolding);
 	if (c.isValid())
 		editor->setPanelColor(c);
-	c = theme.getEditorColor(Qate::EditorCurrentLine);
+        c = theme.getEditorColor(/*Qate::*/EditorCurrentLine);
 	if (c.isValid())
 		editor->setCurrentLineBackground(c);
-	c = theme.getEditorColor(Qate::EditorModifiedLines);
+        c = theme.getEditorColor(/*Qate::*/EditorModifiedLines);
 	if (c.isValid())
 		editor->setModifiedColor(c);
 }
@@ -186,9 +186,9 @@ public:
 		editor->setFont( QFont("Courier new",14) );
 		theme.setupDefaultColors();
 //		theme.load("data/colors/default.theme");
-		theme.load("data/colors/solarized-light.theme");
-//		theme.load("data/colors/solarized-dark.theme");
-//		theme.load("data/colors/breeze-dark.theme");
+//		theme.load("data/colors/solarized-light.theme");
+                theme.load("data/colors/solarized-dark.theme");
+//                theme.load("data/colors/breeze-dark.theme");
 		ApplyTheme(theme, editor, highlight);
 
 		mimes      = new Qate::MimeDatabase();
@@ -254,17 +254,19 @@ public slots:
 			highlight->setDefaultContext(highlight_definition->initialContext());
 //		else
 //			highlight->setDefaultContext(nulptr);
-	}
+                highlight->light();
+        }
 
 	void setCPPHighlight()
 	{
-		highlight_definition = hl_manager->definition( hl_manager->definitionIdByName("Pascal") );
+                highlight_definition = hl_manager->definition( hl_manager->definitionIdByName("Pascal") );
 //		highlight_definition = hl_manager->definition( hl_manager->definitionIdByName("C++") );
 		if (highlight_definition.isNull()) {
 			editor->displayBannerMessage("No C++ highlight definition is found. If you are using QtCreator's defintion, please download also C++");
 			return;
 		}
 		highlight->setDefaultContext(highlight_definition->initialContext());
+                highlight->rehighlight();
 	}
 
 	void setup_GUI()

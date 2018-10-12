@@ -47,49 +47,50 @@ class QPlainTextEdit;
 
 namespace Qate {
 
-const char* FormatNormal       = "Normal";
-const char* FormatKeyword      = "Keyword";
-const char* FormatDataType     = "DataType";
-const char* FormatDecimal      = "DecVal";
-const char* FormatBaseN        = "BaseN";
-const char* FormatFloat        = "Float";
-const char* FormatChar         = "Char";
-const char* FormatString       = "String";
-const char* FormatComment      = "Comment";
-const char* FormatAlert        = "Alert";
-const char* FormatError        = "Error";
-const char* FormatFunction     = "Function";
-const char* FormatRegionMarker = "RegionMarker";
-const char* FormatOthers       = "Others";
 
-const char* EditorBackgroundColor             = "background-color";
-const char* EditorCodeFolding                 = "code-folding";
-const char* EditorBracketMatching             = "bracket-matching";
-const char* EditorCurrentLine                 = "current-line";
-const char* EditorIconBorder                  = "icon-border";
-const char* EditorIndentationLine             = "indentation-line";
-const char* EditorLineNumbers                 = "line-numbers";
-const char* EditorCurrentLineNumber           = "current-line-number";
-const char* EditorMarkBookmark                = "mark-bookmark";
-const char* EditorMarkBreakpointActive        = "mark-breakpoint-active";
-const char* EditorMarkBreakpointReached       = "mark-breakpoint-reached";
-const char* EditorMarkBreakpointDisabled      = "mark-breakpoint-disabled";
-const char* EditorMarkExecution               = "mark-execution";
-const char* EditorMarkWarning                 = "mark-warning";
-const char* EditorMarkError                   = "mark-error";
-const char* EditorModifiedLines               = "modified-lines";
-const char* EditorReplaceHighlight            = "replace-highlight";
-const char* EditorSavedLines                 = "saved-lines";
-const char* EditorSearchHighlight             = "search-highlight";
-const char* EditorSelection                   = "selection";
-const char* EditorSeparator                   = "separator";
-const char* EditorSpellChecking               = "spell-checking";
-const char* EditorTabMarker                   = "tab-marker";
-const char* EditorTemplateBackground          = "template-background";
-const char* EditorTemplatePlaceholder         = "template-placeholder";
-const char* EditorTemplateFocusedPlaceholder  = "template-focused-placeholder";
-const char* EditorTemplateReadOnlyPlaceholder = "template-read-only-placeholder";
-const char *EditorWordWrapMarker              = "word-wrap-marker";
+#define FormatNormal        "Normal"
+#define FormatKeyword       "Keyword"
+#define FormatDataType      "DataType"
+#define FormatDecimal       "DecVal"
+#define FormatBaseN         "BaseN"
+#define FormatFloat         "Float"
+#define FormatChar          "Char"
+#define FormatString        "String"
+#define FormatComment       "Comment"
+#define FormatAlert         "Alert"
+#define FormatError         "Error"
+#define FormatFunction      "Function"
+#define FormatRegionMarker  "RegionMarker"
+#define FormatOthers        "Others"
+
+#define EditorBackgroundColor              "background-color"
+#define EditorCodeFolding                  "code-folding"
+#define EditorBracketMatching              "bracket-matching"
+#define EditorCurrentLine                  "current-line"
+#define EditorIconBorder                   "icon-border"
+#define EditorIndentationLine              "indentation-line"
+#define EditorLineNumbers                  "line-numbers"
+#define EditorCurrentLineNumber            "current-line-number"
+#define EditorMarkBookmark                 "mark-bookmark"
+#define EditorMarkBreakpointActive         "mark-breakpoint-active"
+#define EditorMarkBreakpointReached        "mark-breakpoint-reached"
+#define EditorMarkBreakpointDisabled       "mark-breakpoint-disabled"
+#define EditorMarkExecution                "mark-execution"
+#define EditorMarkWarning                  "mark-warning"
+#define EditorMarkError                    "mark-error"
+#define EditorModifiedLines                "modified-lines"
+#define EditorReplaceHighlight             "replace-highlight"
+#define EditorSavedLines                   "saved-lines"
+#define EditorSearchHighlight              "search-highlight"
+#define EditorSelection                    "selection"
+#define EditorSeparator                    "separator"
+#define EditorSpellChecking                "spell-checking"
+#define EditorTabMarker                    "tab-marker"
+#define EditorTemplateBackground           "template-background"
+#define EditorTemplatePlaceholder          "template-placeholder"
+#define EditorTemplateFocusedPlaceholder   "template-focused-placeholder"
+#define EditorTemplateReadOnlyPlaceholder  "template-read-only-placeholder"
+#define EditorWordWrapMarker               "word-wrap-marker"
 
 class Theme
 {
