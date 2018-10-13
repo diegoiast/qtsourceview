@@ -1,3 +1,12 @@
+/**
+ * \brief Forth demo - better text editor control
+ *
+ * The default text edit available for Qt is very simple. This example
+ * shows a more advanced text editor, which has a built in find/replace/
+ * goto line controls (inline), displays the current line with different
+ * backgroud, has line numbering... and more.
+ */
+
 #include "qsvte/qsvtextoperationswidget.h"
 #include "qsvte/qsvdefaulthighlighter.h"
 #include "qsvte/qsvtextedit.h"

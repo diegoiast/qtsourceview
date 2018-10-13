@@ -1,3 +1,28 @@
+/**
+ * \brief First Demo - a plain QTextEdit with QsvSyntaxHighlighter
+ *
+ * This demo shows how to load a color definition, then a language definition
+ * for the syntax highlighter. Then the code creates a syntax highlighter and
+ * applies it to an editor.
+ *
+ * Note that this demo needs to read files from the real file system, and
+ * when building out of source, like QtCreator does, the app will fail at
+ * runtime. Please run the app from the source directory.
+ *
+ * When building from command line:
+ * \code
+ * mkdir qbuild
+ * cd qbuild
+ * qmake ../
+ * make
+ * cd ..
+ * ./qbuild/demo1
+ * \endcode
+ *
+ * When building from QtCreator, open the Projects tab, in the Build &Run
+ * section choose this demo, and in Working direcotry type %{sourceDir}.
+ */
+
 #include <QTextEdit>
 #include <QApplication>
 #include <QMessageBox>
@@ -10,31 +35,6 @@
 #include "qsvsh/qsvcolordeffactory.h"
 #include "qsvsh/qsvlangdef.h"
 #include "qsvsh/qsvsyntaxhighlighter.h"
-
-/** 
- * \brief First Demo - a plain QTextEdit with QsvSyntaxHighlighter
- * 
- * This demo shows how to load a color definition, then a language definition
- * for the syntax highlighter. Then the code creates a syntax highlighter and
- * applies it to an editor.
- * 
- * Note that this demo needs to read files from the real file system, and
- * when building out of source, like QtCreator does, the app will fail at 
- * runtime. Please run the app from the source directory.
- * 
- * When building from command line:
- * \code
- * mkdir qbuild
- * cd qbuild
- * qmake ../
- * make
- * cd ..
- * ./qbuild/demo1
- * \endcode
- * 
- * When building from QtCreator, open the Projects tab, in the Build &Run 
- * section choose this demo, and in Working direcotry type %{sourceDir}.
- */
 
 int main(int argc, char *argv[])
 {

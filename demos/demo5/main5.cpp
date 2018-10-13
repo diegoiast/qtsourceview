@@ -1,3 +1,13 @@
+/**
+ * \brief Fifth demo - mixing the text editor with syntyax highliting
+ *
+ * This example shows how to mix the syntax highlighter with the new
+ * text editor control.
+ *
+ * The app creates a main window with all function on the toolbar, without
+ * any menus.
+ */
+
 #include <QApplication>
 #include <QAction>
 #include <QToolBar>
@@ -156,7 +166,7 @@ public:
 		defColors        = new QsvColorDefFactory( "data/colors/kate.xml" );
 		langDefinition   = QsvLangDefFactory::getInstanse()->getHighlight("1.cpp");
 		highlight        = new MyHighlighter(editor->document());
-		textOpetations = new QsvTextOperationsWidget(editor);
+        textOpetations   = new QsvTextOperationsWidget(editor);
 		
 		if (!defColors->isValid() || !langDefinition->isValid()) {
 			QMessageBox::information(this, 
@@ -168,7 +178,6 @@ public:
 			));
 		}
 		
-
 		highlight->setColorsDef(defColors);
 		highlight->setHighlight(langDefinition);
 		editor->setHighlighter(highlight);
