@@ -47,7 +47,7 @@ class QPlainTextEdit;
 
 namespace Qate {
 
-
+#if 0
 #define FormatNormal        "Normal"
 #define FormatKeyword       "Keyword"
 #define FormatDataType      "DataType"
@@ -91,6 +91,52 @@ namespace Qate {
 #define EditorTemplateFocusedPlaceholder   "template-focused-placeholder"
 #define EditorTemplateReadOnlyPlaceholder  "template-read-only-placeholder"
 #define EditorWordWrapMarker               "word-wrap-marker"
+#else
+
+static constexpr const char* FormatNormal = "Normal";
+static constexpr const char* FormatKeyword = "Keyword";
+static constexpr const char* FormatDataType = "DataType";
+static constexpr const char* FormatDecimal = "DecVal";
+static constexpr const char* FormatBaseN = "BaseN";
+static constexpr const char* FormatFloat = "Float";
+static constexpr const char* FormatChar = "Char";
+static constexpr const char* FormatString = "String";
+static constexpr const char* FormatComment = "Comment";
+static constexpr const char* FormatAlert = "Alert";
+static constexpr const char* FormatError = "Error";
+static constexpr const char* FormatFunction = "Function";
+static constexpr const char* FormatRegionMarker = "RegionMarker";
+static constexpr const char* FormatOthers = "Others";
+
+static constexpr const char* EditorBackgroundColor  = "background-color";
+static constexpr const char* EditorCodeFolding  = "code-folding";
+static constexpr const char* EditorBracketMatching  = "bracket-matching";
+static constexpr const char* EditorCurrentLine  = "current-line";
+static constexpr const char* EditorIconBorder  = "icon-border";
+static constexpr const char* EditorIndentationLine  = "indentation-line";
+static constexpr const char* EditorLineNumbers  = "line-numbers";
+static constexpr const char* EditorCurrentLineNumber  = "current-line-number";
+static constexpr const char* EditorMarkBookmark  = "mark-bookmark";
+static constexpr const char* EditorMarkBreakpointActive  = "mark-breakpoint-active";
+static constexpr const char* EditorMarkBreakpointReached  = "mark-breakpoint-reached";
+static constexpr const char* EditorMarkBreakpointDisabled  = "mark-breakpoint-disabled";
+static constexpr const char* EditorMarkExecution  = "mark-execution";
+static constexpr const char* EditorMarkWarning  = "mark-warning";
+static constexpr const char* EditorMarkError  = "mark-error";
+static constexpr const char* EditorModifiedLines  = "modified-lines";
+static constexpr const char* EditorreplaceHighlight  = "replace-highlight";
+static constexpr const char* EditorSsavedLines  = "saved-lines";
+static constexpr const char* EditorSearchHighlight  = "search-highlight";
+static constexpr const char* EditorSelection  = "selection";
+static constexpr const char* EditorSeparator  = "separator";
+static constexpr const char* EditorSpellChecking  = "spell-checking";
+static constexpr const char* EditorTabMarker  = "tab-marker";
+static constexpr const char* EditorTemplateBackground  = "template-background";
+static constexpr const char* EditorTemplatePlaceholder  = "template-placeholder";
+static constexpr const char* EditorTemplateFocusedPlaceholder  = "template-focused-placeholder";
+static constexpr const char* EditorTemplateReadOnlyPlaceholder  = "template-read-only-placeholder";
+static constexpr const char* EditorWordWrapMarker = "word-wrap-marker";
+#endif
 
 class Theme
 {

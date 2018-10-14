@@ -150,13 +150,13 @@ void ApplyTheme(const Qate::Theme &theme, QsvTextEdit *editor, TextEditor::Inter
 	theme.applyToEditor(editor);
 
 	QColor c;
-        c = theme.getEditorColor(/*Qate::*/EditorCodeFolding);
+	c = theme.getEditorColor(Qate::EditorCodeFolding);
 	if (c.isValid())
 		editor->setPanelColor(c);
-        c = theme.getEditorColor(/*Qate::*/EditorCurrentLine);
+	c = theme.getEditorColor(Qate::EditorCurrentLine);
 	if (c.isValid())
 		editor->setCurrentLineBackground(c);
-        c = theme.getEditorColor(/*Qate::*/EditorModifiedLines);
+	c = theme.getEditorColor(Qate::EditorModifiedLines);
 	if (c.isValid())
 		editor->setModifiedColor(c);
 }
