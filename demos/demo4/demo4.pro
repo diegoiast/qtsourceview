@@ -5,5 +5,5 @@ DESTDIR		=	../../
 INCLUDEPATH	=	../../src .
 LIBS		=	-L../../ -lqsvte
 TARGET          =       demo4
-SOURCES		=	demo4.cpp
+SOURCES		=	main4.cpp
 HEADERS		=	mainwindow4.h
