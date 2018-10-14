@@ -6,6 +6,9 @@
  * for the loaded file.
  *
  * A better notepad than notepad.exe
+ *
+ * When building from QtCreator, open the Projects tab, in the Build &Run
+ * section choose this demo, and in Working direcotry type %{sourceDir}.
  */
 
 #include <QApplication>

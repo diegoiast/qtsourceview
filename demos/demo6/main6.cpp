@@ -4,6 +4,9 @@
  * The Kate project has a large amount of syntax definitions. The code
  * has been ripped from QtCreator, and now can be used as a simple
  * Qt application.
+ *
+ * When building from QtCreator, open the Projects tab, in the Build &Run
+ * section choose this demo, and in Working direcotry type %{sourceDir}.
  */
 
 #include <QApplication>

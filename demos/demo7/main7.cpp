@@ -296,8 +296,6 @@ public slots:
 		b->addAction( tr("Find &prev"), textOpetations, SLOT(searchPrev())) ->setShortcut(QKeySequence("Shift+F3"));
 		b->setMovable(false);
 	}
-
-private:
 };
 
 int main(int argc, char *argv[])

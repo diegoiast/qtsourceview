@@ -6,6 +6,9 @@
  *
  * The app creates a main window with all function on the toolbar, without
  * any menus.
+ *
+ * When building from QtCreator, open the Projects tab, in the Build &Run
+ * section choose this demo, and in Working direcotry type %{sourceDir}.
  */
 
 #include <QApplication>
