@@ -1,3 +1,11 @@
+This source is a collection of libraries aimed for developing a text editor.
+
+ * QsvSyntaxHighlighter - a QSyntaxHighlighter implementation based on GtkSourceView
+ * QsvTextEdit - a drop in replacement for Q{Plain}TextEdit aimed for developers
+ * Qate - the next generation syntax highlighter based on Kate definitions
+
+QsvSyntaxHighlighter
+--------------------
 This is a demo of a syntax highlighter done in C++/Qt.
 The code is extraeamly non optimized, but it does work most of the time.
 The class is very slow, so please don't use it on large files.
@@ -46,7 +54,33 @@ To use this code in your application:
 
     QSyntaxHighliter *highlight = new QsvSyntaxHighlighter( textEdit, defColors, langCpp );
 
-    
+
+
+
+QsvTextEdit
+-----------
+The core of a text editor is an editor control. Using QTextEdit (or QPlainTextEdit)
+is not enough. You can use QsvTextEdit instead which consists:
+
+- line numbering
+- current line marking
+- marking lines with different background
+- bookmarks
+- find/replace/goto line - all as inline dialogs
+- display messages on the top of the editor
+- theme support
+
+Qate
+----
+The Kate project created a set of syntax highlight definitions for
+almost all languages. This library can load those definitions and you can
+use them on your Q{Plain}TextEdit of QsvTextEdit to get a powerful editor.
+
+The code was taken from the QtCreator and ported to be a standalone
+code. The code was forked from QtCreator's code may 2011 (!) and ported to
+Qt5 (quite easily I admit).
+
+
 All code is licensed under the terms of the LGPL.
 
 The tests available in this release are taken from the Kate project.
@@ -65,3 +99,4 @@ seen the code, nor used it once. I am planing of pikking inside when my library 
 usable enough, to see how they did it, maybe I can get some better ideas, maybe they can :)
 
 Diego Iastrubni <elcuco@kde.org>,  4-2-2006, 22-7-2006
+Diego Iastrubni <diegoiast@gmail.com>,  14-08-2018
