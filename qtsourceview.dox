@@ -2,23 +2,27 @@
 
 \mainpage The QtSourceView library documentation
 
+\b Next \ref demo1
+
 QtSourceView is a library which enables you to define basic syntax
-highliters for your Qt4 based editors. 
+highliters for your Qt5 based editors.
 
 This is a bundle of several libraires:
-- \ref QtSourceViewHighlight "QtSourceViewHighlight" -  an highlighter engine based on GtkSourceView - deprecated
-- \ref Qate "Qate" - an highlighter engine based on KatePart
 
-Note that while QtSourceViewHighlight is deprecated, this is the only "usable"
+- \ref QsvSyntaxHighlighter - a QSyntaxHighlighter implementation based on GtkSourceView
+- \ref QsvTextEdit - a drop in replacement for Q{Plain}TextEdit aimed for developers
+- \ref Qate - the next generation syntax highlighter based on Kate definitions
+
+Note that while QsvSyntaxHighlighter is deprecated, this is the only "usable"
 highlighter available as Qate is not yet stable.
 
 \image html demo5-explain.png
 
-Don't know what this image is? Follow this link: \ref QtSourceViewHighlight 
+Don't know what this image is? Follow this link: \ref QsvTextEdit
 
 \page Qate Qate - Highlighter engine based on KatePart
 
-This is a port of the generic syntax highlighter found in Nokia's QtCreator
+This is a port of the generic syntax highlighter found in QtCreator
 to a pure Qt environment outside of QtCreator, to be embedded inside 3rd party 
 applications.
 
@@ -30,16 +34,8 @@ editor:
 \note 
 The qate library is under heavy development. I forked some code and new classes
 (or modified classes) are under the Qate namespace. This documentation still
-does not cover the Qate library, and the documentation is still a work in 
+does not fully cover the Qate library, and the documentation is still a work in
 progress.
-
-To compile the code you will need to add inside src directory a file with this content:
-
-\verbatim
-QTCREATOR_DIR=/home/myself/src/qt-creator
-\endverbatim
-
-This should be the place in which you have the full QtCreator source checkout. 
 
 To add the qate library to your *pro file, add the following code:
 \verbatim
@@ -53,14 +49,13 @@ Note that you need to include the PRI file and also set a global variable before
 specifing the exact dir. Note that by doing this you \b will link the Qate library
 into your application \b statically and it will render your application a GPL
 application. If you need this in a non-GPL application, you will need to compile 
-qate into a shared library (something out of the scope of this documentation at
-the moment).
+qate into a shared library. Look at internal demos to understand how this is done.
 
 \section license License of Qate
-Qate is a derivative work of QtCreator which is released under the LGPL 2.1. 
-Therefor the license of Qate is the LGPL 2.1, which can be found here
-http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html
 
+Qate currently is forked from QtCreator (arround september 2011) in which time
+it was licensed under the LGPL 2.1, which can be found here
+http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html
 
 \page loading_definition_by_file Qate - Example: Loading a definition by file
 
@@ -83,6 +78,8 @@ highlight->setDefaultContext(Qate::HighlightDefinitionManager::instance()->defin
 
 \page loading_definition_by_mime Qate - Example: Loading a definition by MIME type
 
+\b Back \ref Qate
+
 This is a minimal example to load a definition by mime name. It's not 
 trivial, but it is very powerfull.
 
@@ -97,6 +94,7 @@ will find the most suited file for you.
 #include "qate/highlightdefinitionmanager.h"
 #include "qate/defaultcolors.h"
 
+Qate::Theme                                                theme;
 QPlainTextEdit                                            *text_editor;
 Qate::MimeDatabase                                        *mimes;
 Qate::HighlightDefinitionManager                          *hl_manager;
@@ -106,7 +104,7 @@ QSharedPointer<TextEditor::Internal::HighlightDefinition>  highlight_definition;
 hl_manager = Qate::HighlightDefinitionManager::instance();
 editor = new QPlainTextEdit(main_window);
 highlight = new TextEditor::Internal::Highlighter(text_editor->document());
-Qate::DefaultColors::ApplyToHighlighter(highlight);
+theme.applyToHighlighter(highlighter);
 
 mimes = new Qate::MimeDatabase();
 hl_manager->setMimeDatabase(mimes);
@@ -118,11 +116,13 @@ if (!highlight_definition.isNull()) {
 }
 \endcode
 
-\page QtSourceViewHighlight QtSourceViewHighlight - Highlighter engine based on GtkSourceView definitions
+\b Back \ref Qate
 
-\b Next \ref demo1 
+\page QsvSyntaxHighlighter QsvSyntaxHighlighter - Highlighter engine based on GtkSourceView definitions
 
-This is an old (experimental) code I wrote for a syntax highlighter. This is 
+\b Back \ref Qate
+
+This is an old (experimental) code I wrote for a syntax highlighter. This will be
 deprecated and I recommend using \ref Qate instead.
 
 The library is splited into 2 main parts:
@@ -162,10 +162,11 @@ if you are interested in linking library (*.so, *.a or similar):
 TARGET		= my_cool_app
 SOURCES		= my_cool_app.cpp
 INCLUDEPATH	= /home/myself/qtsourceview .
-LIBS		= -L/home/myself/qtsourceview -lqtsourceview
+LIBS		= -L/home/myself/qtsourceview -lqvshl
 \endverbatim
 Note that you wil need to issue "make" in your application directory and inside 
-QtSourceView's directory.
+QtSourceView's directory. See demos/demo1/demo1.pro for a full example on how
+to build the code as a library.
 
 \section SyntaxDef Syntax definitions
 
@@ -194,9 +195,9 @@ The colors definition is loosly based on the color definitions based on the colo
 definition inside Kate XML files. The factory for loading them is also is original.
 
 
-\b Next \ref demo1 
- 
-\page demo1 QtSourceViewHighlight - demo1: using the syntax hilghlighter
+\b Back \ref Qate
+
+\page demo1 QsvSyntaxHighlighter - demo1: using the syntax hilghlighter
  
  \b Next \ref demo2
 
@@ -255,7 +256,7 @@ QSyntaxHighlighter), and thus it can work with any control that uses a QTextDocu
 
 \b Next \ref demo2
 
-\page demo2 QtSourceViewHighlight - demo2: changing colors and language definitions
+\page demo2 QsvSyntaxHighlighter - demo2: changing colors and language definitions
 
 \b Next \ref demo3
 
@@ -303,7 +304,7 @@ highlight = new QsvSyntaxHighlighter( textEdit, defColors, defLang );
 \b Next \ref demo3
 
 
-\page demo3 QtSourceViewHighlight - demo3: asking the language definition manager for the best highlighter available
+\page demo3 QsvSyntaxHighlighter - demo3: asking the language definition manager for the best highlighter available
 
 \b Next \ref demo4
 
@@ -374,20 +375,19 @@ more information look into QsvLangDef
 \b Next \ref demo4
 
 
-\page demo4 QtSourceViewHighlight  - demo4: text editor control (work in progress)
+\page demo4 QsvTextEdit - demo4: text editor control
 \b Next \ref demo5
 
 \note
-This code is still a work in progress. Even tough it works, it has it's rough edges,
-and is not compatible with \ref Qate. The parenthesis mathing is based on the example on QtQuarterly #31, http://doc.trolltech.com/qq/QtQuarterly31.pdf (http://doc.trolltech.com/qq/qq31-parenthesis.zip). 
+Code is based on idea described on QtQuarterly #31, https://doc.qt.io/archives/qq/QtQuarterly31.pdf
 
-This demo shows a text editor widget I am working on. It contains internal find/replace/goto line
+This demo shows a text editor widget. It contains internal find/replace/goto line
 commands, and can display messages on the top of the widget. It was designed to be very keyboard 
 centric and easy to embed inside applications. It can work with another syntax highlighter 
 (see \ref demo5 for a more complete example).
 
 For the parenthesis mathcing the editor needs it's own syntax highlighter. In 
-this application we create a new one, which basically does nothing, and then 
+this application we create a new one (which basically paints nothing), and then
 assign it to the editor. The editor also has a widget which can be used to
 search, replace or "goto line". From this point, the editor is now self
 sustaining, and does all the work for you. It also contains several QAction for
@@ -422,13 +422,13 @@ QsvTextOperationsWidget *textOpetations = new QsvTextOperationsWidget(editor);
 \endcode
 
 
-
 \b Next \ref demo5
 
 
-\page demo5 QtSourceViewHighlight  - demo5: a working text editor
+\page demo5 QsvTextEdit  - demo5: a working text editor
+\b Next \ref demo6
 
-This is a (more or less) real life example of using teh QtSourceViewHighlight in 
+This is a (more or less) real life example of using the QsvSyntaxHighlighter in
 an application. It uses the editor widget showed in \ref demo4, and the highlighter
 showed in \ref demo3 to create a real highlighter (unlike the one in demo4).
 
@@ -490,6 +490,55 @@ editor->loadFile(filename);
 editor->removeModifications();
 setWindowTitle(filename);
 \endcode
+
+\b Next \ref demo6
+
+
+\page demo6 Qate - demo 6 - Kate based syntax highligher
+
+\b Next \ref demo7
+
+This example shows how to use the Qate synatx highlighter instead of QtSourceView.
+The implementation of QtSourceView has some issues (can be very slow for medium sized
+documents), and you cannot nest definitions.
+
+Qate, not only works in O(1), (where n is the number of rules defined in the language,
+) also each iteration of QtSourceView iterarion uses internaly regular expressions, which
+are very slow.
+
+A small snipet of code for using this library:
+
+
+\code
+#include "qate/context.h"
+#include "qate/highlighter.h"
+#include "qate/highlightdefinition.h"
+#include "qate/highlightdefinitionmanager.h"
+#include "qate/defaultcolors.h"
+
+Qate::Theme theme;
+Qate::MimeDatabase *mimes;
+Qate::HighlightDefinitionManager *hl_manager;
+TextEditor::Internal::Highlighter *highlighter;
+QSharedPointer<TextEditor::Internal::HighlightDefinition> highlight_definition;
+QPlainTextEdit *textEditor;
+
+textEditor = new QPlainTextEdit(main_window);
+highlighter = new TextEditor::Internal::Highlighter(text_editor->document());
+theme.setupDefaultColors();
+theme.applyToHighlighter(highlighter);
+theme.applyToEditor(textEditor);
+
+highlight_definition = hl_manager->definition( hl_manager->definitionIdByName("Perl") );
+if (!highlight_definition.isNull())
+        highlighter->setDefaultContext(highlight_definition->initialContext());
+\endcode
+
+\b Next \ref demo7
+
+
+\page demo7 Qate - demo 7 - Editor based on Qate and QsvTextEdit
+
 
 
 */
