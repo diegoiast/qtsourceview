@@ -56,7 +56,7 @@ int main( int argc, char* argv[] )
 	
 	// create the main widget
 	text_editor = new QPlainTextEdit(main_window);
-	highlighter   = new TextEditor::Internal::Highlighter(text_editor->document());
+	highlighter = new TextEditor::Internal::Highlighter(text_editor->document());
 
 	theme.setupDefaultColors();
 	theme.applyToHighlighter(highlighter);
