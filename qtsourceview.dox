@@ -24,7 +24,8 @@ Don't know what this image is? Follow this link: \ref QsvTextEdit
 
 This is a port of the generic syntax highlighter found in QtCreator
 to a pure Qt environment outside of QtCreator, to be embedded inside 3rd party 
-applications.
+applications. This is a complete fork from the code in QtCreator, arround
+september 2011. I do plan in upgrading the code, don't worry :)
 
 This library provides two ways for loading a syntax definition to your text 
 editor:
@@ -539,6 +540,8 @@ if (!highlight_definition.isNull())
 
 \page demo7 Qate - demo 7 - Editor based on Qate and QsvTextEdit
 
+This example shows how to merge the \ref Qate and \ref QsvTextEdit. See also
+\red demo5
 
 
 */
