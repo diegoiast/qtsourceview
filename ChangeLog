@@ -1,3 +1,7 @@
+QtSourceView - 19 Oct 2018 - 0.0.4
+ * Qt5 support, cmake not maintained
+ * Qate theme support
+
 QtSourceView - 30 Jul 2011 - 0.0.3
  * Hilight engine: Support for non case-sensitve languages
  * new demos: a text editor control (demo4, demo5)
