@@ -79,14 +79,12 @@ void MainWindow3::on_action_Open_triggered()
 	highlight->setHighlight( langDefinition );
 	
 	
-	if (!langDefinition->isValid()) {
-		QMessageBox::information(textEdit, 
-			textEdit->tr("Read documentation"),
-			textEdit->tr("Cannot find color or language definition.\n\n"
+    if (langDefinition == nullptr || !langDefinition->isValid()) {
+        qDebug("Cannot find color or language definition.\n\n"
 			"Are you running the app from the top dir?\n"
 			"If running from QtCreator, set up working directory to %{sourceDir}\n"
 			"See documentation in main1.cpp"
-		));
+        );
 	}
 	
 	QTextStream in(&file);

@@ -1,5 +1,4 @@
-#ifndef KATE_ITEM_DATA_MANAGER_HEADER
-#define KATE_ITEM_DATA_MANAGER_HEADER
+#pragma once
 
 /**
  * \file qsvcolordeffactory.h
@@ -35,5 +34,3 @@ public:
 	QString version;
 	QString author;
 };
-
-#endif // KATE_ITEM_DATA_MANAGER_HEADER

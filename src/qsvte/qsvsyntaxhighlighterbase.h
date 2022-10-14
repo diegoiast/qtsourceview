@@ -1,5 +1,4 @@
-#ifndef QSVSYNTAXHIGHLIGHTERBASE_H
-#define QSVSYNTAXHIGHLIGHTERBASE_H
+#pragma once
 
 #include <QList>
 #include "qate/qateblockdata.h"
@@ -30,4 +29,3 @@ protected:
 	QString m_matchBracketsList;
 };
 
-#endif // QSVSYNTAXHIGHLIGHTERBASE_H

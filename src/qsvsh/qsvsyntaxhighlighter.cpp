@@ -13,6 +13,7 @@
 #include <QFile>
 #include <QTextCharFormat>
 #include <QPlainTextEdit>
+#include <QRegularExpression>
 
 #include "qorderedmap.h"
 #include "qsvlangdef.h"
@@ -302,8 +303,8 @@ HANDLE_BLOCK_COMMENTS:
 	if (language->blockCommentsDefs.count() == 0)
 		return;
 
-	QRegExp startExpression( language->blockCommentsDefs.at(0).startRegex );
-	QRegExp endExpression  ( language->blockCommentsDefs.at(0).endRegex );
+    QRegularExpression startExpression( language->blockCommentsDefs.at(0).startRegex );
+    QRegularExpression endExpression  ( language->blockCommentsDefs.at(0).endRegex );
 	
 	int startIndex = 0;
 	if (previousBlockState() != 1)
@@ -311,6 +312,9 @@ HANDLE_BLOCK_COMMENTS:
 	
 	while (startIndex >= 0) 
 	{
+        auto m_start = startExpression.match(text, startIndex);
+        auto m_end = endExpression.match(text, startIndex+1);
+
 		int endIndex = text.indexOf(endExpression, startIndex);
 		int commentLength;
 		
@@ -322,7 +326,7 @@ HANDLE_BLOCK_COMMENTS:
 		else 
 		{
 			commentLength = endIndex - startIndex
-				+ endExpression.matchedLength();
+                    + m_start.capturedView().length();
 		}
 		setFormat( startIndex, commentLength, colors->getColorDef("dsComment").toCharFormat() );
 		startIndex = text.indexOf( startExpression, startIndex + commentLength );
@@ -402,8 +406,7 @@ void QsvSyntaxHighlighter::drawText( QString text, QString s, QTextCharFormat &f
 
 void QsvSyntaxHighlighter::drawRegExp( QString text, QString s, QTextCharFormat &format, Qt::CaseSensitivity caseSensitive )
 {	
-	QRegExp expression(s);
-	expression.setCaseSensitivity(caseSensitive);
+    QRegularExpression expression(s, QRegularExpression::CaseInsensitiveOption | QRegularExpression::DotMatchesEverythingOption);
 	int index = text.indexOf(expression, 0);
 
 #ifdef __DEBUG_HIGHLIGHT__
@@ -412,8 +415,9 @@ void QsvSyntaxHighlighter::drawRegExp( QString text, QString s, QTextCharFormat 
 
 	while (index >= 0)
 	{
-		int length = expression.matchedLength();
-		setFormat(index, length, format );
+        auto m = expression.match(text, index);
+        int length = m.capturedView().length();
+        setFormat(index, length, format );
 		index = text.indexOf(expression, index + length );
 	}
 }

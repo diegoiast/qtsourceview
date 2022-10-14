@@ -1,5 +1,4 @@
-#ifndef QSVTEXTEDIT_H
-#define QSVTEXTEDIT_H
+#pragma once
 
 #include <QPlainTextEdit>
 #include <QTextCharFormat>
@@ -168,5 +167,3 @@ protected:
 
 	QsvEditorConfigData m_config;
 };
-
-#endif // QSVTEXTEDIT_H

@@ -54,7 +54,7 @@ Qate::BlockData::LineFlags DefaultHighlighter::getBlockFlags(QTextBlock &block)
 {
 	Qate::BlockData *data = getBlockData(block);
 	if (data == nullptr)
-		return nullptr;
+		return Qate::BlockData::LineFlag::Empty;
 	return data->m_flags;
 }
 

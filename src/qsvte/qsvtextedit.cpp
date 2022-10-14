@@ -6,7 +6,6 @@
 #include <QAction>
 #include <QFile>
 #include <QFileInfo>
-#include <QTextCodec>
 #include <QTextStream>
 #include <QDebug>
 #include <QLabel>
@@ -297,13 +296,7 @@ int	QsvTextEdit::loadFile(const QString &fileName)
 		if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
 			return -1;
 		
-//		QTextCodec *c = m_config.textCodec;
-		QTextCodec *c = nullptr;
-		if (c == nullptr)
-			c = QTextCodec::codecForLocale();
-
 		QTextStream textStream(&file);
-		textStream.setCodec( c );
 		setPlainText( textStream.readAll() );
 		file.close();
 	
@@ -340,14 +333,8 @@ int	QsvTextEdit::saveFile(const QString &fileName)
 	if (!file.open(QIODevice::WriteOnly))
 		return false;
 
-	QTextCodec *c = nullptr;
-	//	QTextCodec *c = textCodec;
-	if (c == nullptr)
-		c = QTextCodec::codecForLocale();
 
 	QTextStream textStream(&file);
-	textStream.setCodec(c);
-
 	QTextBlock block = document()->begin();
 	while(block.isValid()) {
 //		if (endOfLine==KeepOldStyle){
@@ -581,6 +568,7 @@ void	QsvTextEdit::updateExtraSelections()
 	int relativePosition;
 	QChar currentChar;
 	Qate::BlockData *data;
+    QString textBlock;
 
 	selections = m_selections;
 	if (m_config.markCurrentLine) {
@@ -597,13 +585,18 @@ void	QsvTextEdit::updateExtraSelections()
 	if (!m_config.matchBrackets)
 		goto NO_MATCHES;
 	block             = cursor.block();
-	blockPosition     = block.position();
+    textBlock         = block.text();
+    if (textBlock.isEmpty())
+        return;
+    data              = dynamic_cast<Qate::BlockData*>(block.userData());
+    if (data == nullptr)
+        return;
+    blockPosition     = block.position();
 	cursorPosition    = cursor.position();
 	relativePosition  = cursorPosition - blockPosition;
-	currentChar       = block.text()[relativePosition];
-	data              = dynamic_cast<Qate::BlockData*>(block.userData());
-	if (data == nullptr)
-		return;
+    if (relativePosition >= textBlock.size())
+        return;
+    currentChar       = textBlock[relativePosition];
 
 	for ( int k=0; k<data->matches.length(); k++) {
 		Qate::MatchData m = data->matches.at(k);
@@ -766,7 +759,8 @@ void QsvTextEdit::setModifiedColor(const QColor &color)
 void	QsvTextEdit::paintEvent(QPaintEvent *e)
 {
 	if (m_config.showMargins) {
-		int position = fontMetrics().width(' ') * m_config.marginsWidth;
+		
+		int position = fontMetrics().size(Qt::TextSingleLine, " ").width() * m_config.marginsWidth;
 		QPainter p(viewport());
 		QPen     pen = p.pen();
 		QColor   c = pen.color();
@@ -1147,11 +1141,8 @@ uint	QsvTextEdit::getMarginsWidth() const
 void	QsvTextEdit::setTabSize( int size )
 {
 	m_config.tabSize = size;
-#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
-        setTabStopDistance(QFontMetricsF(font()).width(' ') * 4);
-#else
-        setTabStopWidth(fontMetrics().width(" ")*size);
-#endif
+	auto tabSize = fontMetrics().size(Qt::TextSingleLine, " ").width() * size;
+	setTabStopDistance(tabSize);
 }
 
 int	QsvTextEdit::getTabSize() const

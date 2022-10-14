@@ -1,5 +1,4 @@
-#ifndef QSV_SYNTAXHIGHLIGHTER_HEADER
-#define QSV_SYNTAXHIGHLIGHTER_HEADER
+#pragma once
 
 /**
  * \file qsvsyntaxhighlighter.h
@@ -51,5 +50,3 @@ private:
 	QsvLangDef		*language;
 	QOrderedMap<QString,QsvLanguageEntity> mappings;
 };
-
-#endif  // QSV_SYNTAXHIGHLIGHTER_HEADER

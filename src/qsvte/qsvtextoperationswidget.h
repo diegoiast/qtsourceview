@@ -1,12 +1,4 @@
-#ifndef QSVTEXTOPERATIONSWIDGET_H
-#define QSVTEXTOPERATIONSWIDGET_H
-
-// this is done to shut up warnings inside Qt Creator
-// if you remove it, the whole project gets marked with warnings
-// as it thinks QObject is not defined. WTF.
-class QObject;
-class QString;
-class QTextCursor;
+#pragma once
 
 #include <QObject>
 #include <QString>
@@ -79,5 +71,3 @@ public:
 	Ui::searchForm *searchFormUi;
 	Ui::replaceForm *replaceFormUi;
 };
-
-#endif // QSVTEXTOPERATIONSWIDGET_H

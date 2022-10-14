@@ -11,6 +11,7 @@
 #include <QDomDocument>
 #include <QDomNode>
 #include <QFile>
+#include <QRegularExpression>
 
 #include "qsvlangdef.h"
 
@@ -171,7 +172,7 @@ bool	QsvLangDef::load( QDomDocument doc )
 		QString value = n.attributes().item(i).nodeValue();
 		
 		if (name=="mimetypes")
-			mimeTypes = value.split(QRegExp("[;,]"));
+            mimeTypes = value.split(QRegularExpression("[;,]"));
 		else if (name=="extensions")
 			extensions = value.split(";");
 		else

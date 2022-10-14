@@ -1,5 +1,4 @@
-#ifndef __QSV_COLOR_DEF_H__
-#define __QSV_COLOR_DEF_H__
+#pragma once
 
 /**
  * \file qsvcolordef.h
@@ -35,5 +34,3 @@ public:
 private:
 	QMap<QString,QString> attributes;
 };
-
-#endif // __QSV_COLOR_DEF_H__

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language SYSTEM "language.dtd">
-<language _name="Qt project file" version="1.0" _section="Sources" mimetypes="text/x-pro" author="Diego Iastrubni (elcuco@kde.org)">
+<language _name="Qt project file" version="1.0" _section="Sources" mimetypes="text/x-pro" author="Diego Iastrubni (diegoiast@gmail.com)">
 	<escape-char>\</escape-char>
 
 	<line-comment _name = "Line Comment" style= "Comment">

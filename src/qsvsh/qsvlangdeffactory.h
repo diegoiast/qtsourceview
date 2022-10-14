@@ -1,5 +1,4 @@
-#ifndef __QSV_LANGDEF_FACTORY_H__
-#define __QSV_LANGDEF_FACTORY_H__
+#pragma once
 
 /**
  * \file qsvlangdeffactory.h
@@ -32,5 +31,3 @@ private:
 	QList<QsvLangDef*>		langList;
 	QMap<QString,QStringList>	mimeTypes;
 };
-
-#endif // __QSV_LANGDEF_FACTORY_H__

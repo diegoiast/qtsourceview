@@ -1,5 +1,4 @@
-#ifndef __QSV_LANG_DEF__
-#define __QSV_LANG_DEF__
+#pragma once
 
 /**
  * \file qsvlangdef.h
@@ -10,10 +9,10 @@
  */
 
 #include <QMap>
+#include <QStringList>
 
 class QDomDocument;
 class QString;
-class QStringList;
 
 class QDomNode;
 class QDomNodeList;
@@ -102,5 +101,3 @@ private:
 	QList<QsvEntityPatternItem>	patternItems; 
 	QList<QsvEntityBlockComment>	syntaxItemDefs; 
 };
-
-#endif // __QSV_LANG_DEF__

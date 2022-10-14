@@ -1,5 +1,4 @@
-#ifndef __QE_ORDERED_MAP_H__
-#define __QE_ORDERED_MAP_H__
+#pragma once
 
 #include <QString>
 #include <QList>
@@ -242,5 +241,3 @@ Value& QOrderedMap<Key, Value>::value( Key k )
 			return n.value;
 	}
 }
-
-#endif // __QE_ORDERED_MAP_H__

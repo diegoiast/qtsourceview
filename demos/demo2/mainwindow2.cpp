@@ -106,11 +106,11 @@ void MainWindow2::on_actionE_xit_triggered()
 }
 
 
-void MainWindow2::on_comboBox_colors_currentIndexChanged( const QString & text )
+void MainWindow2::on_comboBox_colors_currentIndexChanged(int index)
 {
 	if (disable_combo_updates)
 		return;
-			
+    auto text = this->comboBox_colors->itemText(index);
 #if 0
 	delete defColors;
 	defColors = new QsvColorDefFactory( dataPath + "/data/colors/" + text );
@@ -122,11 +122,11 @@ void MainWindow2::on_comboBox_colors_currentIndexChanged( const QString & text )
 	statusBar()->showMessage(tr("New color: %1").arg(text), 3000 );
 }
 
-void MainWindow2::on_comboBox_syntax_currentIndexChanged( const QString & text )
+void MainWindow2::on_comboBox_syntax_currentIndexChanged(int index)
 {
 	if (disable_combo_updates)
 		return;
-		
+    auto text = this->comboBox_colors->itemText(index);
 #if 0
 	delete defLang;
 	defLang = new QsvLangDef( dataPath + "/data/langs/" + text );

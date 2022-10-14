@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<itemDatas name="Kate" description="Color scheme compatible with Kate" version="1.0" author="Diego Iastrubni (elcuco@kde.org)" >
+<itemDatas name="Kate" description="Color scheme compatible with Kate" version="1.0" author="Diego Iastrubni (diegoiast@gmail.com)" >
 	<itemData defStyleNum="dsNormal"   name="Normal"         color="#000000" selColor="#ffffff" bold="0" italic="0" />
 	<itemData defStyleNum="dsKeyword"  name="Keyword"        color="#000000" selColor="#ffffff" bold="1" italic="0" />
 	<itemData defStyleNum="dsDataType" name="Data type"      color="#800000" selColor="#ffffff" bold="0" italic="0" />

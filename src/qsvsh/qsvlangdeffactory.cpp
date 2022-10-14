@@ -8,10 +8,10 @@
  */
  
 #include <QMessageBox>
-#include <QRegExp>
 #include <QFile>
 #include <QDir>
 #include <QTextStream>
+#include <QRegularExpression>
 
 #include "qsvlangdeffactory.h"
 #include "qsvlangdef.h"
@@ -128,22 +128,18 @@ QsvLangDef* QsvLangDefFactory::getHighlight( QString fileName )
 				continue;
 			}
 			
-			for ( int j=0; j<mimeTypes[langMimeType].count(); j ++ ) 
-			{
-				QString s = "*." + mimeTypes[langMimeType][j];
+            for (auto l: mimeTypes[langMimeType]) {
+                QString s = "*." + l;
 				
-				if	(
-						// match full names like Makefile, Doyxgen, Changelog, etc
-						(mimeTypes[langMimeType][j] == trimmedFileName) ||
-						// otherwise match by extensions
-						QDir::match( s, fileName) 
-					) // still the "if"
+                // match full names like Makefile, Doyxgen, Changelog, etc
+                // otherwise match by extensions
+                if	(l == trimmedFileName ||QDir::match( s, trimmedFileName))
 				{
 #ifdef __DEBUG_FOUND_LANG_DEF__
 					qDebug( "%s %d - Found language definition %s [%s,%s]",
 						__FILE__, __LINE__,
 						qPrintable(langDef->getName()),
-						qPrintable(fileName), qPrintable( "*" + mimeTypes[langMimeType][j] )
+                        qPrintable(fileName), qPrintable( "*" + l )
 					);
 #endif
 					return langDef;
@@ -287,7 +283,7 @@ bool	QsvLangDefFactory::addMimeTypes( QString fileName )
 		if (line.startsWith("#"))
 			continue;
 
-		QStringList l = line.split( QRegExp("\\s+") );
+        QStringList l = line.split( QRegularExpression("\\s+") );
 		QString     name = l[0];
 		l.removeAt( 0 );
 
