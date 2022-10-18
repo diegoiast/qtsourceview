@@ -526,7 +526,12 @@ void	QsvTextEdit::gotoMatchingBracket()
 	int blockPosition     = block.position();
 	int cursorPosition    = cursor.position();
 	int relativePosition  = cursorPosition - blockPosition;
-	QChar currentChar     = block.text()[relativePosition];
+    auto textBlock = block.text();
+
+    if (relativePosition == textBlock.size())
+        relativePosition --;
+
+    QChar currentChar     = textBlock[relativePosition];
 	
 	// lets find it's partner
 	// in theory, no errors shuold not happen, but one can never be too sure
@@ -594,8 +599,8 @@ void	QsvTextEdit::updateExtraSelections()
     blockPosition     = block.position();
 	cursorPosition    = cursor.position();
 	relativePosition  = cursorPosition - blockPosition;
-    if (relativePosition >= textBlock.size())
-        return;
+    if (relativePosition == textBlock.size())
+        relativePosition --;
     currentChar       = textBlock[relativePosition];
 
 	for ( int k=0; k<data->matches.length(); k++) {
