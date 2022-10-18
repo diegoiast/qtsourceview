@@ -293,8 +293,10 @@ int	QsvTextEdit::loadFile(const QString &fileName)
 		QFile file(fileName);
 		QFileInfo fileInfo(file);
 		
-		if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            QApplication::restoreOverrideCursor();
 			return -1;
+        }
 		
 		QTextStream textStream(&file);
 		setPlainText( textStream.readAll() );
