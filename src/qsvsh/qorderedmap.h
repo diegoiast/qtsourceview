@@ -118,13 +118,12 @@ void QOrderedMap<Key, Value>::remove( Key k )
 	QOrderedMapNode<Key, Value> n;
 	foreach( n, nodes )
 	{
-		i ++;
-		if (n.key == k )
+	        if (n.key == k)
 		{
-			//nodes.erase( n );
 			nodes.removeAt( i );
 			return;
-		}
+        	}
+        	i++;
 	}
 }
 
